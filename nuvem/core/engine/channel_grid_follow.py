@@ -336,6 +336,8 @@ def _replaceable(row, wall_idx, squares, margin):
     cand = row["cand"]
     if cand.get("wall_idx") != wall_idx or not row["along"] or row["tie"] or cand.get("converted_tie"):
         return False
+    if _orf.is_b54_cinta_piece(cand):
+        return False   # SECAO 86.16: U34 + U19 do B54 da cinta fica (parada, como o no')
     code = cand.get("logical_code")
     if not (code in FOLLOW_CODES or is_target_channel(cand)):
         return False
@@ -1369,7 +1371,7 @@ def _check_invariants(ctx, pieces, chosen, seg_rows, zones, squares):
     for lo, hi, cand in pieces:
         if _orf.is_channel_code(cand.get("logical_code")) and _orf._square_hit(lo, hi, squares, margin) is not None:
             return "CHANNEL_AT_NODE"
-    if not _orf.half_channel_allowed() and any(_orf.is_half_channel_piece(c) for _lo, _hi, c in pieces):
+    if not _orf.half_channel_allowed() and any(_orf.is_forbidden_half_channel_piece(c) for _lo, _hi, c in pieces):
         return "HALF_CHANNEL"   # SECAO 86.14
     for z in zones:
         if not any(_orf.is_channel_code(c.get("logical_code")) for lo, hi, c in pieces

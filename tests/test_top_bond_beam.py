@@ -159,23 +159,29 @@ def test_cinta_continua_sobre_os_vaos_sem_fiada_de_bloco_ate_a_verga(estrategia)
 @pytest.mark.parametrize("estrategia", ESTRATEGIAS)
 @pytest.mark.parametrize("nome", ["tee", "l_corner"])
 def test_cinta_mantem_o_bloco_de_amarracao_no_quadrado_do_no(nome, estrategia):
-    """Variante A: no quadrado do no' continua o B34/B54 (canaleta nunca amarra)."""
+    """Variante A: no quadrado do no' continua o B34 (canaleta nunca amarra). SECAO 86.16
+    (correcao do usuario 2026-10-08, excecao a' regra 75 so' para o B54 da ultima fiada): o
+    B54 de amarracao do T vira U34 + U19 marcadas; todas as outras amarracoes ficam iguais."""
     com, walls, nodes, _o = _solve(nome, estrategia)
     sem, walls0, _n0, _o0 = _solve(nome, estrategia, beam=False)
     tb = com["top_bond_beam"]
-    assert tb["counts"]["kept_tie"] >= 1
+    assert tb["counts"]["kept_tie"] + tb["counts"]["b54_cinta_tie_split"] >= 1
     assert tb["audit"]["counts"]["TOP_BOND_BEAM_CHANNEL_AT_NODE"] == 0
     assert tb["audit"]["counts"]["TOP_BOND_BEAM_TIE_ROLE"] == 0
     assert tb["audit"]["counts"]["TOP_BOND_BEAM_BLOCK_NOT_CONVERTED"] == 0
-    # toda peca de amarracao da ultima fiada continua igual (codigo e posicao)
-    amarracoes = lambda res: sorted(orf._physical_key(c) for c in res["course_candidates"][TOP] if orf._is_tie(c))
-    assert amarracoes(com) and amarracoes(com) == amarracoes(sem)
+    # toda peca de amarracao da ultima fiada que nao e' B54 continua igual (codigo e posicao)
+    amarracoes = lambda res: sorted(orf._physical_key(c) for c in res["course_candidates"][TOP]
+                                    if orf._is_tie(c) and c["logical_code"] != "B54")
+    assert amarracoes(com) == amarracoes(sem)
+    assert amarracoes(com) or tb["counts"]["b54_cinta_tie_split"] >= 1
     assert not [c for c in com["course_candidates"][TOP] if orf._is_tie(c) and orf.is_channel_code(c["logical_code"])]
-    # nenhuma canaleta da cinta dentro do quadrado de um no' (geometria do grafo)
+    assert not [c for c in com["course_candidates"][TOP] if c["logical_code"] == "B54"]   # 86.16
+    # nenhuma canaleta da cinta dentro do quadrado de um no' (geometria do grafo), exceto a U34/U19
+    # do B54 da cinta (86.16)
     for wi in range(len(walls)):
         quadrados = orf._node_squares_cm(walls, nodes, wi)
         for r in _own(_rows(com, walls, wi, TOP), wi):
-            if orf.is_top_bond_beam_piece(r["cand"]):
+            if orf.is_top_bond_beam_piece(r["cand"]) and not orf.is_b54_cinta_piece(r["cand"]):
                 assert orf._square_hit(r["lo"], r["hi"], quadrados, 0.5) is None, (wi, r["lo"], r["hi"])
     # os gates de amarracao nao mudam: regra 75 vazia e 76.1 igual
     assert com["channel_as_junction_bond"] == []
@@ -290,12 +296,14 @@ def _peca(code, lo, hi, reason="STANDARD_FILL", z=241.0, wall_idx=0):
     return ws._make_block_candidate(code, CAT[code], TOP, origin, m.XYZ(1.0, 0.0, 0.0), reason, wall_idx=wall_idx)
 
 
-@pytest.mark.parametrize("half", [True, False])
-def test_planejador_funde_compensador_divide_b54_de_preenchimento_e_mantem_amarracao(half, monkeypatch):
+@pytest.mark.parametrize("half,b54", [(True, True), (False, False), (False, True)])
+def test_planejador_funde_compensador_divide_b54_de_preenchimento_e_mantem_amarracao(half, b54, monkeypatch):
     """half=True: contrato original da 86.7 (B54 -> U34+U19, B19+C09 -> U_CUT 29) com a
-    meia canaleta religada. half=False (padrao, SECAO 86.14): sem meia canaleta - B54 ->
-    U_CUT 14 + U39 e o B19+C09 completado com o B39 vizinho em U34+U34 (sem U_CUT)."""
+    meia canaleta religada. half=False (SECAO 86.14): sem meia canaleta - o B19+C09
+    completado com o B39 vizinho em U34+U34 (sem U_CUT); o B54 da ultima fiada vira
+    U34 + U19 com a 86.16 ligada (padrao) e U_CUT 14 + U39 sem ela."""
     monkeypatch.setattr(orf, "CHANNEL_HALF_U19_ENABLED", half)
+    monkeypatch.setattr(orf, "TOP_BOND_BEAM_B54_AS_CHANNEL", b54)
     walls = [(seg(0, 0, 400, 0), ft(14.0), (False, False))]
     verga = dict(_peca("B39", 300.0, 339.0), logical_code=orf.CHANNEL_U_39,
                  reinforcement={"roles": [orf.ROLE_ABOVE_OPENING], "run_id": "x"})
@@ -323,10 +331,18 @@ def test_planejador_funde_compensador_divide_b54_de_preenchimento_e_mantem_amarr
         assert ("CHANNEL_U_CUT", 170.0, 199.0) in got
         assert ("CHANNEL_U_39", 200.0, 239.0) in got
     else:
-        # 86.14: B54 -> U_CUT 14 + U39 (sem U19) e B19 + C09 + B39 = U34 + U34 (sem U_CUT)
-        assert sorted(g[0] for g in split) == ["CHANNEL_U_39", "CHANNEL_U_CUT"]
+        if b54:
+            # 86.16 (padrao): o B54 da ultima fiada vira U34 + U19 - a unica U19 permitida
+            assert sorted(g[0] for g in split) == ["CHANNEL_U_19", "CHANNEL_U_34"]
+            assert all(orf.is_b54_cinta_piece(r["cand"]) for r in rows if 115.0 - 0.1 <= r["lo"]
+                       and r["hi"] <= 169.0 + 0.1)
+            assert orf.half_channel_audit(plano["course_candidates"])["counts"]["CHANNEL_U_19_B54_CINTA"] == 1
+        else:
+            # 86.14 sem a 86.16: B54 -> U_CUT 14 + U39 (sem U19)
+            assert sorted(g[0] for g in split) == ["CHANNEL_U_39", "CHANNEL_U_CUT"]
+            assert not any(orf.is_half_channel_piece(r["cand"]) for r in rows)
+        # 86.14: B19 + C09 + B39 = U34 + U34 (sem U_CUT)
         assert ("CHANNEL_U_34", 170.0, 204.0) in got and ("CHANNEL_U_34", 205.0, 239.0) in got
-        assert not any(orf.is_half_channel_piece(r["cand"]) for r in rows)
         assert orf.half_channel_audit(plano["course_candidates"])["counts"]["total"] == 0
         assert plano["counts"]["half_channel_resplits"] == 1
     assert ("CHANNEL_U_39", 300.0, 339.0) in got                 # a verga fica como esta'
@@ -337,13 +353,16 @@ def test_planejador_funde_compensador_divide_b54_de_preenchimento_e_mantem_amarr
     assert len(beam) == c["channel_pieces"] == 6
     assert all(x["reinforcement"]["roles"] == [orf.ROLE_TOP_BOND_BEAM] for x in beam)
     assert orf.channel_as_junction_bond(plano["course_candidates"]) == []
-    cortada = [x for x in beam if x["logical_code"] == orf.CHANNEL_U_CUT][0]
+    cortadas = [x for x in beam if x["logical_code"] == orf.CHANNEL_U_CUT]
     if half:
-        assert cortada["instance_length_cm"] == pytest.approx(29.0)
-        assert cortada["reinforcement"]["source_codes"] == ["B19", "C09"]
+        assert cortadas[0]["instance_length_cm"] == pytest.approx(29.0)
+        assert cortadas[0]["reinforcement"]["source_codes"] == ["B19", "C09"]
     else:
-        assert cortada["instance_length_cm"] == pytest.approx(14.0)
-        assert cortada["reinforcement"]["source_codes"] == ["B54_SPLIT"]
+        if b54:
+            assert cortadas == []
+        else:
+            assert cortadas[0]["instance_length_cm"] == pytest.approx(14.0)
+            assert cortadas[0]["reinforcement"]["source_codes"] == ["B54_SPLIT"]
         recomp = [x for x in beam if x["reinforcement"].get("half_channel_resplit")]
         assert sorted(tuple(x["reinforcement"]["source_codes"]) for x in recomp) == [("B19", "C09", "B39"), ("B39",)]
     assert sorted(x["reinforcement"]["source_codes"][0] for x in beam
@@ -355,14 +374,16 @@ def test_auditoria_acusa_canaleta_no_quadrado_do_no_mutante():
     a variante B faria) e' acusada pela auditoria independente."""
     com, walls, nodes, _o = _solve("tee", None)
     cc = dict((ci, list(p)) for ci, p in com["course_candidates"].items())
-    tie = [c for c in cc[TOP] if orf._is_tie(c) and c.get("wall_idx") == 0][0]
+    # (SECAO 86.16: o B54 do T na ultima fiada ja' e' U34 + U19 marcadas - a peca do no' sem a
+    # marca da excecao e' o mutante)
+    tie = [c for c in cc[TOP] if (orf._is_tie(c) or orf.is_b54_cinta_piece(c)) and c.get("wall_idx") == 0][0]
     mutante = dict(tie, logical_code=orf.CHANNEL_U_CUT, placement_reason="STANDARD_FILL",
                    reinforcement={"roles": [orf.ROLE_TOP_BOND_BEAM]})
     cc[TOP] = [mutante if c is tie else c for c in cc[TOP]]
     audit = orf.top_bond_beam_audit(cc, walls, nodes, TOP)
     assert audit["counts"]["TOP_BOND_BEAM_CHANNEL_AT_NODE"] >= 1
     # e a mesma peca com a razao de amarracao e' acusada pela regra 75
-    cc[TOP] = [dict(mutante, placement_reason=tie["placement_reason"]) if c is mutante else c for c in cc[TOP]]
+    cc[TOP] = [dict(mutante, placement_reason="T_INTERSECTION_MAIN") if c is mutante else c for c in cc[TOP]]
     assert orf.top_bond_beam_audit(cc, walls, nodes, TOP)["counts"]["TOP_BOND_BEAM_TIE_ROLE"] >= 1
     assert orf.channel_as_junction_bond(cc)
 

@@ -3941,6 +3941,10 @@ OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = True
 # SECAO 86.14 (correcao do usuario 2026-10-05): o B19->U19 / B54->U34+U19 acima
 # so' vale com opening_reinforcement.CHANNEL_HALF_U19_ENABLED = True; no padrao
 # (False) nao existe meia canaleta - o trecho fecha com U39/U34 (+ um U_CUT >= 9).
+# SECAO 86.16 (correcao do usuario 2026-10-08, chave
+# opening_reinforcement.TOP_BOND_BEAM_B54_AS_CHANNEL = True): na ultima fiada TODO B54
+# (inclusive o de amarracao do no' T) vira U34 + U19 - a unica U19 permitida; o B34
+# de amarracao no quadrado do no' continua bloco (excecao a' 75/76.1 so' para o B54).
 TOP_BOND_BEAM_ENABLED = True
 # SECAO 86.12 (correcao do usuario 2026-10-05, REGRA OBRIGATORIA) - A CANALETA
 # SEGUE A GRADE DA FIADA DE MESMA PARIDADE ABAIXO: em toda fiada com canaleta

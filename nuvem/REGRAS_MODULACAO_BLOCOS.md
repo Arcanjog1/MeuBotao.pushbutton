@@ -11936,6 +11936,10 @@ verga; a U19 é `MEIA CANALETA - 14x19x19` em `CHANNEL_FAMILY_CATALOG_DEFINITION
   o B19 é fundido à vizinha como compensador (B19+C04 = U_CUT 24, B19+C09 = U_CUT 29, B19+B19 = U39) e o que sobra
   sozinho é refeito com as vizinhas em U39/U34 + no máximo um U_CUT ≥ 9 cm; o B54 de preenchimento vira U39 +
   U_CUT 14. Trecho de 19 cm sem recomposição fica bloco (`TOP_BOND_BEAM_HALF_BLOCK_KEPT`). Detalhes na §86.14.
+- **ATUALIZADA pela §86.16 (correção do usuário 2026-10-08, "bloco 54 na última fiada deve virar uma canaleta 34 e
+  uma canaleta 19"):** na última fiada TODO B54 — inclusive o B54 de amarração do nó T — vira U34 + U19 (a junta a
+  mais desencontrada da fiada c−1 e coerente com a grade). CONFLITO com a variante A (item 2) **só para o B54**: o
+  B34 de amarração no quadrado do nó continua bloco. Exceção à §75/§76.1 restrita a essas peças.
 - §51.10 ("a estratégia CHANNEL não gera TOP_BOND_BEAM", cinta PENDENTE no item F de 2026-09-14): a cinta passa a
   ser gerada como mecanismo **separado** do reforço de abertura, nos dois caminhos; a separação de papéis e a
   ocupação única continuam.
@@ -12404,8 +12408,8 @@ espelhamento e divisão do B54).
   B19+vão+C09 de 89 cm (W1 f12) → U_CUT 14 sobre o vão; B19 na ponta (W5 f12) → U34 + U_CUT 24.
 - **DOCUMENTADO — pendências**:
   1. A família "MEIA CANALETA - 14x19x19" continua na lista obrigatória de `CHANNEL_FAMILY_CATALOG_DEFINITIONS`
-     (a falta dela ainda bloqueia o reforço com `CHANNEL_FAMILY_MISSING`), embora o motor não a use mais —
-     tirar da lista é decisão de integração (pendência de código aberta).
+     (a falta dela bloqueia o reforço com `CHANNEL_FAMILY_MISSING`). Desde a §86.16 ela volta a ser usada (só no
+     B54 da cinta de topo), então deve continuar na lista.
   2. Medição no pavimento: o integrador roda o cálculo completo e mede U19 = 0 (`half_channel_audit` /
      `CHANNEL_HALF_PIECE`), juntas duras atravessadas = 0 e U_CUT (régua `diag_soft.py`, ao lado de `diag_user.py`
      sobre o mesmo `rows_*.json`), além de `diag_user.py` e `r4_score.py`. A régua antiga `diag_joints.py` (junta de
@@ -12420,3 +12424,56 @@ espelhamento e divisão do B54).
   `tests/test_channel_reinforcement.py::test_door_gets_channel_course_on_head_and_nothing_else_changes_geometrically`
   ("o planejador nunca cria junta nova" vale agora exceto na canaleta recomposta pela 86.14, marcada
   `half_channel_resplit` — ali o C04 sozinho na ponta deixou de ser U_CUT 4 e virou U34 + U_CUT 9).
+- **ATUALIZADA pela §86.16 (correção do usuário 2026-10-08):** o B54 da ÚLTIMA fiada (amarração do nó T e
+  preenchimento) vira **U34 + U19** — é a única U19 permitida; o item 5 desta subseção (B54 → U39 + U_CUT 14) passa a
+  valer só para a cinta com a chave `TOP_BOND_BEAM_B54_AS_CHANNEL` desligada. O resto da §86.14 continua.
+
+### 86.16 B54 da ÚLTIMA fiada = U34 + U19 — inclusive o B54 de amarração do nó T (correção do usuário, 2026-10-08) — REGRA OBRIGATÓRIA; EXCEÇÃO à §75/§76.1 e à §86.14 só para essa peça; IMPLEMENTADO (chave `TOP_BOND_BEAM_B54_AS_CHANNEL = True`)
+
+- **Rótulo**: **REGRA OBRIGATÓRIA** — AMARRAÇÃO (peça do nó na cinta de topo). Decidida pelo usuário como
+  **exceção** à §75 ("canaleta nunca exerce função de amarração") e à §76.1 (amarração obrigatória do nó) **só**
+  para o B54 da última fiada; complementa a §86.14 (a meia canaleta continua proibida em todo o resto).
+- **Correção do usuário (2026-10-08)**, palavras dele: "bloco 54 na última fiada deve virar uma canaleta 34 e uma
+  canaleta 19".
+- **A regra**:
+  1. Na **última fiada** (cinta de topo, `TOP_BOND_BEAM`, §86.7) **todo B54** — o B54 de amarração do nó T e o B54 de
+     preenchimento — vira **U34 + U19** com a mesma extensão do B54. É o **único** lugar onde a U19 (MEIA CANALETA)
+     existe; sobre meio bloco/compensador da fiada de baixo continua a §86.14 (U34/U39, sem U19).
+  2. **Posição da junta U34|U19** (como a §86.7 já fazia no B54 de preenchimento), nesta ordem: desencontrada das
+     juntas da fiada c−1 (≥ 1,5 cm, regra #1); coincidente com uma junta da grade da fiada c−2 (§86.12); a mais
+     desencontrada; U34 primeiro no eixo. **O usuário pediu TODO B54**: quando as duas divisões coincidem com c−1
+     a divisão sai assim mesmo, com achado `TOP_BOND_BEAM_B54_JOINT_COINCIDENT` (no B54 centrado no T as duas
+     juntas possíveis — a 19,5 cm de cada ponta — caem nas FACES da parede que chega, onde a c−1 tem a peça
+     transversal; medido na fixture `tee`: junta em 309,5 = face do T). PADRÃO OBSERVADO a confirmar com o usuário:
+     se essa junta na face do T for indesejada, a alternativa é deixar o B54 de nó como bloco nesses casos.
+  3. O **B34 de amarração** no quadrado do nó da última fiada **continua BLOCO** (variante A da §86.7) — só o B54
+     muda.
+  4. As peças U34/U19 do B54 nunca recebem compensador fundido (§51.3) e o passe da §86.12 não as troca (são
+     parada, como o nó).
+- **Exceções restritas nos gates** (só peça marcada `reinforcement.b54_cinta = "86.16"`, papel único
+  `TOP_BOND_BEAM`, código U34/U19, com a chave ligada): `channel_as_junction_bond` (§75) não a acusa (ela leva razão
+  própria `TOP_BOND_BEAM_B54_SPLIT`, não é peça de nó); `top_bond_beam_audit` não conta
+  `TOP_BOND_BEAM_CHANNEL_AT_NODE` / `_TIE_ROLE` para ela (conta à parte `b54_cinta_at_node`); a auditoria §76.1
+  (`wall_stepper.junction_bond_audit`) aceita como amarrada a região do nó coberta ≥ 85 % por essas canaletas (a
+  junta de 1 cm pode cair dentro do quadrado); `half_channel_audit` / `CHANNEL_HALF_PIECE` não contam essa U19
+  (`CHANNEL_U_19_B54_CINTA` à parte). Fora disso tudo continua igual.
+- **CONFLITO registrado**: com a **variante A da §86.7** ("no quadrado de cada nó continua o BLOCO de amarração"),
+  **só para o B54** — vale a correção mais recente do usuário. Aproxima o humano (variante B da §86.7: B54→U34+U19
+  no nó), sem adotar a variante B para o B34 nem a canaleta passando sobre o nó.
+- **Implementação**: `opening_reinforcement.plan_top_bond_beam` (`_b54_cinta_split_rows`, `_finish_b54_cinta_piece`,
+  contagens `b54_cinta_split` / `b54_cinta_tie_split`), `is_b54_cinta_piece`, `is_forbidden_half_channel_piece`;
+  `channel_grid_follow._replaceable`; `wall_stepper.junction_bond_audit` (`B54_CINTA_MIN_NODE_COVERAGE = 0,85`). O B54
+  do T pode estar gravado na parede que chega (`secondary_wall_idx`) — é processado na parede onde está ao longo.
+  Chave desligada = comportamento da §86.14 (B54 de amarração fica bloco; B54 de preenchimento U39 + U_CUT 14).
+- **Medido** (offline; o cálculo completo do pavimento NÃO foi rodado): fixture `tee` (T a 80 cm, 13 fiadas, nos dois
+  caminhos): B54 de amarração [275–329] da f12 → `U34 [275–309] + U19 [310–329]`; regra 75 vazia, 76.1 sem caso novo,
+  auditoria da cinta 0/0, validação sem meia canaleta proibida, auditorias de amarração aprovadas, materialização
+  limpa; fixture `l_corner`: B34 de amarração da f12 continua bloco, nenhuma U19. Planejador isolado: B54 de
+  preenchimento → U19 + U34 com a junta a 20 cm da junta de baixo (a outra divisão ficaria a 5 cm); sem junta de
+  baixo por perto, vence a junta que coincide com a grade da c−2.
+- **Pendência**: medir no pavimento (integrador): número de B54 da f12 convertidos, `CHANNEL_U_19_B54_CINTA`,
+  `TOP_BOND_BEAM_B54_JOINT_COINCIDENT`, 76.1 e regra 75 iguais ao estado sem a §86.16; conferir no Revit que a
+  família "MEIA CANALETA - 14x19x19" está carregada (volta a ser usada).
+- Testes: `tests/test_b54_cinta_86_16.py` (B54 de nó e de preenchimento na última fiada → U34+U19; B34 de nó continua
+  bloco; gates aprovam; nenhuma U19 fora do B54 da cinta; junta pela c−1 e pela grade; chave desligada;
+  determinismo); `tests/test_top_bond_beam.py` (planejador nos modos legado / 86.14 sem a 86.16 / 86.16).

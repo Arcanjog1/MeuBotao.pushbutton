@@ -110,9 +110,40 @@ SECTION_NO_HALF_CHANNEL = "86.14"
 SPLIT_B54_NO_HALF_LENGTHS_CM = (39.0, 14.0)
 
 
+# SECAO 86.16 (correcao do usuario 2026-10-08, REGRA OBRIGATORIA - excecao a' 86.14
+# e a' regra 75/76.1 SO' para o B54 da cinta de topo): "bloco 54 na ultima fiada deve
+# virar uma canaleta 34 e uma canaleta 19". Na ULTIMA fiada (TOP_BOND_BEAM) TODO B54 -
+# inclusive o B54 de amarracao do no' T - vira U34 + U19, com a junta U34|U19 a mais
+# desencontrada das juntas da fiada c-1 e coerente com a grade da fiada c-2. A U19 so'
+# existe nesse caso; o B34 de amarracao no quadrado do no' continua BLOCO (variante A).
+# Os gates (75, 76.1, auditoria da cinta, meia canaleta) aceitam SO' essas pecas
+# (marca `reinforcement.b54_cinta = "86.16"`, papel TOP_BOND_BEAM, U34/U19). False =
+# comportamento da 86.14 (B54 de amarracao fica bloco; B54 de preenchimento U39+U_CUT14).
+# Ver a secao 86.16 de nuvem/REGRAS_MODULACAO_BLOCOS.md.
+TOP_BOND_BEAM_B54_AS_CHANNEL = True
+B54_CINTA_SECTION = "86.16"
+B54_CINTA_SPLIT_LENGTHS_CM = (34.0, 19.0)
+B54_CINTA_REASON = "TOP_BOND_BEAM_B54_SPLIT"
+
+
 def half_channel_allowed():
     """SECAO 86.14: a meia canaleta (U19) so' existe com a chave religada."""
     return bool(CHANNEL_HALF_U19_ENABLED)
+
+
+def b54_cinta_enabled():
+    """SECAO 86.16: B54 da ultima fiada vira U34 + U19."""
+    return bool(TOP_BOND_BEAM_B54_AS_CHANNEL)
+
+
+def is_b54_cinta_piece(candidate):
+    """Canaleta U34/U19 da cinta de topo que veio de um B54 da ultima fiada (86.16) -
+    a UNICA peca isenta da proibicao da meia canaleta (86.14) e dos gates de
+    amarracao (75/76.1) no quadrado do no'."""
+    rein = (candidate or {}).get("reinforcement") or {}
+    return (b54_cinta_enabled() and rein.get("b54_cinta") == B54_CINTA_SECTION
+            and list(rein.get("roles") or []) == [ROLE_TOP_BOND_BEAM]
+            and candidate.get("logical_code") in (CHANNEL_U_34, CHANNEL_U_19))
 
 
 def is_half_channel_length(length_cm):
@@ -136,15 +167,27 @@ def is_half_channel_piece(candidate):
     return False
 
 
+def is_forbidden_half_channel_piece(candidate):
+    """Meia canaleta proibida: U19 / U_CUT de 19 fora da excecao do B54 da cinta
+    (86.16), com a 86.14 ligada."""
+    return (not half_channel_allowed() and is_half_channel_piece(candidate)
+            and not is_b54_cinta_piece(candidate))
+
+
 def half_channel_audit(course_candidates):
     """SECAO 86.14 - auditoria independente: meias canaletas (U19 e U_CUT de 19 cm)
-    nas fiadas. Devolve {"counts": {"CHANNEL_U_19", "CHANNEL_U_CUT_19", "total"},
-    "items": [...]}. Com a chave desligada (padrao) o aceitavel e' total == 0."""
-    counts = {"CHANNEL_U_19": 0, "CHANNEL_U_CUT_19": 0, "total": 0}
+    nas fiadas. Devolve {"counts": {"CHANNEL_U_19", "CHANNEL_U_CUT_19", "total",
+    "CHANNEL_U_19_B54_CINTA"}, "items": [...]}. A U19 do B54 da cinta de topo (86.16)
+    e' contada a parte e NAO entra no total. Com a chave desligada (padrao) o
+    aceitavel e' total == 0."""
+    counts = {"CHANNEL_U_19": 0, "CHANNEL_U_CUT_19": 0, "total": 0, "CHANNEL_U_19_B54_CINTA": 0}
     items = []
     for ci in sorted(course_candidates or {}):
         for cand in (course_candidates or {}).get(ci) or []:
             if not is_half_channel_piece(cand):
+                continue
+            if is_b54_cinta_piece(cand):
+                counts["CHANNEL_U_19_B54_CINTA"] += 1
                 continue
             key = "CHANNEL_U_19" if cand.get("logical_code") == CHANNEL_U_19 else "CHANNEL_U_CUT_19"
             counts[key] += 1
@@ -295,6 +338,10 @@ def channel_as_junction_bond(course_candidates, report=None):
             code = cand.get("logical_code")
             reason = str(cand.get("placement_reason") or "")
             if code not in canal:
+                continue
+            if is_b54_cinta_piece(cand):
+                # SECAO 86.16 (excecao decidida pelo usuario a' regra 75, SO' para o B54
+                # da cinta de topo): U34 + U19 no lugar do B54 da ultima fiada
                 continue
             if _is_tie(cand) or cand.get("converted_tie") or reason == "CHANNEL_NODE_CROSSING":
                 violations.append({"kind": "CHANNEL_PIECE_WITH_TIE_ROLE", "course_index": ci,
@@ -798,13 +845,14 @@ def _group_run_members(members, policy):
         options = []
         if groups:
             last = groups[-1]
-            if row["lo"] - last[-1]["hi"] <= gap:
+            # SECAO 86.16: a U34/U19 do B54 da cinta nunca recebe compensador fundido
+            if row["lo"] - last[-1]["hi"] <= gap and not any(x.get("b54_cinta") for x in last):
                 length = row["hi"] - last[0]["lo"]
                 if _merge_length_ok(length, max_len):
                     options.append((0 if _standard_code_for_length(length) else 1, 0, "LEFT"))
         if k + 1 < n:
             nxt = members[k + 1]
-            if nxt["lo"] - row["hi"] <= gap:
+            if nxt["lo"] - row["hi"] <= gap and not nxt.get("b54_cinta"):
                 length = nxt["hi"] - row["lo"]
                 if _merge_length_ok(length, max_len):
                     options.append((0 if _standard_code_for_length(length) else 1, 1, "RIGHT"))
@@ -958,7 +1006,8 @@ def _avoid_half_channel_groups(groups, adjacent_joints, policy, walls_to_create=
         baseline = None
         mandatory = True
         for k, g in enumerate(groups):
-            if id(g) not in skip and is_half_channel_length(g[-1]["hi"] - g[0]["lo"]):
+            if id(g) not in skip and is_half_channel_length(g[-1]["hi"] - g[0]["lo"]) and \
+                    not any(row.get("b54_cinta") for row in g):   # U19 do B54 da cinta (86.16)
                 target = k
                 break
         if target is None:
@@ -1141,6 +1190,67 @@ def _tie_split_rows(row, walls_to_create, wall_idx, adjacent_joints, policy):
         parts.append({"cand": cand, "lo": lo, "hi": hi, "along": True, "eligible": True, "tie": False,
                       "split_of": tie})
     return parts
+
+
+def _b54_cinta_split_rows(row, walls_to_create, wall_idx, below_joints, grid_joints, policy):
+    """SECAO 86.16 - B54 da ultima fiada (amarracao ou preenchimento) dividido em
+    U34 + U19 (ou U19 + U34). Junta nova, nesta ordem: desencontrada das juntas da
+    fiada c-1 (>= tie_split_min_stagger_cm, regra #1); coincidente com uma junta da
+    grade da fiada c-2 (86.12); a mais desencontrada; U34 primeiro no eixo. O usuario
+    pediu TODO B54 - quando as duas divisoes coincidem com c-1 (o B54 centrado no T:
+    as duas juntas possiveis caem nas faces da parede que chega, onde a fiada c-1 tem
+    a peca transversal) a divisao sai assim mesmo e a parte 0 leva `stagger_cm` para
+    o achado. None so' quando a peca nao e' um B54 (54 = 34 + 1 + 19)."""
+    joint = policy["course_joint_cm"]
+    total = row["hi"] - row["lo"]
+    tol = policy.get("tie_split_min_stagger_cm", 1.5)
+    best = None
+    for l1 in B54_CINTA_SPLIT_LENGTHS_CM:
+        l2 = total - l1 - joint
+        if abs(l2 - (B54_CINTA_SPLIT_LENGTHS_CM[0] + B54_CINTA_SPLIT_LENGTHS_CM[1] - l1)) > 0.6:
+            continue   # nao e' um B54 (54 = 34 + 1 + 19)
+        t = row["lo"] + l1 + joint / 2.0
+        stagger = min([abs(t - a) for a in below_joints or []] or [1e9])
+        grade = 0 if any(abs(t - g) <= 0.6 for g in grid_joints or []) else 1
+        key = (0 if stagger >= tol else 1, grade, -round(min(stagger, 1e6), 3), 0 if l1 > 20.0 else 1)
+        if best is None or key < best[0]:
+            best = (key, l1, l2, stagger)
+    if best is None:
+        return None
+    _key, l1, l2, best_stagger = best
+    p0, _p1, wall_dir, _len_ft, _th = _wall_axis_and_length(walls_to_create, wall_idx)
+    tie = row["cand"]
+    old_center_t = (tie["origin_world"] - p0).DotProduct(wall_dir)
+    parts = []
+    for lo, hi in ((row["lo"], row["lo"] + l1), (row["hi"] - l2, row["hi"])):
+        cand = dict(tie)
+        cand["logical_code"] = TIE_SPLIT_CODE
+        cand["length_cm"] = hi - lo
+        cand["cells_world"] = []
+        cand["origin_world"] = tie["origin_world"] + wall_dir * (_cm_to_ft((lo + hi) / 2.0) - old_center_t)
+        parts.append({"cand": cand, "lo": lo, "hi": hi, "along": True, "eligible": True, "tie": False,
+                      "split_of": tie, "b54_cinta": True, "b54_tie": bool(row.get("tie"))})
+    parts[0]["stagger_cm"] = round(min(best_stagger, 1e6), 3)
+    parts[0]["joint_cm"] = round(row["lo"] + l1 + joint / 2.0, 3)
+    return parts
+
+
+def _finish_b54_cinta_piece(piece, group):
+    """SECAO 86.16: a parte do B54 da cinta sai U34 ou U19 (a meia canaleta e'
+    permitida SO' aqui), com a marca da secao e razao propria (nao e' peca de no' -
+    a regra 75 nao a trata como amarracao; os gates aceitam pela marca)."""
+    length = group[-1]["hi"] - group[0]["lo"]
+    code = CHANNEL_U_34 if abs(length - 34.0) <= 0.6 else CHANNEL_U_19
+    piece["logical_code"] = code
+    piece["length_cm"] = CHANNEL_LOGICAL_TYPES[code]["nominal_length_cm"]
+    piece["instance_length_cm"] = None
+    piece["placement_reason"] = B54_CINTA_REASON
+    rein = piece.get("reinforcement")
+    if isinstance(rein, dict):
+        rein["cut"] = None
+        rein["b54_cinta"] = B54_CINTA_SECTION
+        rein["b54_tie"] = bool(group[0].get("b54_tie"))
+    return piece
 
 
 def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_wall, course_band,
@@ -1655,7 +1765,9 @@ def plan_top_bond_beam(course_candidates, walls_to_create, num_courses, nodes=No
     out_cc = dict((ci, list(pcs or [])) for ci, pcs in (course_candidates or {}).items())
     counts = {"source_pieces_converted": 0, "channel_pieces": 0, "by_code": {}, "kept_tie": 0,
               "kept_at_node": 0, "kept_ineligible": 0, "shared_with_opening": 0, "b54_split": 0,
-              "walls_with_beam": 0, "half_channel_resplits": 0, "kept_half_block": 0}
+              "walls_with_beam": 0, "half_channel_resplits": 0, "kept_half_block": 0,
+              "b54_cinta_split": 0, "b54_cinta_tie_split": 0}
+    b54_on = b54_cinta_enabled()
     findings = []
     report = {"role": ROLE_TOP_BOND_BEAM, "variant": pol["variant"], "policy": pol, "course_index": None,
               "runs": [], "findings": findings, "counts": counts, "course_candidates": out_cc}
@@ -1667,6 +1779,7 @@ def plan_top_bond_beam(course_candidates, walls_to_create, num_courses, nodes=No
     if not pieces:
         return report
     below = (out_cc.get(ci - 1) or []) if ci > 0 else []
+    grid = (out_cc.get(ci - 2) or []) if ci > 1 else []
     removed = set()
     inserted = {}
     for wall_idx in range(len(walls_to_create)):
@@ -1681,7 +1794,37 @@ def plan_top_bond_beam(course_candidates, walls_to_create, num_courses, nodes=No
             code = cand.get("logical_code")
             own = cand.get("wall_idx") == wall_idx
             new_rows = None
-            if own and r["along"] and not r["tie"]:
+            if b54_on and r["along"] and code == "B54" and (own or cand.get("secondary_wall_idx") == wall_idx):
+                # (o B54 do T pode estar gravado na parede que chega, ao longo desta - a
+                # parede onde ele esta' AO LONGO e' a unica que o processa)
+                # SECAO 86.16: TODO B54 da ultima fiada (amarracao do no' ou preenchimento)
+                # vira U34 + U19, junta desencontrada de c-1 e coerente com a grade de c-2
+                if below_joints is None:
+                    below_joints = _row_joints_cm(_wall_strip_pieces(below, walls_to_create, wall_idx),
+                                                  cpol["contiguous_gap_cm"])
+                grid_joints = _row_joints_cm(
+                    [x for x in _wall_strip_pieces(grid, walls_to_create, wall_idx)
+                     if x["cand"].get("wall_idx") == wall_idx and x["along"]], cpol["contiguous_gap_cm"])
+                parts = _b54_cinta_split_rows(r, walls_to_create, wall_idx, below_joints, grid_joints, cpol)
+                if parts is None:
+                    counts["kept_tie" if r["tie"] else "kept_ineligible"] += 1
+                else:
+                    counts["b54_split"] += 1
+                    counts["b54_cinta_split"] += 1
+                    if r["tie"]:
+                        counts["b54_cinta_tie_split"] += 1
+                    if parts[0]["stagger_cm"] < cpol.get("tie_split_min_stagger_cm", 1.5) - 1e-6:
+                        # TODO B54 vira U34 + U19 (pedido do usuario): a junta que coincide com
+                        # c-1 fica registrada (no T e' a face da parede que chega)
+                        findings.append({"code": "TOP_BOND_BEAM_B54_JOINT_COINCIDENT",
+                                         "severity": SEVERITY_INFO if r["tie"] else SEVERITY_WARNING,
+                                         "classification": "USER_RULE_86_16", "wall_idx": wall_idx,
+                                         "course_index": ci, "lo_cm": round(r["lo"], 3), "hi_cm": round(r["hi"], 3),
+                                         "joint_cm": parts[0]["joint_cm"], "tie": bool(r["tie"]),
+                                         "detail": "junta U34|U19 do B54 da cinta coincide com junta da fiada "
+                                                   "de baixo (86.16)"})
+                    new_rows = parts
+            elif own and r["along"] and not r["tie"]:
                 if is_channel_code(code):
                     counts["shared_with_opening"] += 1
                 elif _square_hit(r["lo"], r["hi"], squares, margin) is not None:
@@ -1759,6 +1902,8 @@ def plan_top_bond_beam(course_candidates, walls_to_create, num_courses, nodes=No
                     ("B54_SPLIT" if g.get("split_of") is not None else g["cand"].get("logical_code"))
                     for g in group]
                 finish_half_resplit_piece(piece, group)
+                if group[0].get("b54_cinta"):
+                    _finish_b54_cinta_piece(piece, group)
                 record["pieces"].append({"code": piece["logical_code"], "lo_cm": round(group[0]["lo"], 3),
                                          "hi_cm": round(group[-1]["hi"], 3),
                                          "source_codes": list(piece["reinforcement"]["source_codes"])})
@@ -1827,7 +1972,9 @@ def top_bond_beam_audit(course_candidates, walls_to_create, nodes, course_index,
     pol = top_bond_beam_policy(policy)
     margin = pol["node_square_margin_cm"]
     counts = {"TOP_BOND_BEAM_WRONG_COURSE": 0, "TOP_BOND_BEAM_TIE_ROLE": 0, "TOP_BOND_BEAM_CHANNEL_AT_NODE": 0,
-              "TOP_BOND_BEAM_BLOCK_NOT_CONVERTED": 0, "beam_pieces": 0}
+              "TOP_BOND_BEAM_BLOCK_NOT_CONVERTED": 0, "beam_pieces": 0,
+              # SECAO 86.16 (informativo): U34/U19 do B54 da cinta, e as que ficam no quadrado do no'
+              "b54_cinta_pieces": 0, "b54_cinta_at_node": 0}
     items = []
     for ci in sorted(course_candidates or {}):
         for cand in course_candidates.get(ci) or []:
@@ -1838,6 +1985,9 @@ def top_bond_beam_audit(course_candidates, walls_to_create, nodes, course_index,
                 counts["TOP_BOND_BEAM_WRONG_COURSE"] += 1
                 items.append({"code": "TOP_BOND_BEAM_WRONG_COURSE", "course_index": ci,
                               "wall_idx": cand.get("wall_idx"), "logical_code": cand.get("logical_code")})
+            if is_b54_cinta_piece(cand):
+                counts["b54_cinta_pieces"] += 1
+                continue   # SECAO 86.16: excecao do usuario a' regra 75 (B54 da cinta)
             if _is_tie(cand) or cand.get("converted_tie"):
                 counts["TOP_BOND_BEAM_TIE_ROLE"] += 1
                 items.append({"code": "TOP_BOND_BEAM_TIE_ROLE", "course_index": ci,
@@ -1858,7 +2008,9 @@ def top_bond_beam_audit(course_candidates, walls_to_create, nodes, course_index,
             code = cand.get("logical_code")
             square = _square_hit(r["lo"], r["hi"], squares, margin)
             if is_top_bond_beam_piece(cand):
-                if square is not None:
+                if square is not None and is_b54_cinta_piece(cand):
+                    counts["b54_cinta_at_node"] += 1   # SECAO 86.16: B54 de no' da cinta = U34 + U19
+                elif square is not None:
                     counts["TOP_BOND_BEAM_CHANNEL_AT_NODE"] += 1
                     items.append({"code": "TOP_BOND_BEAM_CHANNEL_AT_NODE", "wall_idx": wall_idx,
                                   "course_index": course_index, "node_index": square[2],
@@ -2026,7 +2178,8 @@ def validate_channel_reinforcement(course_candidates, walls_to_create, openings_
         counts["top_bond_beam_pieces"] += sum(1 for c in pieces if is_top_bond_beam_piece(c))
         if not half_channel_allowed():
             for c in pieces:
-                if is_half_channel_piece(c):
+                # (a U19 do B54 da cinta de topo, 86.16, e' a excecao do usuario)
+                if is_forbidden_half_channel_piece(c):
                     counts["CHANNEL_HALF_PIECE"] += 1
                     items.append({"code": "CHANNEL_HALF_PIECE", "course_index": ci, "wall_idx": c.get("wall_idx"),
                                   "logical_code": c.get("logical_code")})
