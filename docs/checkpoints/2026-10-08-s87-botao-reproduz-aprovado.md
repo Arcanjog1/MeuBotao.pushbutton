@@ -1,7 +1,7 @@
 # §87 — o botão reproduz a modulação aprovada do BUTANTÃ a partir do arquivo cru
 
 Estado CANDIDATO da branch `claude/script-modulation-blocks-469ec2` (= `claude/revit-butanta-modulation-8611b5`
-+ §87). PR aberto para revisão; sem merge. Não é estado oficial nem aprovação normativa.
++ §87). PR [#50](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/50) (draft) para revisão; sem merge. Não é estado oficial nem aprovação normativa.
 
 ```json
 {
@@ -10,7 +10,7 @@ Estado CANDIDATO da branch `claude/script-modulation-blocks-469ec2` (= `claude/r
   "branch": "claude/script-modulation-blocks-469ec2",
   "head": "2a18c547824407f9fba5191127a6fc625da17403",
   "base": "894e3f5278ffa9cb030efe01a70c7305b252af15",
-  "pr": "not-created",
+  "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/50",
   "objective": "Fazer o fluxo normal do botao (CAD -> Walls) gerar, a partir do arquivo cru 'butanta testes cru.rvt', a mesma modulacao aprovada pelo usuario em 2026-10-08 (lote 20261008-143828, 6 526 pecas, motor 06ecb87), sem ajustes posteriores via MCP e sem copiar coordenadas da planta.",
   "changes": [
     "87.1 (configuracao, documentado): o layer de paredes do CAD arquitetonico e' 'Estrutura _1_' (46 pares = 46 paredes historicas); 'Paredes' e' acabamento e fragmenta (52 eixos).",
