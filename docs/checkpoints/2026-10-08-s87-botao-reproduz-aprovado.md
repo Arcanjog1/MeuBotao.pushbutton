@@ -8,7 +8,7 @@ Estado CANDIDATO da branch `claude/script-modulation-blocks-469ec2` (= `claude/r
   "date": "2026-10-08",
   "scope": "current",
   "branch": "claude/script-modulation-blocks-469ec2",
-  "head": "2a18c54",
+  "head": "2a18c547824407f9fba5191127a6fc625da17403",
   "base": "894e3f5278ffa9cb030efe01a70c7305b252af15",
   "pr": "not-created",
   "objective": "Fazer o fluxo normal do botao (CAD -> Walls) gerar, a partir do arquivo cru 'butanta testes cru.rvt', a mesma modulacao aprovada pelo usuario em 2026-10-08 (lote 20261008-143828, 6 526 pecas, motor 06ecb87), sem ajustes posteriores via MCP e sem copiar coordenadas da planta.",

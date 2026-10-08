@@ -6,7 +6,7 @@ estado oficial nem aprovação normativa.
 ```json
 {
   "date": "2026-10-08",
-  "scope": "current",
+  "scope": "historical",
   "branch": "claude/revit-butanta-modulation-8611b5",
   "head": "06ecb87cb39303969b35ee8e65d9c7479d353509",
   "base": "894e3f5278ffa9cb030efe01a70c7305b252af15",
