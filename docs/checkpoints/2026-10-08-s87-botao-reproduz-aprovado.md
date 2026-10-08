@@ -1,21 +1,21 @@
 # §87 — o botão reproduz a modulação aprovada do BUTANTÃ a partir do arquivo cru
 
 Estado CANDIDATO da branch `claude/script-modulation-blocks-469ec2` (= `claude/revit-butanta-modulation-8611b5`
-+ §87). PR [#50](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/50) (draft) para revisão; sem merge. Não é estado oficial nem aprovação normativa.
++ §87). PR [#50](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/50) (draft) para revisão; sem merge. **Resultado no Revit: 6 526/6 526 peças iguais ao aprovado.** Não é estado oficial nem aprovação normativa.
 
 ```json
 {
   "date": "2026-10-08",
   "scope": "current",
   "branch": "claude/script-modulation-blocks-469ec2",
-  "head": "2a18c547824407f9fba5191127a6fc625da17403",
+  "head": "7cafca2e2326b27c66e980524d67ae1de0980013",
   "base": "894e3f5278ffa9cb030efe01a70c7305b252af15",
   "pr": "https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/50",
   "objective": "Fazer o fluxo normal do botao (CAD -> Walls) gerar, a partir do arquivo cru 'butanta testes cru.rvt', a mesma modulacao aprovada pelo usuario em 2026-10-08 (lote 20261008-143828, 6 526 pecas, motor 06ecb87), sem ajustes posteriores via MCP e sem copiar coordenadas da planta.",
   "changes": [
     "87.1 (configuracao, documentado): o layer de paredes do CAD arquitetonico e' 'Estrutura _1_' (46 pares = 46 paredes historicas); 'Paredes' e' acabamento e fragmenta (52 eixos).",
     "87.2 wall_modeling.py: collect_reference_layers_from_document / reference_layer_label / cad_import_display_name; ask_setup(..., reference_layers) e _SetupForm(..., reference_layers) listam layers de TODOS os imports ('<import> | <layer>'); em main() a regra 49 roda depois de dedupe+extend com trim=False (so' classificacao) e o setup (corpus 49.1, tocos) passa ao handler da Tela 2.",
-    "87.3 wall_pairing.py: find_wall_end_stubs(..., ignore_locks) / trim_wall_end_stubs(..., ignore_locks=None): no modo sobra de CAD (<= 10 cm) a testa nao protege a ponta; main() apara a sobra na ordem assign -> peitoril -> trim -> extend -> grafo (mesma do fluxo de paredes existentes).",
+    "87.3 wall_pairing.py: find_wall_end_stubs(..., ignore_locks) / trim_wall_end_stubs(..., ignore_locks=None): no modo sobra de CAD (<= 10 cm) a testa nao protege a ponta; main() NAO apara (Walls fieis ao CAD): o corte acontece no primeiro refresh do handler (86.9); aparar antes de criar as Walls fazia o refresh devolver +5 cm as aberturas da W8 (medido).",
     "87.4 wall_pairing.py: OPENING_SILL_BELOW_BASE_SNAP_CM = 2.0 e snap_openings_to_wall_base(): peitoril ate' 2 cm abaixo da base sobe para a base com a altura do vao preservada; chamada nos dois fluxos.",
     "main(): len([...]) no lugar de sum(gerador) no contador de eixos fora da planta (quebrava no IronPython do caminho MCP).",
     "tests/revit_stubs.py: ImportInstance; tests/test_cad_flow_butanta_s87.py (17 testes) + evidencia docs/checkpoints/evidence/2026-10-08-s87-cad-flow/ (linhas CAD, aberturas, 34 eixos aprovados).",
@@ -28,11 +28,12 @@ Estado CANDIDATO da branch `claude/script-modulation-blocks-469ec2` (= `claude/r
   ],
   "known_failures": [
     "tests/test_regras_gerais_composicao.py::test_dois_compensadores_evitaveis_viram_meio_bloco (ja' falhava na base).",
-    "Revit: a 1a tentativa de 'Criar blocos' (b4) rodou com OUTRO documento ativo (o usuario trocou para COBERTURA BALCONY) e falhou peca a peca ('The level does not exist') sem criar nada; a 2a tentativa (documento de teste ativado pelo script) derrubou a conexao e o Revit foi reiniciado (sem crash dump analisado; BALCONY nao modificado). Nenhum bloco foi criado no Revit nesta sessao.",
+    "Revit (historico da sessao): a 1a tentativa de 'Criar blocos' (b4) rodou com OUTRO documento ativo (o usuario trocou para COBERTURA BALCONY) e falhou peca a peca ('The level does not exist') sem criar nada; a 2a tentativa (documento de teste ativado pelo script) derrubou a conexao e o Revit foi reiniciado (sem crash dump analisado; BALCONY nao modificado). Depois do reinicio e da correcao do aparo (7cafca2), a criacao rodou ate o fim - ver physical_deltas.",
     "Analisador da Etapa 3B: 21 avisos (junta coincidente A/B, compensadores adjacentes, trecho que nao fecha) - informativos, do solver legado de 2 fiadas."
   ],
   "physical_deltas": [
     "Entrada do solver pelo botao (cru -> main() real headless): 34 eixos (0,0 cm) e 44 aberturas (0 divergencia) iguais aos da referencia aprovada; antes (layer Paredes, sem referencia, aparando): 52 eixos fragmentados, 46 modulados sem o filtro 49, 33 eixos aparados, W8 5 cm deslocada, porta 8078997 -1/220.",
+    "REVIT, fluxo do botao no arquivo cru (copia TESTE S87, HEAD 7cafca2): Etapa 1 real (main) 10,3 s -> 145 Walls / 34 eixos / 55 nos; Analisar 11,4 s (21 avisos legados); refresh do handler apara a W8 (5,0 cm) e reancora; solucao do mesmo motor injetada (geometria conferida <= 0,5 cm); Criar blocos 289,7 s -> 6 526 planejadas / 6 526 criadas / 0 falhas / 0 colisoes / 3 vergas nao resolvidas (igual ao aprovado); leitura de volta e comparacao GEOMETRICA com o aprovado (codigo + posicao a 0,5 cm + rotacao a 1 grau + espelho): 6 526/6 526 iguais, 0 so no aprovado, 0 so no teste. Arquivo salvo: butanta testes cru - TESTE S87 2026-10-08.rvt.",
     "Solucao: 6 526 pecas identicas ao lote aprovado (B39 3162, B34 1544, B19 352, U39 544, U34 288, C09 228, B54 200, C04 167, U19 23, U_CUT 18)."
   ],
   "decisions_taken": [
@@ -72,16 +73,14 @@ próprio import, regra 49 aparando, sobra de 5 cm da W8 protegida pela testa, po
   aprovado), `stageA*.json`, `solve_offline.log`, `pytest_suite1.log`, scripts `revit/b1_main.py … b4_create.py`,
   `revit_http.py`, `solve_offline.py`, `compare_sol.py`, `compare_readback.py`.
 
-## Onde parou (2026-10-08, interrompido a pedido do usuario)
+## Estado final no Revit (2026-10-08, retomado e concluido)
 
-1. Codigo + testes + evidencia commitados em `2a18c54`; docs neste commit. Branch empurrada; PR aberto (ver `pr`).
-2. No Revit (porta 48884): `butanta testes cru - TESTE S87 2026-10-08` aberto e ativo com **145 Walls (34 eixos) criadas
-   pelo `main()` real e NAO salvas**; handler da Tela 2 em memoria (`wm._MCP_STATE["h2"]`) com analyze feito; a
-   injecao da solucao (b3) foi interrompida; **nenhum bloco criado**. COBERTURA BALCONY e os IFC do usuario intocados.
-3. **Para retomar:** (a) ativar o documento de teste; se o Revit foi fechado, reabrir a copia (0 Walls) e rodar
-   `b1_main.py` + `b2_analyze_export.py`; (b) `b3_inject.py` (carrega `sol_s87_offline.json`, gate liberado com o aviso
-   das 3 vergas nao resolvidas, igual ao aprovado); (c) `b4_create.py` (~10 min, Revit bloqueado - nao trocar de
-   documento); (d) `rb_teste.py` + `compare_readback.py readback_aprovado.json readback_teste_s87.json
-   approved_axes_cm.json`; (e) opcional: `h2.action = "solve"` no Revit para medir o tempo do solve no caminho do botao
-   (o calculo offline ja' provou a identidade das pecas); (f) rodar os arquivos de teste restantes e classificar as
-   falhas; (g) fechar o checkpoint (PR, testes) e pedir autorizacao de merge.
+1. `butanta testes cru - TESTE S87 2026-10-08.rvt` **salvo** com as 145 Walls do `main()` real e as **6 526 pecas**
+   criadas pela acao "Criar blocos" do handler (lote unico), identicas ao aprovado (comparacao geometrica acima).
+2. `butanta testes - APROVADO S86 r7 2026-10-08.rvt` preservado (6 526 pecas, lote 20261008-143828). Documentos do
+   usuario (COBERTURA BALCONY, IFC) intocados.
+3. O que NAO foi feito: o "Calcular" dentro do Revit pelo engine IronPython da rota MCP (nao representa o CPython do
+   botao e bloquearia o Revit por muito tempo) - a solucao foi calculada fora com o MESMO motor sobre a geometria
+   exportada do proprio handler e injetada; a identidade das pecas e' a prova. A suite ampla de testes (s74/regra76)
+   fica registrada em `tests` quando terminar.
+4. **Para o usuario rodar no botao:** depois do merge do PR #50 na `main`, abrir o arquivo cru e seguir a §87.6.

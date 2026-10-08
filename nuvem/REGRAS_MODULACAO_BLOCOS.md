@@ -12007,8 +12007,9 @@ analistas preveem as duas vergas idênticas ao humano); contagem de `CHANNEL_STO
 > **§87.3 (2026-10-08):** no modo *sobra de CAD* (`STUB_TRIM_ENABLED = False`, só a sobra ≤ `STUB_OVERSHOOT_TRIM_MAX_CM`)
 > a **testa do CAD não protege a ponta** (`ignore_locks`): a sobra de poucos cm além da face da parede que cruza é erro
 > de desenho mesmo quando o CAD fecha a parede ali — BUTANTÃ W8 (5 cm). A testa continua impedindo a EXTENSÃO. O
-> fluxo CAD→Walls passou a aparar a sobra em `main()` (assign → peitoril na base → sobra → extend → grafo), na mesma
-> ordem do fluxo de paredes existentes — o "NÃO aplicado em main" mais abaixo está superado.
+> fluxo CAD→Walls continua NÃO aparando em `main()` (as Walls nascem fiéis ao CAD): o corte acontece no primeiro
+> refresh do handler, como descrito abaixo — aparar antes de criar as Walls fez o refresh (que mede o corte na Wall do
+> documento) achar corte zero e devolver as aberturas ao `t` sem aparo (+5 cm na W8, medido em 2026-10-08).
 
 > **CORREÇÃO DO USUÁRIO (2026-10-05, revisão do pavimento recriado no Revit) — REGRA OBRIGATÓRIA, SUBSTITUI a regra abaixo:** "algumas paredes não foram moduladas porque no projeto humano não foi modulado" — corrigir. Os tocos de eixo além da face da parede que cruza **SÃO modulados** como qualquer trecho de parede (a parede do Revit existe e tem de receber blocos), mesmo que o humano não os module. `STUB_TRIM_ENABLED = False` (wall_pairing.py); a função `trim_wall_end_stubs` fica disponível só para estudo. **Exceção de tolerância geométrica (decisão de integração, 2026-10-05):** a sobra de eixo de até 10 cm além da face (`STUB_OVERSHOOT_TRIM_MAX_CM`) não é parede, é erro de desenho do CAD, e continua aparada — no BUTANTÃ só a W8 (5 cm além da W29; o humano também começa a fiada 0 em 5 cm). Sem isso a parede inteira fica deslocada 5 cm e surgem 80 septos sem apoio. O texto abaixo continua como registro do padrão observado no humano (não é mais regra).
 
@@ -12662,9 +12663,12 @@ usuário na Tela de Configuração (lembrada no `modulacao_automatica_setup.json
 - `find_wall_end_stubs(..., ignore_locks)` / `trim_wall_end_stubs(..., ignore_locks=None)`: no modo *sobra de CAD*
   (`STUB_TRIM_ENABLED = False`, `STUB_OVERSHOOT_TRIM_MAX_CM = 10`) `ignore_locks` vale `True` — a testa do CAD não
   protege a sobra (ela continua impedindo a extensão). No modo pleno (`enabled=True`) a testa protege, como antes.
-- `main()` apara a sobra na **mesma ordem** do fluxo de paredes existentes: `assign_openings_to_walls` → §87.4 →
-  `trim_wall_end_stubs` → `extend_wall_ends_to_junctions` → `build_wall_graph`; o que foi aparado vai para
-  `corpus_selection["trimmed"]` e para o output. BUTANTÃ: 1 ponta (eixo `cad#8`, 5,0 cm, 719 → 714 cm).
+- `main()` **não** apara (as Walls nascem fiéis ao CAD; o grafo da Etapa 1 é montado depois de `assign_openings_to_walls`
+  → §87.4). O corte acontece no **primeiro refresh** do handler da Tela 2 (`_refresh_geometry_from_document` →
+  `_reapply_stub_trims`, §86.9), que reancora as aberturas uma única vez e grava o corte em
+  `corpus_selection["trimmed"]`. Medido (2026-10-08): aparar ANTES de criar as Walls fazia o refresh medir corte zero
+  na Wall já curta e devolver as aberturas ao `t` sem aparo (W8: 184 → 189 cm) — por isso o aparo ficou só no refresh.
+  BUTANTÃ: 1 ponta (eixo 8, 5,0 cm, 719 → 714 cm).
 
 ### 87.4 Peitoril até 2 cm ABAIXO da base sobe para a base — REGRA OBRIGATÓRIA (tolerância geométrica); IMPLEMENTADO
 
