@@ -23,7 +23,9 @@ Estado CANDIDATO da branch `claude/script-modulation-blocks-469ec2` (= `claude/r
   ],
   "tests": [
     "HEAD 2a18c54: py -3 -m pytest tests/test_cad_flow_butanta_s87.py tests/test_stub_trim_86_9.py tests/test_reference_layer_filter.py tests/test_corpus_selection_paredes_existentes.py tests/test_channel_ui_and_family_gate.py -q -> 65 passaram (17 novos + 48).",
-    "HEAD 2a18c54: suite ampla (test_script + 86.x + s74/regra76 corpus) INTERROMPIDA a pedido do usuario ('PARE') com 97 % rodado: 5-6 falhas marcadas (F) no trecho test_junta_no_toco_86_15 / test_compensator_at_jamb_face_86_13 / test_s74_corpus_butanta / test_regra76_corpus_butanta - nomes NAO capturados (o pytest so' lista no fim). PENDENTE: rodar esses arquivos um a um e classificar (ja' falhavam na base 2c301ac? test_dois_compensadores_evitaveis_viram_meio_bloco ja' falhava).",
+    "HEAD 7cafca2: py -3 -m pytest tests/test_script.py tests/test_sem_meia_canaleta_86_14.py tests/test_b54_cinta_86_16.py tests/test_channel_grid_follow_86_12.py tests/test_top_bond_beam.py tests/test_junta_no_toco_86_15.py tests/test_compensator_at_jamb_face_86_13.py tests/test_stub_trim_86_9.py tests/test_loader_provenance.py tests/test_regras_gerais_composicao.py -q -> 456 passaram, 1 falhou (test_dois_compensadores_evitaveis_viram_meio_bloco, ja' falhava na base), 13 min 12 s.",
+    "HEAD 7cafca2: tests/test_cad_flow_butanta_s87.py + test_channel_ui_and_family_gate.py + test_corpus_selection_paredes_existentes.py -> 35 passaram.",
+    "tests/test_s74_corpus_butanta.py e tests/test_regra76_corpus_butanta.py (corpus pesado): resultado registrado abaixo quando concluido (a 1a rodada da suite ampla foi interrompida a pedido do usuario com marcas F nesse trecho, sem nomes capturados).",
     "Calculo offline (CPython 3.14, tools/audit/s74_corpus, 13 fiadas) sobre a geometria exportada do handler do botao: 1055 s, 6 526 pecas, gates 0/0/0/0/0; comparado com sol_r7_13 (aprovado): 6 526/6 526 pecas iguais (fiada, codigo, origem a 0,5 cm, rotacao, comprimento), 0 divergencias."
   ],
   "known_failures": [
