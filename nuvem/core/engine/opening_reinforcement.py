@@ -91,6 +91,112 @@ CHANNEL_THROUGH_T_PATTERN = "CHANNEL_THROUGH_T_SUPPORTED_PATTERN"
 TIE_SPLIT_CODE = "TIE_SPLIT"
 STANDARD_CHANNEL_BY_LENGTH = ((39.0, CHANNEL_U_39), (34.0, CHANNEL_U_34), (19.0, CHANNEL_U_19))
 
+# SECAO 86.14 (correcao do usuario 2026-10-05, REGRA OBRIGATORIA - substitui o
+# B19->U19 da 86.7 e da 86.12): "isso nao existe, pode parar; a continuacao das
+# canaletas nao serve para os meio bloco; quando houver um meio bloco nas fiadas
+# abaixo deve ser completado por bloco de 34 ou 39". A MEIA CANALETA (CHANNEL_U_19,
+# familia "MEIA CANALETA - 14x19x19") NAO e' usada em nenhuma fiada de canaleta
+# (verga, contraverga, cinta) - nem como U_CUT de 19 cm (a mesma peca cortada). O
+# trecho do meio bloco/compensador/B54 fecha com U39/U34 e, so' se nada fechar,
+# UM U_CUT (>= 9 cm). False = proibida (o padrao); True = comportamento anterior
+# (86.7/86.12 com U19). Ver a secao 86.14 de nuvem/REGRAS_MODULACAO_BLOCOS.md.
+CHANNEL_HALF_U19_ENABLED = False
+HALF_CHANNEL_NOMINAL_CM = 19.0
+# U_CUT a menos disto de 19 cm e' a meia canaleta cortada (proibida junto)
+HALF_CHANNEL_TOLERANCE_CM = 0.5
+SECTION_NO_HALF_CHANNEL = "86.14"
+# B54 de preenchimento sob canaleta sem U19: U39 + U_CUT 14 (a junta nova longe
+# das juntas vizinhas) - o U_CUT e' o ultimo recurso (86.14)
+SPLIT_B54_NO_HALF_LENGTHS_CM = (39.0, 14.0)
+
+
+# SECAO 86.16 (correcao do usuario 2026-10-08, REGRA OBRIGATORIA - excecao a' 86.14
+# e a' regra 75/76.1 SO' para o B54 da cinta de topo): "bloco 54 na ultima fiada deve
+# virar uma canaleta 34 e uma canaleta 19". Na ULTIMA fiada (TOP_BOND_BEAM) TODO B54 -
+# inclusive o B54 de amarracao do no' T - vira U34 + U19, com a junta U34|U19 a mais
+# desencontrada das juntas da fiada c-1 e coerente com a grade da fiada c-2. A U19 so'
+# existe nesse caso; o B34 de amarracao no quadrado do no' continua BLOCO (variante A).
+# Os gates (75, 76.1, auditoria da cinta, meia canaleta) aceitam SO' essas pecas
+# (marca `reinforcement.b54_cinta = "86.16"`, papel TOP_BOND_BEAM, U34/U19). False =
+# comportamento da 86.14 (B54 de amarracao fica bloco; B54 de preenchimento U39+U_CUT14).
+# Ver a secao 86.16 de nuvem/REGRAS_MODULACAO_BLOCOS.md.
+TOP_BOND_BEAM_B54_AS_CHANNEL = True
+B54_CINTA_SECTION = "86.16"
+B54_CINTA_SPLIT_LENGTHS_CM = (34.0, 19.0)
+B54_CINTA_REASON = "TOP_BOND_BEAM_B54_SPLIT"
+
+
+def half_channel_allowed():
+    """SECAO 86.14: a meia canaleta (U19) so' existe com a chave religada."""
+    return bool(CHANNEL_HALF_U19_ENABLED)
+
+
+def b54_cinta_enabled():
+    """SECAO 86.16: B54 da ultima fiada vira U34 + U19."""
+    return bool(TOP_BOND_BEAM_B54_AS_CHANNEL)
+
+
+def is_b54_cinta_piece(candidate):
+    """Canaleta U34/U19 da cinta de topo que veio de um B54 da ultima fiada (86.16) -
+    a UNICA peca isenta da proibicao da meia canaleta (86.14) e dos gates de
+    amarracao (75/76.1) no quadrado do no'."""
+    rein = (candidate or {}).get("reinforcement") or {}
+    return (b54_cinta_enabled() and rein.get("b54_cinta") == B54_CINTA_SECTION
+            and list(rein.get("roles") or []) == [ROLE_TOP_BOND_BEAM]
+            and candidate.get("logical_code") in (CHANNEL_U_34, CHANNEL_U_19))
+
+
+def is_half_channel_length(length_cm):
+    """Comprimento de meia canaleta (19 cm, U19 ou U_CUT de 19)."""
+    if length_cm is None:
+        return False
+    return abs(float(length_cm) - HALF_CHANNEL_NOMINAL_CM) <= HALF_CHANNEL_TOLERANCE_CM
+
+
+def is_half_channel_piece(candidate):
+    """Peca de canaleta que e' a MEIA CANALETA proibida pela 86.14: U19 ou U_CUT
+    com 19 cm (a mesma peca, cortada de uma U39)."""
+    code = (candidate or {}).get("logical_code")
+    if code == CHANNEL_U_19:
+        return True
+    if code == CHANNEL_U_CUT:
+        length = candidate.get("instance_length_cm")
+        if length is None:
+            length = candidate.get("length_cm")
+        return is_half_channel_length(length)
+    return False
+
+
+def is_forbidden_half_channel_piece(candidate):
+    """Meia canaleta proibida: U19 / U_CUT de 19 fora da excecao do B54 da cinta
+    (86.16), com a 86.14 ligada."""
+    return (not half_channel_allowed() and is_half_channel_piece(candidate)
+            and not is_b54_cinta_piece(candidate))
+
+
+def half_channel_audit(course_candidates):
+    """SECAO 86.14 - auditoria independente: meias canaletas (U19 e U_CUT de 19 cm)
+    nas fiadas. Devolve {"counts": {"CHANNEL_U_19", "CHANNEL_U_CUT_19", "total",
+    "CHANNEL_U_19_B54_CINTA"}, "items": [...]}. A U19 do B54 da cinta de topo (86.16)
+    e' contada a parte e NAO entra no total. Com a chave desligada (padrao) o
+    aceitavel e' total == 0."""
+    counts = {"CHANNEL_U_19": 0, "CHANNEL_U_CUT_19": 0, "total": 0, "CHANNEL_U_19_B54_CINTA": 0}
+    items = []
+    for ci in sorted(course_candidates or {}):
+        for cand in (course_candidates or {}).get(ci) or []:
+            if not is_half_channel_piece(cand):
+                continue
+            if is_b54_cinta_piece(cand):
+                counts["CHANNEL_U_19_B54_CINTA"] += 1
+                continue
+            key = "CHANNEL_U_19" if cand.get("logical_code") == CHANNEL_U_19 else "CHANNEL_U_CUT_19"
+            counts[key] += 1
+            counts["total"] += 1
+            items.append({"course_index": ci, "wall_idx": cand.get("wall_idx"), "logical_code": cand.get("logical_code"),
+                          "roles": list(((cand.get("reinforcement") or {}).get("roles")) or [])})
+    return {"allowed": half_channel_allowed(), "section": SECTION_NO_HALF_CHANNEL, "counts": counts,
+            "items": items}
+
 TIE_REASON_PREFIXES = ("L_CORNER", "T_INTERSECTION", "X_INTERSECTION", "CORNER")
 # REGRA 76.1: o compensador que fecha um no' sem amarracao valida
 # (wall_stepper.JUNCTION_UNRESOLVED_FILL_REASON) deixou de ser DESIGNADO
@@ -232,6 +338,10 @@ def channel_as_junction_bond(course_candidates, report=None):
             code = cand.get("logical_code")
             reason = str(cand.get("placement_reason") or "")
             if code not in canal:
+                continue
+            if is_b54_cinta_piece(cand):
+                # SECAO 86.16 (excecao decidida pelo usuario a' regra 75, SO' para o B54
+                # da cinta de topo): U34 + U19 no lugar do B54 da ultima fiada
                 continue
             if _is_tie(cand) or cand.get("converted_tie") or reason == "CHANNEL_NODE_CROSSING":
                 violations.append({"kind": "CHANNEL_PIECE_WITH_TIE_ROLE", "course_index": ci,
@@ -685,10 +795,30 @@ def _extend_run(rows, i0, i1, t_lo, t_hi, policy, cross=None, need_cm=None):
 
 
 def _standard_code_for_length(length_cm, tol=0.05):
+    allow_half = half_channel_allowed()
     for nominal, code in STANDARD_CHANNEL_BY_LENGTH:
+        if code == CHANNEL_U_19 and not allow_half:
+            continue   # SECAO 86.14: 19 cm deixou de ser comprimento de canaleta
         if abs(length_cm - nominal) <= tol:
             return code
     return None
+
+
+def _run_mergeable_codes():
+    """Codigos fundidos a' vizinha pela 51.3. SECAO 86.14: sem a meia canaleta o
+    B19 tambem e' fundido (B19+C04 = U_CUT 24, B19+C09 = U_CUT 29, B19+B19 = U39,
+    C09+B19+C04 = U34) - o que sobra sozinho e' refeito com as vizinhas por
+    `_avoid_half_channel_groups`."""
+    if half_channel_allowed():
+        return MERGEABLE_CODES
+    return MERGEABLE_CODES + ("B19",)
+
+
+def _merge_length_ok(length, max_len):
+    if length > max_len + 0.05:
+        return False
+    # SECAO 86.14: a fusao nunca cria uma canaleta de 19 cm
+    return half_channel_allowed() or not is_half_channel_length(length)
 
 
 def _group_run_members(members, policy):
@@ -696,32 +826,35 @@ def _group_run_members(members, policy):
 
     Peca comum -> um grupo proprio. Compensador -> fundido a uma vizinha
     CONTIGUA se o comprimento final <= max_channel_length_cm; prefere a
-    fusao que da' canaleta de comprimento padrao (39/34/19), depois a da
-    esquerda. Sem fusao possivel, vira canaleta cortada sozinho."""
+    fusao que da' canaleta de comprimento padrao (39/34; 19 so' com a meia
+    canaleta religada - 86.14), depois a da esquerda. Sem fusao possivel, vira
+    canaleta cortada sozinho."""
     max_len = policy["max_channel_length_cm"]
     gap = policy["contiguous_gap_cm"] + CONTIGUOUS_GAP_EPSILON_CM
+    mergeable = _run_mergeable_codes()
     groups = []
     k = 0
     n = len(members)
     while k < n:
         row = members[k]
         code = row["cand"].get("logical_code")
-        if code not in MERGEABLE_CODES or not policy.get("merge_compensators", True):
+        if code not in mergeable or not policy.get("merge_compensators", True):
             groups.append([row])
             k += 1
             continue
         options = []
         if groups:
             last = groups[-1]
-            if row["lo"] - last[-1]["hi"] <= gap:
+            # SECAO 86.16: a U34/U19 do B54 da cinta nunca recebe compensador fundido
+            if row["lo"] - last[-1]["hi"] <= gap and not any(x.get("b54_cinta") for x in last):
                 length = row["hi"] - last[0]["lo"]
-                if length <= max_len + 0.05:
+                if _merge_length_ok(length, max_len):
                     options.append((0 if _standard_code_for_length(length) else 1, 0, "LEFT"))
         if k + 1 < n:
             nxt = members[k + 1]
-            if nxt["lo"] - row["hi"] <= gap:
+            if nxt["lo"] - row["hi"] <= gap and not nxt.get("b54_cinta"):
                 length = nxt["hi"] - row["lo"]
-                if length <= max_len + 0.05:
+                if _merge_length_ok(length, max_len):
                     options.append((0 if _standard_code_for_length(length) else 1, 1, "RIGHT"))
         options.sort()
         if not options:
@@ -743,7 +876,8 @@ def _channel_candidate_from_group(group, walls_to_create, wall_idx, run_record, 
     hi = group[-1]["hi"]
     length = hi - lo
     source_codes = [g["cand"].get("logical_code") for g in group]
-    if len(group) == 1 and source_codes[0] in COMMON_TO_CHANNEL:
+    if len(group) == 1 and source_codes[0] in COMMON_TO_CHANNEL and (
+            COMMON_TO_CHANNEL[source_codes[0]] != CHANNEL_U_19 or half_channel_allowed()):
         code = COMMON_TO_CHANNEL[source_codes[0]]
         cut = None
     else:
@@ -777,6 +911,171 @@ def _channel_candidate_from_group(group, walls_to_create, wall_idx, run_record, 
         "policy_version": policy["policy_version"],
     }
     return new
+
+
+# --------------------------------------------------------------------------
+# SECAO 86.14 - sem meia canaleta nas corridas trocadas no lugar (86.7 / 51.3)
+# --------------------------------------------------------------------------
+HALF_RESPLIT_CUT_CODE = "HALF_RESPLIT_CUT"
+# grupos vizinhos (de cada lado) que a recomposicao pode abranger
+HALF_RESPLIT_MAX_SIDE_GROUPS = 2
+
+
+def _plain_group(group):
+    """Grupo de pecas comuns da propria fiada (sem amarracao dividida, travessia
+    de no' nem peca ja' recomposta) - o unico que a 86.14 recompoe."""
+    for row in group:
+        if row.get("split_of") is not None or row.get("crossing_of") is not None or "covers" in row:
+            return False
+        code = row["cand"].get("logical_code")
+        if not (code in COMMON_TO_CHANNEL or code in COMPENSATOR_CODES or is_channel_code(code)):
+            return False
+    return True
+
+
+def group_source_cands(group):
+    """Pecas ORIGINAIS da fiada cobertas por um grupo (a peca recomposta pela 86.14
+    carrega as que substitui em `covers`)."""
+    out = []
+    for row in group:
+        if "covers" in row:
+            out.extend(row["covers"])
+        else:
+            out.append(row.get("split_of") or row["cand"])
+    return out
+
+
+def finish_half_resplit_piece(piece, group):
+    """Origem (source_codes) e marca 86.14 da canaleta criada de um grupo
+    recomposto; nada muda para os outros grupos."""
+    sources = group[0].get("resplit_sources") if group else None
+    if sources is None:
+        return piece
+    rein = piece.get("reinforcement")
+    if isinstance(rein, dict):
+        rein["source_codes"] = list(sources)
+        rein["half_channel_resplit"] = SECTION_NO_HALF_CHANNEL
+    return piece
+
+
+def _avoid_half_channel_groups(groups, adjacent_joints, policy, walls_to_create=None, wall_idx=None):
+    """SECAO 86.14 - nenhum grupo de 19 cm (U19 ou U_CUT de 19) numa corrida.
+
+    O grupo que daria a meia canaleta (B19 sem vizinha para fundir) e' refeito
+    junto com ate' `HALF_RESPLIT_MAX_SIDE_GROUPS` grupos vizinhos contiguos: a
+    janela [inicio do primeiro, fim do ultimo] fecha com U39/U34 e no maximo UM
+    U_CUT (>= 9 cm, nunca 19) - o mesmo preenchimento do trecho livre da 86.12.
+    As pontas da janela sao juntas que ja' existiam (ficam onde estao). Escolha:
+    juntas novas coincidentes com as das fiadas vizinhas (regra #1), U_CUT,
+    numero de grupos abrangidos, U_CUT minuscula (< 19), numero de pecas; o
+    trecho e' resolvido no sentido canonico do mundo quando a parede e' dada.
+
+    Depois, o compensador sozinho que viraria U_CUT abaixo de 9 cm (C04 entre
+    dois B39) e' refeito com as vizinhas quando alguma janela fecha, e o meio
+    bloco fundido a compensador em U_CUT (B19+C04 = 24, B19+C09 = 29) tambem e'
+    refeito quando uma janela com as vizinhas fecha estritamente melhor (ex.: sem
+    U_CUT: B19+C09+B39 = U34+U34) - "deve ser completado por bloco de 34 ou 39",
+    o U_CUT (>= 9 cm) e' o ultimo recurso.
+
+    Devolve (grupos, recomposicoes, sem_solucao). Sem a chave (meia canaleta
+    religada) devolve os grupos como vieram."""
+    groups = list(groups or [])
+    if half_channel_allowed() or not groups:
+        return groups, [], []
+    from core.engine import channel_grid_follow as _cgf
+    pol = _cgf.channel_grid_follow_policy({"joint_cm": policy.get("course_joint_cm", 1.0)})
+    canonical = True
+    if walls_to_create is not None and wall_idx is not None:
+        canonical = _cgf._canonical_axis(walls_to_create, wall_idx)
+    gap = policy["contiguous_gap_cm"] + CONTIGUOUS_GAP_EPSILON_CM
+    adj = sorted(adjacent_joints or [])
+    cache = {}
+    resplits = []
+    unresolved = []
+    skip = set()
+    side = HALF_RESPLIT_MAX_SIDE_GROUPS
+
+    def _half_cut_group(g):
+        # meio bloco fundido em canaleta cortada (nao e' 19, nao e' padrao)
+        length = g[-1]["hi"] - g[0]["lo"]
+        return (_plain_group(g) and any(row["cand"].get("logical_code") == "B19" for row in g)
+                and _standard_code_for_length(length) is None and not is_half_channel_length(length))
+
+    while True:
+        target = None
+        baseline = None
+        mandatory = True
+        for k, g in enumerate(groups):
+            if id(g) not in skip and is_half_channel_length(g[-1]["hi"] - g[0]["lo"]) and \
+                    not any(row.get("b54_cinta") for row in g):   # U19 do B54 da cinta (86.16)
+                target = k
+                break
+        if target is None:
+            # compensador sozinho que viraria U_CUT abaixo de 9 cm (a canaleta "acompanhando"
+            # a pastilha): refeito com as vizinhas quando alguma janela fecha
+            for k, g in enumerate(groups):
+                if id(g) not in skip and _plain_group(g) and \
+                        g[-1]["hi"] - g[0]["lo"] < pol["min_cut_cm"] - 1e-6:
+                    target = k
+                    mandatory = False
+                    break
+        if target is None:
+            for k, g in enumerate(groups):
+                if id(g) not in skip and _half_cut_group(g):
+                    target = k
+                    mandatory = False
+                    length = g[-1]["hi"] - g[0]["lo"]
+                    # ficar como esta': nenhuma junta nova, um U_CUT
+                    baseline = (0, 1, 0, 1 if length < pol["small_cut_cm"] - 1e-6 else 0, 1)
+                    break
+        if target is None:
+            break
+        best = None
+        for a in range(max(0, target - side), target + 1):
+            for b in range(target, min(len(groups), target + side + 1)):
+                window = groups[a:b + 1]
+                if not all(_plain_group(g) for g in window):
+                    continue
+                if any(window[i + 1][0]["lo"] - window[i][-1]["hi"] > gap for i in range(len(window) - 1)):
+                    continue
+                lo, hi = window[0][0]["lo"], window[-1][-1]["hi"]
+                res = _cgf._fill_canonical(lo, hi, False, False, adj, pol, None, canonical, cache)
+                if res is None:
+                    continue
+                key = (res["key"][0], res["key"][1], b - a, res["key"][2], res["key"][3],
+                       a if canonical else -b)
+                if baseline is not None and not key[:5] < baseline:
+                    continue
+                if best is None or key < best[0]:
+                    best = (key, a, b, res)
+        if best is None:
+            g = groups[target]
+            skip.add(id(g))
+            if mandatory:
+                unresolved.append(g)
+            continue
+        _key, a, b, res = best
+        window = groups[a:b + 1]
+        covered = [row for g in window for row in g]
+        first_cand = covered[0]["cand"]
+        first_key = _physical_key(first_cand)
+        new_groups = []
+        for i, (plo, phi, code) in enumerate(res["pieces"]):
+            tpl = dict(first_cand)
+            tpl["logical_code"] = code if code in ("B39", "B34") else HALF_RESPLIT_CUT_CODE
+            sources = [row["cand"].get("logical_code") for row in covered
+                       if min(phi, row["hi"]) - max(plo, row["lo"]) > 0.05]
+            new_groups.append([{"cand": tpl, "lo": plo, "hi": phi, "along": True, "eligible": True, "tie": False,
+                                "covers": [row["cand"] for row in covered] if i == 0 else [],
+                                "anchor_cand": first_cand,
+                                "pseudo_key": "HALF_RESPLIT|%s|%.4f|%.4f" % (first_key, plo, phi),
+                                "resplit_sources": sources}])
+        resplits.append({"before": [[row["cand"].get("logical_code"), round(row["lo"], 3), round(row["hi"], 3)]
+                                    for row in covered],
+                         "after": [[("CHANNEL_U_39" if c == "B39" else "CHANNEL_U_34" if c == "B34"
+                                     else CHANNEL_U_CUT), round(p, 3), round(q, 3)] for p, q, c in res["pieces"]]})
+        groups[a:b + 1] = new_groups
+    return groups, resplits, unresolved
 
 
 def _crossing_row(row, walls_to_create, wall_idx):
@@ -862,10 +1161,13 @@ def _tie_split_rows(row, walls_to_create, wall_idx, adjacent_joints, policy):
     joint = policy["course_joint_cm"]
     total = row["hi"] - row["lo"]
     best = None
+    allow_half = half_channel_allowed()
     for l1 in policy["tie_split_lengths_cm"]:
         l2 = total - l1 - joint
         if l2 < min(policy["tie_split_lengths_cm"]) - 0.05 or l2 > policy["max_channel_length_cm"] + 0.05:
             continue
+        if not allow_half and (is_half_channel_length(l1) or is_half_channel_length(l2)):
+            continue   # SECAO 86.14: nenhuma parte de 19 cm (meia canaleta)
         j = row["lo"] + l1 + joint / 2.0
         stagger = min([abs(j - a) for a in adjacent_joints] or [1e9])
         if stagger < policy["tie_split_min_stagger_cm"]:
@@ -888,6 +1190,67 @@ def _tie_split_rows(row, walls_to_create, wall_idx, adjacent_joints, policy):
         parts.append({"cand": cand, "lo": lo, "hi": hi, "along": True, "eligible": True, "tie": False,
                       "split_of": tie})
     return parts
+
+
+def _b54_cinta_split_rows(row, walls_to_create, wall_idx, below_joints, grid_joints, policy):
+    """SECAO 86.16 - B54 da ultima fiada (amarracao ou preenchimento) dividido em
+    U34 + U19 (ou U19 + U34). Junta nova, nesta ordem: desencontrada das juntas da
+    fiada c-1 (>= tie_split_min_stagger_cm, regra #1); coincidente com uma junta da
+    grade da fiada c-2 (86.12); a mais desencontrada; U34 primeiro no eixo. O usuario
+    pediu TODO B54 - quando as duas divisoes coincidem com c-1 (o B54 centrado no T:
+    as duas juntas possiveis caem nas faces da parede que chega, onde a fiada c-1 tem
+    a peca transversal) a divisao sai assim mesmo e a parte 0 leva `stagger_cm` para
+    o achado. None so' quando a peca nao e' um B54 (54 = 34 + 1 + 19)."""
+    joint = policy["course_joint_cm"]
+    total = row["hi"] - row["lo"]
+    tol = policy.get("tie_split_min_stagger_cm", 1.5)
+    best = None
+    for l1 in B54_CINTA_SPLIT_LENGTHS_CM:
+        l2 = total - l1 - joint
+        if abs(l2 - (B54_CINTA_SPLIT_LENGTHS_CM[0] + B54_CINTA_SPLIT_LENGTHS_CM[1] - l1)) > 0.6:
+            continue   # nao e' um B54 (54 = 34 + 1 + 19)
+        t = row["lo"] + l1 + joint / 2.0
+        stagger = min([abs(t - a) for a in below_joints or []] or [1e9])
+        grade = 0 if any(abs(t - g) <= 0.6 for g in grid_joints or []) else 1
+        key = (0 if stagger >= tol else 1, grade, -round(min(stagger, 1e6), 3), 0 if l1 > 20.0 else 1)
+        if best is None or key < best[0]:
+            best = (key, l1, l2, stagger)
+    if best is None:
+        return None
+    _key, l1, l2, best_stagger = best
+    p0, _p1, wall_dir, _len_ft, _th = _wall_axis_and_length(walls_to_create, wall_idx)
+    tie = row["cand"]
+    old_center_t = (tie["origin_world"] - p0).DotProduct(wall_dir)
+    parts = []
+    for lo, hi in ((row["lo"], row["lo"] + l1), (row["hi"] - l2, row["hi"])):
+        cand = dict(tie)
+        cand["logical_code"] = TIE_SPLIT_CODE
+        cand["length_cm"] = hi - lo
+        cand["cells_world"] = []
+        cand["origin_world"] = tie["origin_world"] + wall_dir * (_cm_to_ft((lo + hi) / 2.0) - old_center_t)
+        parts.append({"cand": cand, "lo": lo, "hi": hi, "along": True, "eligible": True, "tie": False,
+                      "split_of": tie, "b54_cinta": True, "b54_tie": bool(row.get("tie"))})
+    parts[0]["stagger_cm"] = round(min(best_stagger, 1e6), 3)
+    parts[0]["joint_cm"] = round(row["lo"] + l1 + joint / 2.0, 3)
+    return parts
+
+
+def _finish_b54_cinta_piece(piece, group):
+    """SECAO 86.16: a parte do B54 da cinta sai U34 ou U19 (a meia canaleta e'
+    permitida SO' aqui), com a marca da secao e razao propria (nao e' peca de no' -
+    a regra 75 nao a trata como amarracao; os gates aceitam pela marca)."""
+    length = group[-1]["hi"] - group[0]["lo"]
+    code = CHANNEL_U_34 if abs(length - 34.0) <= 0.6 else CHANNEL_U_19
+    piece["logical_code"] = code
+    piece["length_cm"] = CHANNEL_LOGICAL_TYPES[code]["nominal_length_cm"]
+    piece["instance_length_cm"] = None
+    piece["placement_reason"] = B54_CINTA_REASON
+    rein = piece.get("reinforcement")
+    if isinstance(rein, dict):
+        rein["cut"] = None
+        rein["b54_cinta"] = B54_CINTA_SECTION
+        rein["b54_tie"] = bool(group[0].get("b54_tie"))
+    return piece
 
 
 def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_wall, course_band,
@@ -1167,8 +1530,26 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                           "lo_cm": round(lo, 3), "hi_cm": round(hi, 3), "roles": roles,
                           "opening_indices": sorted(set(sp[2] for sp in run["items"])), "pieces": []}
                 groups = _group_run_members(members, policy)
-                new_pieces = [_channel_candidate_from_group(g, walls_to_create, wall_idx, record, policy)
-                              for g in groups]
+                if not half_channel_allowed():
+                    # SECAO 86.14: nenhuma meia canaleta - o B19 que sobra sozinho e'
+                    # refeito com as vizinhas (U39/U34 + no maximo um U_CUT >= 9)
+                    adj_half = []
+                    for cj in (ci - 1, ci + 1):
+                        if 0 <= cj < num_courses:
+                            adj_half.extend(_row_joints_cm(_wall_strip_pieces(out_cc[cj], walls_to_create, wall_idx),
+                                                           policy["contiguous_gap_cm"]))
+                    groups, half_resplits, half_unresolved = _avoid_half_channel_groups(
+                        groups, adj_half, policy, walls_to_create, wall_idx)
+                    if half_resplits:
+                        record["half_channel_resplits"] = half_resplits
+                    for g in half_unresolved:
+                        findings.append({"code": "CHANNEL_HALF_PIECE_UNAVOIDABLE", "severity": SEVERITY_ERROR,
+                                         "classification": "NEEDS_RULE", "wall_idx": wall_idx, "course_index": ci,
+                                         "run_id": run_id, "lo_cm": round(g[0]["lo"], 3),
+                                         "hi_cm": round(g[-1]["hi"], 3),
+                                         "detail": "trecho de 19 cm sem recomposicao U39/U34/U_CUT (86.14)"})
+                new_pieces = [finish_half_resplit_piece(
+                    _channel_candidate_from_group(g, walls_to_create, wall_idx, record, policy), g) for g in groups]
                 for g, piece in zip(groups, new_pieces):
                     record["pieces"].append({"code": piece["logical_code"],
                                              "lo_cm": round(g[0]["lo"], 3), "hi_cm": round(g[-1]["hi"], 3),
@@ -1180,9 +1561,13 @@ def plan_channel_reinforcement(course_candidates, walls_to_create, openings_per_
                                          "course_index": ci, "run_id": run_id,
                                          "detail": "canaleta cortada de {:.1f} cm (< {:.1f} cm observado)".format(
                                              piece["instance_length_cm"], policy["observed_min_cut_length_cm"])})
+                    head_key = g[0].get("pseudo_key") or _physical_key(g[0]["cand"])
                     for src in g:
-                        replacements[_physical_key(src["cand"])] = (_physical_key(g[0]["cand"]), piece,
-                                                                    round(g[0]["lo"], 4))
+                        # SECAO 86.14: a peca recomposta substitui as originais em `covers`
+                        for orig in (src["covers"] if "covers" in src else [src["cand"]]):
+                            replacements[_physical_key(orig)] = (head_key, piece, round(g[0]["lo"], 4))
+                    if g[0].get("pseudo_key"):
+                        replacements[head_key] = (head_key, piece, round(g[0]["lo"], 4))
                 for sp in run["items"]:
                     oi, role, lim_l, lim_r, blockers = sp[2], sp[3], sp[4], sp[5], sp[6]
                     opening = openings[oi]
@@ -1288,7 +1673,10 @@ DEFAULT_TOP_BOND_BEAM_POLICY = {
     # B54 que NAO e' amarracao (preenchimento - ex.: caixa de shaft, 85.8) vira
     # U34+U19 com a junta nova o mais longe possivel das juntas da fiada de baixo
     # (humano: B54 -> U34+U19 7x / U19+U34 4x). Sem desencontro minimo fica B54.
+    # SECAO 86.14 (2026-10-05): so' com a meia canaleta religada
+    # (CHANNEL_HALF_U19_ENABLED); sem ela vale `split_b54_lengths_no_half_cm`.
     "split_b54_lengths_cm": (34.0, 19.0),
+    "split_b54_lengths_no_half_cm": SPLIT_B54_NO_HALF_LENGTHS_CM,
     # peca de preenchimento que invade o quadrado do no' mais que isto fica bloco
     "node_square_margin_cm": 0.5,
 }
@@ -1344,6 +1732,14 @@ def plan_top_bond_beam(course_candidates, walls_to_create, num_courses, nodes=No
     51.3) e B54 que NAO e' amarracao dividido em U34+U19. Juntas, amarracoes e
     paridade nao mudam; fundir so' REMOVE junta.
 
+    SECAO 86.14 (correcao do usuario 2026-10-05, chave CHANNEL_HALF_U19_ENABLED =
+    False): sem MEIA CANALETA - o B19 e' fundido a' vizinha como compensador
+    (B19+C04 = U_CUT 24, B19+C09 = U_CUT 29, B19+B19 = U39) e o que sobra
+    sozinho e' refeito com as vizinhas em U39/U34 + no maximo um U_CUT >= 9
+    (`_avoid_half_channel_groups`); o B54 de preenchimento vira U39 + U_CUT 14.
+    Trecho de 19 cm sem recomposicao fica BLOCO (achado
+    TOP_BOND_BEAM_HALF_BLOCK_KEPT).
+
     Variante A: no QUADRADO de cada no' L/T/X continua o BLOCO de amarracao
     (B34/B54 da parede e a peca transversal da outra) e nenhuma peca de
     preenchimento que invada o quadrado vira canaleta - canaleta nunca serve de
@@ -1359,13 +1755,19 @@ def plan_top_bond_beam(course_candidates, walls_to_create, num_courses, nodes=No
     piece_policy = dict(cpol)
     piece_policy["policy_version"] = pol["policy_version"]
     split_policy = dict(cpol)
-    split_policy["tie_split_lengths_cm"] = tuple(pol["split_b54_lengths_cm"])
+    allow_half = half_channel_allowed()
+    # SECAO 86.14: sem meia canaleta o B54 de preenchimento vira U39 + U_CUT 14
+    split_policy["tie_split_lengths_cm"] = tuple(
+        pol["split_b54_lengths_cm"] if allow_half
+        else (pol.get("split_b54_lengths_no_half_cm") or SPLIT_B54_NO_HALF_LENGTHS_CM))
     gap = cpol["contiguous_gap_cm"] + CONTIGUOUS_GAP_EPSILON_CM
     margin = pol["node_square_margin_cm"]
     out_cc = dict((ci, list(pcs or [])) for ci, pcs in (course_candidates or {}).items())
     counts = {"source_pieces_converted": 0, "channel_pieces": 0, "by_code": {}, "kept_tie": 0,
               "kept_at_node": 0, "kept_ineligible": 0, "shared_with_opening": 0, "b54_split": 0,
-              "walls_with_beam": 0}
+              "walls_with_beam": 0, "half_channel_resplits": 0, "kept_half_block": 0,
+              "b54_cinta_split": 0, "b54_cinta_tie_split": 0}
+    b54_on = b54_cinta_enabled()
     findings = []
     report = {"role": ROLE_TOP_BOND_BEAM, "variant": pol["variant"], "policy": pol, "course_index": None,
               "runs": [], "findings": findings, "counts": counts, "course_candidates": out_cc}
@@ -1377,6 +1779,7 @@ def plan_top_bond_beam(course_candidates, walls_to_create, num_courses, nodes=No
     if not pieces:
         return report
     below = (out_cc.get(ci - 1) or []) if ci > 0 else []
+    grid = (out_cc.get(ci - 2) or []) if ci > 1 else []
     removed = set()
     inserted = {}
     for wall_idx in range(len(walls_to_create)):
@@ -1391,7 +1794,37 @@ def plan_top_bond_beam(course_candidates, walls_to_create, num_courses, nodes=No
             code = cand.get("logical_code")
             own = cand.get("wall_idx") == wall_idx
             new_rows = None
-            if own and r["along"] and not r["tie"]:
+            if b54_on and r["along"] and code == "B54" and (own or cand.get("secondary_wall_idx") == wall_idx):
+                # (o B54 do T pode estar gravado na parede que chega, ao longo desta - a
+                # parede onde ele esta' AO LONGO e' a unica que o processa)
+                # SECAO 86.16: TODO B54 da ultima fiada (amarracao do no' ou preenchimento)
+                # vira U34 + U19, junta desencontrada de c-1 e coerente com a grade de c-2
+                if below_joints is None:
+                    below_joints = _row_joints_cm(_wall_strip_pieces(below, walls_to_create, wall_idx),
+                                                  cpol["contiguous_gap_cm"])
+                grid_joints = _row_joints_cm(
+                    [x for x in _wall_strip_pieces(grid, walls_to_create, wall_idx)
+                     if x["cand"].get("wall_idx") == wall_idx and x["along"]], cpol["contiguous_gap_cm"])
+                parts = _b54_cinta_split_rows(r, walls_to_create, wall_idx, below_joints, grid_joints, cpol)
+                if parts is None:
+                    counts["kept_tie" if r["tie"] else "kept_ineligible"] += 1
+                else:
+                    counts["b54_split"] += 1
+                    counts["b54_cinta_split"] += 1
+                    if r["tie"]:
+                        counts["b54_cinta_tie_split"] += 1
+                    if parts[0]["stagger_cm"] < cpol.get("tie_split_min_stagger_cm", 1.5) - 1e-6:
+                        # TODO B54 vira U34 + U19 (pedido do usuario): a junta que coincide com
+                        # c-1 fica registrada (no T e' a face da parede que chega)
+                        findings.append({"code": "TOP_BOND_BEAM_B54_JOINT_COINCIDENT",
+                                         "severity": SEVERITY_INFO if r["tie"] else SEVERITY_WARNING,
+                                         "classification": "USER_RULE_86_16", "wall_idx": wall_idx,
+                                         "course_index": ci, "lo_cm": round(r["lo"], 3), "hi_cm": round(r["hi"], 3),
+                                         "joint_cm": parts[0]["joint_cm"], "tie": bool(r["tie"]),
+                                         "detail": "junta U34|U19 do B54 da cinta coincide com junta da fiada "
+                                                   "de baixo (86.16)"})
+                    new_rows = parts
+            elif own and r["along"] and not r["tie"]:
                 if is_channel_code(code):
                     counts["shared_with_opening"] += 1
                 elif _square_hit(r["lo"], r["hi"], squares, margin) is not None:
@@ -1414,7 +1847,10 @@ def plan_top_bond_beam(course_candidates, walls_to_create, num_courses, nodes=No
                         findings.append({"code": "TOP_BOND_BEAM_B54_SPLIT_NO_STAGGER", "severity": SEVERITY_WARNING,
                                          "classification": "NEEDS_RULE", "wall_idx": wall_idx, "course_index": ci,
                                          "lo_cm": round(r["lo"], 3), "hi_cm": round(r["hi"], 3),
-                                         "detail": "B54 de preenchimento sem divisao U34+U19 com desencontro"})
+                                         "detail": ("B54 de preenchimento sem divisao U34+U19 com desencontro"
+                                                    if allow_half else
+                                                    "B54 de preenchimento sem divisao U39+U_CUT com desencontro "
+                                                    "(86.14)")})
                     else:
                         counts["b54_split"] += 1
                         new_rows = parts
@@ -1439,11 +1875,35 @@ def plan_top_bond_beam(course_candidates, walls_to_create, num_courses, nodes=No
             record = {"run_id": "W{}:C{}:TOP:{:.1f}-{:.1f}".format(wall_idx, ci, lo, hi), "wall_idx": wall_idx,
                       "course_index": ci, "lo_cm": round(lo, 3), "hi_cm": round(hi, 3),
                       "roles": [ROLE_TOP_BOND_BEAM], "opening_indices": [], "pieces": []}
-            for group in _group_run_members(seq, cpol):
+            groups = _group_run_members(seq, cpol)
+            kept_half = set()
+            if not allow_half:
+                # SECAO 86.14: nenhuma meia canaleta na cinta - B19 que sobra sozinho e'
+                # refeito com as vizinhas; sem recomposicao possivel fica BLOCO
+                if below_joints is None:
+                    below_joints = _row_joints_cm(_wall_strip_pieces(below, walls_to_create, wall_idx),
+                                                  cpol["contiguous_gap_cm"])
+                groups, half_resplits, half_unresolved = _avoid_half_channel_groups(
+                    groups, below_joints, cpol, walls_to_create, wall_idx)
+                if half_resplits:
+                    record["half_channel_resplits"] = half_resplits
+                    counts["half_channel_resplits"] += len(half_resplits)
+                kept_half = set(id(g) for g in half_unresolved)
+            for group in groups:
+                if id(group) in kept_half:
+                    counts["kept_half_block"] += 1
+                    findings.append({"code": "TOP_BOND_BEAM_HALF_BLOCK_KEPT", "severity": SEVERITY_WARNING,
+                                     "classification": "NEEDS_RULE", "wall_idx": wall_idx, "course_index": ci,
+                                     "lo_cm": round(group[0]["lo"], 3), "hi_cm": round(group[-1]["hi"], 3),
+                                     "detail": "trecho de 19 cm sem recomposicao U39/U34/U_CUT: fica bloco (86.14)"})
+                    continue
                 piece = _channel_candidate_from_group(group, walls_to_create, wall_idx, record, piece_policy)
                 piece["reinforcement"]["source_codes"] = [
                     ("B54_SPLIT" if g.get("split_of") is not None else g["cand"].get("logical_code"))
                     for g in group]
+                finish_half_resplit_piece(piece, group)
+                if group[0].get("b54_cinta"):
+                    _finish_b54_cinta_piece(piece, group)
                 record["pieces"].append({"code": piece["logical_code"], "lo_cm": round(group[0]["lo"], 3),
                                          "hi_cm": round(group[-1]["hi"], 3),
                                          "source_codes": list(piece["reinforcement"]["source_codes"])})
@@ -1456,10 +1916,10 @@ def plan_top_bond_beam(course_candidates, walls_to_create, num_courses, nodes=No
                                          piece["instance_length_cm"], cpol["observed_min_cut_length_cm"])})
                 counts["channel_pieces"] += 1
                 counts["by_code"][piece["logical_code"]] = counts["by_code"].get(piece["logical_code"], 0) + 1
-                anchor = _physical_key(group[0].get("split_of") or group[0]["cand"])
+                anchor = _physical_key(group[0].get("anchor_cand") or group[0].get("split_of") or group[0]["cand"])
                 inserted.setdefault(anchor, []).append(piece)
-                for src in group:
-                    removed.add(_physical_key(src.get("split_of") or src["cand"]))
+                for orig in group_source_cands(group):
+                    removed.add(_physical_key(orig))
             report["runs"].append(record)
     counts["source_pieces_converted"] = len(removed)
     if inserted:
@@ -1512,7 +1972,9 @@ def top_bond_beam_audit(course_candidates, walls_to_create, nodes, course_index,
     pol = top_bond_beam_policy(policy)
     margin = pol["node_square_margin_cm"]
     counts = {"TOP_BOND_BEAM_WRONG_COURSE": 0, "TOP_BOND_BEAM_TIE_ROLE": 0, "TOP_BOND_BEAM_CHANNEL_AT_NODE": 0,
-              "TOP_BOND_BEAM_BLOCK_NOT_CONVERTED": 0, "beam_pieces": 0}
+              "TOP_BOND_BEAM_BLOCK_NOT_CONVERTED": 0, "beam_pieces": 0,
+              # SECAO 86.16 (informativo): U34/U19 do B54 da cinta, e as que ficam no quadrado do no'
+              "b54_cinta_pieces": 0, "b54_cinta_at_node": 0}
     items = []
     for ci in sorted(course_candidates or {}):
         for cand in course_candidates.get(ci) or []:
@@ -1523,6 +1985,9 @@ def top_bond_beam_audit(course_candidates, walls_to_create, nodes, course_index,
                 counts["TOP_BOND_BEAM_WRONG_COURSE"] += 1
                 items.append({"code": "TOP_BOND_BEAM_WRONG_COURSE", "course_index": ci,
                               "wall_idx": cand.get("wall_idx"), "logical_code": cand.get("logical_code")})
+            if is_b54_cinta_piece(cand):
+                counts["b54_cinta_pieces"] += 1
+                continue   # SECAO 86.16: excecao do usuario a' regra 75 (B54 da cinta)
             if _is_tie(cand) or cand.get("converted_tie"):
                 counts["TOP_BOND_BEAM_TIE_ROLE"] += 1
                 items.append({"code": "TOP_BOND_BEAM_TIE_ROLE", "course_index": ci,
@@ -1543,7 +2008,9 @@ def top_bond_beam_audit(course_candidates, walls_to_create, nodes, course_index,
             code = cand.get("logical_code")
             square = _square_hit(r["lo"], r["hi"], squares, margin)
             if is_top_bond_beam_piece(cand):
-                if square is not None:
+                if square is not None and is_b54_cinta_piece(cand):
+                    counts["b54_cinta_at_node"] += 1   # SECAO 86.16: B54 de no' da cinta = U34 + U19
+                elif square is not None:
                     counts["TOP_BOND_BEAM_CHANNEL_AT_NODE"] += 1
                     items.append({"code": "TOP_BOND_BEAM_CHANNEL_AT_NODE", "wall_idx": wall_idx,
                                   "course_index": course_index, "node_index": square[2],
@@ -1586,6 +2053,8 @@ def validate_channel_reinforcement(course_candidates, walls_to_create, openings_
     counts = {"MISSING_REQUIRED_CHANNEL": 0, "EXTRA_CHANNEL": 0, "CHANNEL_WRONG_COURSE": 0,
               "CHANNEL_INVADES_OPENING": 0, "CHANNEL_COLLISION": 0, "CHANNEL_SUPPORT_BELOW_POLICY": 0,
               "CHANNEL_OPENING_OVERCUT": 0, "CHANNEL_FREE_TO_TOP_NOT_OPEN": 0, "CHANNEL_ORPHAN_PIECE": 0,
+              # SECAO 86.14: meia canaleta (U19 / U_CUT de 19) com a chave desligada
+              "CHANNEL_HALF_PIECE": 0,
               "channel_top_expected": 0, "channel_top_matched": 0,
               "channel_bottom_expected": 0, "channel_bottom_matched": 0, "channel_pieces": 0,
               "channel_cut_pieces": 0, "top_bond_beam_pieces": 0}
@@ -1707,6 +2176,13 @@ def validate_channel_reinforcement(course_candidates, walls_to_create, openings_
         counts["channel_pieces"] += len(channel_idx)
         counts["channel_cut_pieces"] += sum(1 for c in pieces if c.get("logical_code") == CHANNEL_U_CUT)
         counts["top_bond_beam_pieces"] += sum(1 for c in pieces if is_top_bond_beam_piece(c))
+        if not half_channel_allowed():
+            for c in pieces:
+                # (a U19 do B54 da cinta de topo, 86.16, e' a excecao do usuario)
+                if is_forbidden_half_channel_piece(c):
+                    counts["CHANNEL_HALF_PIECE"] += 1
+                    items.append({"code": "CHANNEL_HALF_PIECE", "course_index": ci, "wall_idx": c.get("wall_idx"),
+                                  "logical_code": c.get("logical_code")})
         for wi in range(len(walls_to_create)):
             rows = cached_strip_rows(strip_cache, "now", buckets, ci, wi, walls_to_create)
             along_all = [r for r in rows if r["along"] and is_channel_code(r["cand"].get("logical_code"))

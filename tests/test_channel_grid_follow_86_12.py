@@ -15,6 +15,14 @@ peitoril 80 (contraverga na f3), topo 221 (verga na f11), cinta na f12 (13
 fiadas, como o pavimento do humano). Na f9 o pilarete da primeira janela e'
 `B34 | B19 | jamba` - o caso dos prints do usuario.
 
+SECAO 86.14 (correcao do usuario 2026-10-05): a MEIA CANALETA deixou de existir
+(chave `opening_reinforcement.CHANNEL_HALF_U19_ENABLED = False`). Os testes que
+fixam o B19->U19 / B54->U34+U19 da 86.12 rodam com a chave RELIGADA (legado, a
+chave tem de reproduzir o comportamento anterior); os invariantes da 86.12 que
+continuam valendo (juntas DURAS seguem a fiada c-2, no' com bloco, apoio que
+nao diminui, determinismo...) rodam no padrao novo. O contrato novo esta' em
+tests/test_sem_meia_canaleta_86_14.py.
+
     py -3 -m pytest tests/test_channel_grid_follow_86_12.py -q
 """
 import os
@@ -43,13 +51,16 @@ def _janelas():
 _CACHE = {}
 
 
-def _solve(estrategia=None, follow=True, reverse=False):
-    chave = (estrategia, follow, reverse)
+def _solve(estrategia=None, follow=True, reverse=False, half=False):
+    """`half=True` religa a meia canaleta (86.14 desligada = contrato original da 86.12)."""
+    chave = (estrategia, follow, reverse, half)
     if chave not in _CACHE:
         antes = m.CHANNEL_GRID_FOLLOW_ENABLED
+        meia = orf.CHANNEL_HALF_U19_ENABLED
         # contrato isolado da 86.12: a segunda passada da jamba (86.13, integracao) fica desligada aqui
         segunda = getattr(m, "JAMB_SECOND_PASS_AFTER_GRID_FOLLOW", None)
         m.CHANNEL_GRID_FOLLOW_ENABLED = follow
+        orf.CHANNEL_HALF_U19_ENABLED = half
         if segunda is not None:
             m.JAMB_SECOND_PASS_AFTER_GRID_FOLLOW = False
         try:
@@ -57,9 +68,17 @@ def _solve(estrategia=None, follow=True, reverse=False):
             _CACHE[chave] = tcr.solve(lines, ops, strategy=estrategia, num_courses=NUM, reverse=reverse)
         finally:
             m.CHANNEL_GRID_FOLLOW_ENABLED = antes
+            orf.CHANNEL_HALF_U19_ENABLED = meia
             if segunda is not None:
                 m.JAMB_SECOND_PASS_AFTER_GRID_FOLLOW = segunda
     return _CACHE[chave]
+
+
+WHOLE = ("B39", "B34", "CHANNEL_U_39", "CHANNEL_U_34")
+
+
+def _whole(row):
+    return row["cand"].get("logical_code") in WHOLE
 
 
 def _rows(res, walls, wi, ci):
@@ -78,16 +97,34 @@ def _channel_courses(res):
     return sorted(ci for ci, pcs in res["course_candidates"].items() if any(cgf.is_target_channel(c) for c in pcs))
 
 
-def _desalinhos(res, walls, wi, ci):
-    """Canaletas da fiada `ci` que NAO seguem a fiada ci-2 onde ela tem alvenaria:
-    toda ponta de canaleta que cai sobre alvenaria de r tem de coincidir (1,5 cm)
-    com uma ponta de peca de r (B54 de r pode ser dividido); junta de r DENTRO da
-    canaleta so' quando ao lado de um compensador de r (fusao da 51.3). Ponta na
-    borda LIVRE da fiada c (nada encostado do outro lado: jamba de vao ativo,
-    ponta) nao pode avancar - nunca invade."""
+def _desalinhos(res, walls, wi, ci, half=True):
+    """Canaletas da fiada `ci` que NAO seguem a fiada ci-2 onde ela tem alvenaria.
+
+    `half=True` (86.12 com a meia canaleta, regua estrita): toda ponta de canaleta
+    que cai sobre alvenaria de r tem de coincidir (1,5 cm) com uma ponta de peca de
+    r (B54 de r pode ser dividido); junta de r DENTRO da canaleta so' quando ao lado
+    de um compensador de r (fusao da 51.3).
+
+    `half=False` (86.14, sem meia canaleta): so' as juntas DURAS de r (entre dois
+    blocos inteiros B39/B34/U39/U34) nao podem ficar dentro de uma canaleta, e uma
+    ponta de canaleta nao pode cair no meio de um bloco inteiro de r que tem bloco
+    inteiro encostado dos dois lados; meio bloco, compensador, B54 e U_CUT de r e o
+    bloco inteiro vizinho deles (junta mole) podem ser atravessados.
+
+    Ponta na borda LIVRE da fiada c (nada encostado do outro lado: jamba de vao
+    ativo, ponta) nao pode avancar - nunca invade."""
     r = _own(_rows(res, walls, wi, ci - 2), wi)
     todas = _rows(res, walls, wi, ci)
     out = []
+
+    def contig(a, b):
+        return 0.0 <= b["lo"] - a["hi"] <= 2.5
+
+    def entre_inteiros(k):
+        esq = k > 0 and contig(r[k - 1], r[k]) and _whole(r[k - 1])
+        dir_ = k + 1 < len(r) and contig(r[k], r[k + 1]) and _whole(r[k + 1])
+        return esq and dir_
+
     for p in _own(todas, wi):
         if not cgf.is_target_channel(p["cand"]):
             continue
@@ -101,14 +138,25 @@ def _desalinhos(res, walls, wi, ci):
                 livre = not any(0.0 <= q["lo"] - edge <= 2.5 for q in todas if q is not p)
             if livre:
                 continue
-            cortada = [x for x in r if x["lo"] < edge - 1.5 and x["hi"] > edge + 1.5]
-            if cortada and cortada[0]["cand"].get("logical_code") != "B54":
+            cortada = [(k, x) for k, x in enumerate(r) if x["lo"] < edge - 1.5 and x["hi"] > edge + 1.5]
+            if not cortada:
+                continue
+            k, x = cortada[0]
+            if half:
+                ruim = x["cand"].get("logical_code") != "B54"
+            else:
+                ruim = _whole(x) and entre_inteiros(k)
+            if ruim:
                 out.append(("PONTA", round(p["lo"], 1), round(p["hi"], 1), p["cand"]["logical_code"]))
         for a, b in zip(r, r[1:]):
             junta = (a["hi"] + b["lo"]) / 2.0
-            if p["lo"] + 1.5 < junta < p["hi"] - 1.5 and 0.0 <= b["lo"] - a["hi"] <= 2.5:
-                if a["cand"].get("logical_code") not in ("C04", "C09") and \
-                        b["cand"].get("logical_code") not in ("C04", "C09"):
+            if p["lo"] + 1.5 < junta < p["hi"] - 1.5 and contig(a, b):
+                if half:
+                    ruim = a["cand"].get("logical_code") not in ("C04", "C09") and \
+                        b["cand"].get("logical_code") not in ("C04", "C09")
+                else:
+                    ruim = _whole(a) and _whole(b)
+                if ruim:
                     out.append(("JUNTA", round(p["lo"], 1), round(p["hi"], 1), p["cand"]["logical_code"]))
     return out
 
@@ -124,7 +172,10 @@ def test_chave_ligada_por_padrao_e_politica():
 # ------------------------------------------------------------------ o caso dos prints
 @pytest.mark.parametrize("estrategia", ESTRATEGIAS)
 def test_verga_sobre_pilarete_b34_b19_jamba_vira_u34_u19(estrategia):
-    res, walls, _n, _o = _solve(estrategia)
+    # LEGADO (86.14): o B19->U19 so' existe com a meia canaleta religada - a chave
+    # tem de reproduzir exatamente o contrato original da 86.12. Sem ela (padrao) o
+    # mesmo pilarete fica sem U19: tests/test_sem_meia_canaleta_86_14.py
+    res, walls, _n, _o = _solve(estrategia, half=True)
     f9 = _own(_rows(res, walls, 0, 9), 0)
     f11 = _own(_rows(res, walls, 0, 11), 0)
     # o pilarete da primeira janela na f9 termina em B34 | B19 | jamba (109)
@@ -139,27 +190,36 @@ def test_verga_sobre_pilarete_b34_b19_jamba_vira_u34_u19(estrategia):
     assert res["channel_grid_follow"]["applied"]
 
 
+@pytest.mark.parametrize("half", [False, True])
 @pytest.mark.parametrize("estrategia", ESTRATEGIAS)
-def test_toda_canaleta_segue_a_fiada_de_mesma_paridade_abaixo(estrategia):
-    com, walls, _n, _o = _solve(estrategia)
-    sem, walls0, _n0, _o0 = _solve(estrategia, follow=False)
+def test_toda_canaleta_segue_a_fiada_de_mesma_paridade_abaixo(estrategia, half):
+    # half=False (padrao, 86.14): so' as juntas DURAS de r; half=True: regua estrita da 86.12
+    com, walls, _n, _o = _solve(estrategia, half=half)
+    sem, walls0, _n0, _o0 = _solve(estrategia, follow=False, half=half)
     cursos = _channel_courses(com)
     assert set(cursos) >= set([3, 4, 11, 12])
     for ci in cursos:
-        assert _desalinhos(com, walls, 0, ci) == [], ci
-    # o estado anterior tinha canaleta fora da grade de baixo (o defeito dos prints)
+        assert _desalinhos(com, walls, 0, ci, half=half) == [], ci
+    # o estado anterior tinha canaleta fora da grade de baixo (o defeito dos prints, regua estrita)
     assert any(_desalinhos(sem, walls0, 0, ci) for ci in _channel_courses(sem))
 
 
+@pytest.mark.parametrize("half", [False, True])
 @pytest.mark.parametrize("estrategia", ESTRATEGIAS)
-def test_cinta_repete_a_fiada_10_sobre_o_pilarete(estrategia):
-    res, walls, _n, _o = _solve(estrategia)
+def test_cinta_repete_a_fiada_10_sobre_o_pilarete(estrategia, half):
+    res, walls, _n, _o = _solve(estrategia, half=half)
     f10 = _own(_rows(res, walls, 0, 10), 0)
     f12 = _own(_rows(res, walls, 0, 12), 0)
     pilar = [x for x in f10 if x["lo"] >= 245.0 and x["hi"] <= 335.0]
     assert pilar
-    juntas10 = [round((a["hi"] + b["lo"]) / 2.0, 1) for a, b in zip(pilar, pilar[1:])
-                if a["cand"]["logical_code"] not in ("C04", "C09") and b["cand"]["logical_code"] not in ("C04", "C09")]
+    if half:
+        juntas10 = [round((a["hi"] + b["lo"]) / 2.0, 1) for a, b in zip(pilar, pilar[1:])
+                    if a["cand"]["logical_code"] not in ("C04", "C09")
+                    and b["cand"]["logical_code"] not in ("C04", "C09")]
+    else:
+        # 86.14: so' as juntas duras (entre dois blocos inteiros) - a junta que encosta no
+        # meio bloco/compensador e' mole e a cinta pode atravessa-la
+        juntas10 = [round((a["hi"] + b["lo"]) / 2.0, 1) for a, b in zip(pilar, pilar[1:]) if _whole(a) and _whole(b)]
     for x in pilar:
         sobre = [p for p in f12 if min(p["hi"], x["hi"]) - max(p["lo"], x["lo"]) > 1.0]
         assert sobre and all(orf.is_channel_code(p["cand"]["logical_code"]) for p in sobre)
@@ -167,6 +227,8 @@ def test_cinta_repete_a_fiada_10_sobre_o_pilarete(estrategia):
             same = [p for p in sobre if abs(p["lo"] - x["lo"]) < 0.05 and abs(p["hi"] - x["hi"]) < 0.05]
             if same:
                 assert EQUIV.get(same[0]["cand"]["logical_code"]) == x["cand"]["logical_code"]
+        if not half:
+            assert not any(orf.is_half_channel_piece(p["cand"]) for p in sobre), x
     juntas12 = [round((a["hi"] + b["lo"]) / 2.0, 1) for a, b in zip(f12, f12[1:])]
     assert all(j in juntas12 for j in juntas10), (juntas10, juntas12)
 
@@ -292,7 +354,7 @@ def test_sentido_do_eixo_invertido_mantem_a_regra():
     com, walls, nodes, _o = _solve(None, reverse=True)
     for ci in _channel_courses(com):
         for wi in range(len(walls)):
-            assert _desalinhos(com, walls, wi, ci) == [], (ci, wi)
+            assert _desalinhos(com, walls, wi, ci, half=False) == [], (ci, wi)
     assert com["channel_as_junction_bond"] == []
     counts = com["opening_reinforcement"]["validation"]["counts"]
     assert counts["MISSING_REQUIRED_CHANNEL"] == 0 and counts["CHANNEL_COLLISION"] == 0
@@ -354,9 +416,17 @@ def test_trecho_livre_espelhado_e_o_espelho_do_trecho_canonico():
         [(round(lo, 3), round(hi, 3), c) for lo, hi, c in canon["pieces"]]
 
 
-def test_b54_de_preenchimento_dividido_longe_das_juntas_vizinhas():
+def test_b54_de_preenchimento_dividido_longe_das_juntas_vizinhas(monkeypatch):
     pol = cgf.channel_grid_follow_policy()
     ancora = {"lo": 100.0, "hi": 154.0, "code": "B54"}
+    # LEGADO (meia canaleta religada): U19 + U34
+    monkeypatch.setattr(orf, "CHANNEL_HALF_U19_ENABLED", True)
     partes = cgf._split_b54(ancora, [134.5], pol)
     assert partes == [(100.0, 119.0), (120.0, 154.0)]
     assert cgf._split_b54(ancora, [119.5, 134.5], pol) is None
+    # SECAO 86.14 (padrao): sem meia canaleta - U_CUT 14 + U39 (ou U39 + U_CUT 14)
+    monkeypatch.setattr(orf, "CHANNEL_HALF_U19_ENABLED", False)
+    partes = cgf._split_b54(ancora, [134.5], pol)
+    assert partes == [(100.0, 114.0), (115.0, 154.0)]
+    assert all(not orf.is_half_channel_length(hi - lo) for lo, hi in partes)
+    assert cgf._split_b54(ancora, [114.5, 139.5], pol) is None

@@ -2167,6 +2167,20 @@ def _bond_piece_modular(cand, ci, catalog, spans_by_wall_course, walls_to_create
     return True
 
 
+# SECAO 86.16: fracao minima do nucleo do no' coberta pelas canaletas U34 + U19 do B54
+# da cinta de topo (a junta de 1 cm entre elas pode cair dentro do quadrado)
+B54_CINTA_MIN_NODE_COVERAGE = 0.85
+
+
+def _is_b54_cinta_piece(candidate):
+    """SECAO 86.16 - U34/U19 da cinta de topo vinda de um B54 da ultima fiada."""
+    try:
+        from core.engine import opening_reinforcement as _orf
+    except Exception:  # pragma: no cover - modulo sempre presente no motor
+        return False
+    return _orf.is_b54_cinta_piece(candidate)
+
+
 def junction_bond_audit(course_candidates, nodes, walls_to_create, openings_per_wall=None,
                         course_band_ft=None, unsupported=None, non_modular=None, catalog=None,
                         opening_tol_ft=0.0, fit_tol_cm=None, junction_roles=None):
@@ -2315,6 +2329,15 @@ def junction_bond_audit(course_candidates, nodes, walls_to_create, openings_per_
                     continue
                 bond = cand
                 break
+            if bond is None:
+                # SECAO 86.16 (excecao decidida pelo usuario a' regra 76.1, SO' na cinta de
+                # topo): o B54 de amarracao da ultima fiada virou U34 + U19 - a regiao do no'
+                # coberta por essas canaletas (a junta U34|U19 pode cair dentro dela) conta
+                # como amarrada
+                cinta = [(c, p) for _f, c, p in ocup if _is_b54_cinta_piece(c)]
+                if cinta and sum(_convex_overlap_area(p, nucleo) for _c, p in cinta) >= \
+                        area_nucleo * B54_CINTA_MIN_NODE_COVERAGE:
+                    bond = cinta[0][0]
             if bond is not None:
                 valid += 1
                 resolved.append({"course_index": ci, "node_index": ni, "node_kind": node.get("kind"),

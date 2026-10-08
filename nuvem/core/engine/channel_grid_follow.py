@@ -37,7 +37,24 @@ antes da reauditoria de amarracao. Nao muta `course_candidates`. Deterministico
 (ordem por fiada, parede e eixo; o trecho livre e' escolhido no sentido canonico
 do mundo, independente do sentido do eixo da parede). Compativel com IronPython
 2.7 (sem f-string, sem nonlocal).
+
+SECAO 86.14 (correcao do usuario 2026-10-05, REGRA OBRIGATORIA, chave
+`opening_reinforcement.CHANNEL_HALF_U19_ENABLED = False`) - SEM MEIA CANALETA:
+"isso nao existe, pode parar; a continuacao das canaletas nao serve para os meio
+bloco; quando houver um meio bloco nas fiadas abaixo deve ser completado por
+bloco de 34 ou 39". Substitui o B19->U19 / B54->U34+U19 / U19 do trecho livre:
+
+- juntas de r entre dois blocos INTEIROS (B39/B34, ou U39/U34 de r) sao DURAS: a
+  junta da canaleta continua coincidindo com elas (86.12);
+- meio bloco (B19), compensador (C04/C09), B54 de preenchimento e U_CUT de r sao
+  pecas MOLES: a canaleta nao as acompanha. Elas entram no trecho livre junto com
+  o vao vizinho (se houver) e, quando isso evita U_CUT ou junta coincidente, com o
+  bloco inteiro vizinho (a junta mole dele e' atravessada; a dura fica). O trecho
+  fecha so' com U39/U34 e no maximo UM U_CUT (>= 9 cm, nunca 19 cm). Escolha:
+  juntas novas coincidentes com c-1/c+1, U_CUT, blocos inteiros abrangidos, U_CUT
+  minuscula, numero de pecas (`_soften_items`).
 """
+import itertools
 import math
 
 from core.engine.wall_stepper import _make_block_candidate, _wall_axis_and_length  # noqa: F401
@@ -50,9 +67,20 @@ BLOCK_OF_CHANNEL = {_orf.CHANNEL_U_39: "B39", _orf.CHANNEL_U_34: "B34", _orf.CHA
 FOLLOW_CODES = ("B39", "B34", "B19", "C04", "C09", "B54")
 COMPENSATORS = ("C04", "C09")
 FREE_STEPS = ((39.0, "B39"), (34.0, "B34"), (19.0, "B19"))
+# SECAO 86.14: sem a meia canaleta o trecho livre so' tem 39 e 34
+FREE_STEPS_NO_HALF = ((39.0, "B39"), (34.0, "B34"))
 FREE_CUT = "FREE_CUT"
 FREE_SHORT = "FREE_SHORT"
 MERGEABLE = ("C04", "C09", FREE_SHORT)
+# SECAO 86.14: pecas de r que a canaleta NAO acompanha (juntas moles) e blocos
+# inteiros (juntas duras entre eles)
+SOFT_CODES = ("B19", "C04", "C09", "B54", _orf.CHANNEL_U_CUT)
+WHOLE_CODES = ("B39", "B34")
+SOFT_KIND = "SOFT"
+
+
+def _free_steps():
+    return FREE_STEPS if _orf.half_channel_allowed() else FREE_STEPS_NO_HALF
 
 DEFAULT_CHANNEL_GRID_FOLLOW_POLICY = {
     "policy_version": "CHANNEL-GRID-FOLLOW-2026-10-05-S86.12",
@@ -78,6 +106,12 @@ DEFAULT_CHANNEL_GRID_FOLLOW_POLICY = {
     "max_cut_cm": 39.0,
     "max_extra_pieces": 3,
     "split_b54_lengths_cm": (34.0, 19.0),
+    # SECAO 86.14: B54 de preenchimento sem meia canaleta (so' se ele ainda for
+    # dividido no lugar; com a chave desligada ele e' peca mole do trecho livre)
+    "split_b54_lengths_no_half_cm": _orf.SPLIT_B54_NO_HALF_LENGTHS_CM,
+    # SECAO 86.14: blocos inteiros vizinhos de pecas moles que a escolha do trecho
+    # pode abranger por grupo (todas as combinacoes ate' aqui; acima, ate' 2)
+    "soft_max_absorbable": 8,
     "node_square_margin_cm": 0.5,
 }
 
@@ -120,7 +154,7 @@ def _canonical_axis(walls_to_create, wall_idx):
 # --------------------------------------------------------------------------
 # trecho livre (sobre o vao): U39/U34/U19 + no maximo um U_CUT
 # --------------------------------------------------------------------------
-def _fill_free(s, e, flex_l, flex_r, adj_joints, pol, keep=None):
+def _fill_free(s, e, flex_l, flex_r, adj_joints, pol, keep=None, free_spans=None):
     """Melhor composicao de [s, e] (faces) com pecas de 39/34/19 e no maximo UMA
     cortada. `adj_joints` (ordenadas) = juntas das fiadas c-1 e c+1. `keep` =
     [(lo, hi, code_equivalente)] das pecas originais de c que ja' fecham
@@ -128,18 +162,27 @@ def _fill_free(s, e, flex_l, flex_r, adj_joints, pol, keep=None):
 
     Criterio: juntas novas coincidentes com c-1/c+1, U_CUT, U_CUT minuscula,
     numero de pecas, numero de U19. Devolve {"pieces": [(lo, hi, code)],
-    "key", "kept"} ou None se nao fecha."""
+    "key", "kept"} ou None se nao fecha.
+
+    SECAO 86.14 (meia canaleta proibida, padrao): so' 39/34 e o U_CUT nunca tem
+    19 cm (a meia canaleta cortada). O ultimo criterio (no lugar do numero de
+    U19, sempre 0) passa a ser o U_CUT FORA do vao: com `free_spans` (trechos
+    do intervalo sem alvenaria na fiada c-2) o corte vai para cima do vao - a
+    fase que nao fecha fica sobre o vao, nunca no pilarete (85.10)."""
     j = pol["joint_cm"]
     tol_c = pol["coincident_joint_cm"]
     length = e - s
     if length < -1e-6:
         return None
     end_pos = e + j
+    steps = _free_steps()
+    allow_half = _orf.half_channel_allowed()
 
     def coinc(t):
         return 1 if _near(adj_joints, t, tol_c) else 0
 
-    n_cap = int(math.floor((length + j) / (19.0 + j) + 1e-9)) + 1
+    min_step = min(p for p, _c in steps)
+    n_cap = int(math.floor((length + j) / (min_step + j) + 1e-9)) + 1
     n_min = int(math.ceil((length + j) / (39.0 + j) - 1e-9))
     n_cap = max(1, min(n_cap, n_min + int(pol["max_extra_pieces"])))
 
@@ -154,7 +197,7 @@ def _fill_free(s, e, flex_l, flex_r, adj_joints, pol, keep=None):
                 # `pos` = inicio da peca seguinte (ida) / da peca mais a' esquerda
                 # (volta): nos dois sentidos a junta nova fica em pos - j/2
                 jc = coinc(pos - j / 2.0) if seq else 0
-                for piece_len, _code in FREE_STEPS:
+                for piece_len, _code in steps:
                     q = pos + sign * (piece_len + j)
                     if sign > 0 and q > end_pos + pol["fit_tolerance_cm"] + 1e-6:
                         continue
@@ -210,9 +253,16 @@ def _fill_free(s, e, flex_l, flex_r, adj_joints, pol, keep=None):
                 continue
             if _orf._standard_code_for_length(cut) is not None:
                 continue
+            if not allow_half and _orf.is_half_channel_length(cut):
+                continue   # SECAO 86.14: U_CUT de 19 cm e' a meia canaleta cortada
             jc = (coinc(a - j / 2.0) if sa else 0) + (coinc(b - j / 2.0) if sb_ else 0)
             tiny = 1 if cut < pol["small_cut_cm"] - 1e-6 else 0
-            key = (ca[0] + cb[0] + jc, 1, tiny, ca[1] + cb[1] + 1, ca[2] + cb[2])
+            if allow_half:
+                last = ca[2] + cb[2]
+            else:
+                mid = a + cut / 2.0
+                last = 0 if (free_spans is None or any(lo - 1e-6 <= mid <= hi + 1e-6 for lo, hi in free_spans)) else 1
+            key = (ca[0] + cb[0] + jc, 1, tiny, ca[1] + cb[1] + 1, last)
             seq = tuple(sa) + (round(cut, 3),) + tuple(reversed(sb_))
             pieces = []
             cur = s
@@ -228,9 +278,14 @@ def _fill_free(s, e, flex_l, flex_r, adj_joints, pol, keep=None):
     if keep:
         joints = [(x[1] + y[0]) / 2.0 for x, y in zip(keep, keep[1:])]
         cuts = [x for x in keep if x[2] == FREE_CUT]
+        if allow_half:
+            last = sum(1 for x in keep if x[2] == "B19")
+        else:
+            last = sum(1 for x in cuts if free_spans is not None and not any(
+                lo - 1e-6 <= (x[0] + x[1]) / 2.0 <= hi + 1e-6 for lo, hi in free_spans))
         key = (sum(coinc(t) for t in joints), len(cuts),
                1 if any((x[1] - x[0]) < pol["small_cut_cm"] - 1e-6 for x in cuts) else 0,
-               len(keep), sum(1 for x in keep if x[2] == "B19"))
+               len(keep), last)
         options.append((key, 0, (), list(keep)))
     if not options:
         return None
@@ -240,7 +295,7 @@ def _fill_free(s, e, flex_l, flex_r, adj_joints, pol, keep=None):
 
 
 def _free_code(piece_len):
-    for nominal, code in FREE_STEPS:
+    for nominal, code in _free_steps():
         if abs(piece_len - nominal) <= 0.05:
             return code
     return FREE_CUT
@@ -251,18 +306,22 @@ def _seq_key(seq):
     return tuple(-float(x) for x in seq)
 
 
-def _fill_canonical(s, e, flex_l, flex_r, adj_joints, pol, keep, canonical, cache):
+def _fill_canonical(s, e, flex_l, flex_r, adj_joints, pol, keep, canonical, cache, free_spans=None):
     """`_fill_free` no sentido canonico do mundo (espelha o trecho se o eixo da
-    parede aponta para o outro lado). Memoizado por trecho."""
+    parede aponta para o outro lado). Memoizado por trecho (e pelos trechos
+    sobre o vao, 86.14)."""
+    spans = None if free_spans is None else tuple((round(a, 3), round(b, 3)) for a, b in free_spans)
     ck = (round(s, 3), round(e, 3), bool(flex_l), bool(flex_r),
-          tuple((round(x[0], 3), round(x[1], 3), x[2]) for x in (keep or [])))
+          tuple((round(x[0], 3), round(x[1], 3), x[2]) for x in (keep or [])), spans)
     if ck in cache:
         return cache[ck]
     if canonical:
-        out = _fill_free(s, e, flex_l, flex_r, adj_joints, pol, keep)
+        out = _fill_free(s, e, flex_l, flex_r, adj_joints, pol, keep, free_spans)
     else:
         mirrored_keep = [(-x[1], -x[0], x[2]) for x in reversed(keep or [])] or None
-        out = _fill_free(-e, -s, flex_r, flex_l, sorted(-t for t in adj_joints), pol, mirrored_keep)
+        mirrored_spans = None if free_spans is None else [(-b, -a) for a, b in reversed(list(free_spans))]
+        out = _fill_free(-e, -s, flex_r, flex_l, sorted(-t for t in adj_joints), pol, mirrored_keep,
+                         mirrored_spans)
         if out is not None:
             out = {"pieces": [(-p[1], -p[0], p[2]) for p in reversed(out["pieces"])], "key": out["key"],
                    "kept": out["kept"]}
@@ -277,6 +336,8 @@ def _replaceable(row, wall_idx, squares, margin):
     cand = row["cand"]
     if cand.get("wall_idx") != wall_idx or not row["along"] or row["tie"] or cand.get("converted_tie"):
         return False
+    if _orf.is_b54_cinta_piece(cand):
+        return False   # SECAO 86.16: U34 + U19 do B54 da cinta fica (parada, como o no')
     code = cand.get("logical_code")
     if not (code in FOLLOW_CODES or is_target_channel(cand)):
         return False
@@ -451,6 +512,290 @@ def _absorb_compensators(items, zones, pol, x, y, x_flex, y_flex):
     return items
 
 
+# --------------------------------------------------------------------------
+# SECAO 86.14 - pecas moles de r (meio bloco, compensador, B54, U_CUT)
+# --------------------------------------------------------------------------
+def _jamb_closure(length, hard_left, hard_right, pol, catalog):
+    """Compensador(es) da jamba que fecham a sobra curta numa borda dura (84/86.6)."""
+    if not (hard_left or hard_right) or not catalog:
+        return None
+    for nominal, codes in JAMB_CLOSURES:
+        if abs(length - nominal) <= pol["sync_tolerance_cm"] and all(c in catalog for c in codes):
+            ordered = tuple(codes) if hard_left else tuple(reversed(codes))
+            return ("CLOSURE", ordered, "L" if hard_left else "R")
+    return None
+
+
+def _soft_joint_piece(item, kind):
+    """Peca cuja junta e' MOLE (pode ser atravessada pela canaleta): vao livre,
+    meio bloco, compensador e U_CUT de r sob a corrida. O B54 de preenchimento e'
+    peca mole (a canaleta nao o acompanha), mas a junta dele com um bloco inteiro
+    continua dura - ele e' dividido por dentro ou junto do vao/peca mole."""
+    if item[0] == "F":
+        return True
+    return kind == "S" and item[1]["code"] != "B54"
+
+
+SOFT_JOINT_ROW_CODES = ("B19", "C04", "C09", _orf.CHANNEL_U_CUT, _orf.CHANNEL_U_19)
+
+
+def _r_neighbor_hard(r_rows, anchor, side, wide):
+    """A peca REAL de r encostada em `anchor` do lado `side` (+1 direita, -1
+    esquerda) faz junta dura com ele? (bloco inteiro, B54, amarracao, peca de
+    outra parede). Vao (nada encostado), meio bloco, compensador e U_CUT = mole.
+    Usado quando o item vizinho na janela e' um trecho livre: o trecho pode estar
+    sobre alvenaria de r que nao virou ancora (peca de r que passa da borda da
+    janela) - ai a junta de r continua dura."""
+    if not r_rows:
+        return False
+    for row in r_rows:
+        if row["cand"] is anchor.get("cand"):
+            continue
+        if side > 0:
+            gap = row["lo"] - anchor["hi"]
+        else:
+            gap = anchor["lo"] - row["hi"]
+        if -0.05 <= gap <= wide:
+            if row.get("tie") or not row.get("along", True):
+                return True
+            return row["cand"].get("logical_code") not in SOFT_JOINT_ROW_CODES
+    return False
+
+
+def _vao_spans(s, e, r_rows, wide):
+    """Partes de [s, e] sem alvenaria na fiada r (o vao de verdade): onde o U_CUT
+    prefere ficar (85.10). Sem `r_rows` o trecho inteiro conta como vao."""
+    if not r_rows:
+        return [(s, e)]
+    cover = sorted((max(s, r["lo"]), min(e, r["hi"])) for r in r_rows if r["hi"] > s and r["lo"] < e)
+    out = []
+    cur = s
+    for a, b in cover:
+        if a - cur > wide:
+            out.append((cur, a))
+        cur = max(cur, b)
+    if e - cur > wide:
+        out.append((cur, e))
+    return out
+
+
+def _soft_cluster_layout(ctx, items, kinds, softj, k0, k1, absorbed, x, y, x_flex, y_flex, adj_joints):
+    """Itens de saida da faixa [k0, k1] de `items` com os blocos inteiros
+    `absorbed` dentro do trecho livre, e o custo. None se algum trecho nao fecha.
+
+    Trecho = itens moles (vao livre, peca mole de r) e blocos absorvidos ligados
+    por juntas MOLES (`softj[k]` = junta entre k e k+1); junta dura (entre dois
+    blocos inteiros, ou B54 x bloco inteiro) sempre separa trechos."""
+    pol = ctx["pol"]
+    last = len(items) - 1
+    runs = []
+    cur = None
+    for k in range(k0, k1 + 1):
+        member = kinds[k] == "S" or k in absorbed
+        if not member:
+            if cur is not None:
+                runs.append(("ST", cur[0], cur[1]))
+                cur = None
+            runs.append(("A", k))
+            continue
+        if cur is not None and not softj[k - 1]:
+            runs.append(("ST", cur[0], cur[1]))
+            cur = None
+        if cur is None:
+            cur = [k, k]
+        else:
+            cur[1] = k
+    if cur is not None:
+        runs.append(("ST", cur[0], cur[1]))
+    out = []
+    coinc = cuts = tiny = pieces = off_vao = 0
+    closures = 0
+    for run in runs:
+        if run[0] == "A":
+            out.append(items[run[1]])
+            continue
+        i0, i1 = run[1], run[2]
+        if i0 == 0:
+            s, fl = x, x_flex
+        elif items[i0][0] == "F":
+            s, fl = items[i0][1], items[i0][3]
+        else:
+            s, fl = items[i0][1]["lo"], True
+        if i1 == last:
+            e, fr = y, y_flex
+        elif items[i1][0] == "F":
+            e, fr = items[i1][2], items[i1][4]
+        else:
+            e, fr = items[i1][1]["hi"], True
+        covered = [items[i][1]["code"] for i in range(i0, i1 + 1) if items[i][0] == "A"]
+        # trechos sem alvenaria na fiada c-2 (o U_CUT prefere ficar sobre eles - 85.10)
+        spans = []
+        for i in range(i0, i1 + 1):
+            if items[i][0] == "F":
+                fs = s if i == 0 else items[i][1]
+                fe = e if i == last else items[i][2]
+                spans.extend(_vao_spans(fs, fe, ctx.get("r_rows"), pol["wide_joint_cm"]))
+        meta = {"soft": bool(covered), "covers": covered, "free_spans": spans,
+                "absorbed": sum(1 for i in range(i0, i1 + 1) if i in absorbed), "closure": None}
+        length = e - s
+        if length < pol["min_cut_cm"] - 1e-6:
+            if length <= 0.0:
+                return None
+            closure = _jamb_closure(length, i0 == 0 and not fl, i1 == last and not fr, pol, ctx.get("catalog"))
+            if closure is None:
+                return None
+            meta["closure"] = closure
+            closures += 1
+            pieces += len(closure[1])
+            out.append(["F", s, e, fl, fr, meta])
+            continue
+        res = _fill_canonical(s, e, fl, fr, adj_joints, pol, None, ctx["canonical"], ctx["fill_cache"], spans)
+        if res is None:
+            return None
+        coinc += res["key"][0]
+        cuts += res["key"][1]
+        tiny += res["key"][2]
+        pieces += res["key"][3]
+        off_vao += res["key"][4]
+        out.append(["F", s, e, fl, fr, meta])
+    # juntas ENTRE as pecas da faixa (peca mantida | trecho, trecho | peca mantida e as
+    # duas pontas da faixa): mudam com os blocos abrangidos - coincidente com c-1/c+1
+    # conta como a junta nova do trecho (regra #1); cada junta fisica conta uma vez
+    gap = pol["max_joint_cm"] + _orf.CONTIGUOUS_GAP_EPSILON_CM
+    ext = []
+    if k0 > 0:
+        ext.append(_item_extent(items[k0 - 1]))
+    ext.extend(_item_extent(it) for it in out)
+    if k1 < last:
+        ext.append(_item_extent(items[k1 + 1]))
+    for (_a0, a1), (b0, _b1) in zip(ext, ext[1:]):
+        if 0.0 <= b0 - a1 <= gap and _near(adj_joints, (a1 + b0) / 2.0, pol["coincident_joint_cm"]):
+            coinc += 1
+    # o compensador da jamba pesa como 1,5 bloco abrangido: fundir com UM vizinho
+    # (C04 + B34 = U39) continua preferido, como na 86.12
+    cost = (coinc, cuts, len(absorbed) + 1.5 * closures, tiny, pieces, off_vao)
+    return out, cost
+
+
+def _item_extent(item):
+    if item[0] == "A":
+        return item[1]["lo"], item[1]["hi"]
+    return item[1], item[2]
+
+
+def _soften_items(ctx, items, zones, x, y, x_flex, y_flex, adj_joints):
+    """SECAO 86.14 - a canaleta NAO acompanha meio bloco, compensador, B54 de
+    preenchimento nem U_CUT de r (pecas MOLES): cada grupo de itens moles
+    contiguos (com o vao livre vizinho, se houver) vira trecho livre, que fecha
+    so' com U39/U34 e no maximo um U_CUT (>= 9, nunca 19), de preferencia sobre o
+    vao. O bloco inteiro vizinho de uma peca mole (junta mole) pode entrar no
+    trecho quando isso evita junta coincidente ou U_CUT; a junta entre dois
+    blocos inteiros (e a do B54 com bloco inteiro) e' dura e nunca e'
+    atravessada. Escolha por grupo (todas as combinacoes dos blocos inteiros
+    abrangiveis): (juntas coincidentes com c-1/c+1, U_CUT, blocos abrangidos,
+    U_CUT minuscula, pecas, U_CUT fora do vao), desempate no sentido canonico do
+    mundo.
+
+    So' itens de canaleta (sobre a corrida) sao moles; bloco de c no flanco segue
+    r como antes (85.10). Devolve (itens, info) ou (None, None) quando algum
+    grupo nao fecha."""
+    pol = ctx["pol"]
+    flags = _channel_flags(items, zones)
+    n = len(items)
+    kinds = []
+    for it, flag in zip(items, flags):
+        if it[0] == "F":
+            kinds.append("S")
+        elif flag and it[1]["code"] in SOFT_CODES:
+            kinds.append("S")
+        elif flag and it[1]["code"] in WHOLE_CODES:
+            kinds.append("H")
+        else:
+            kinds.append("X")
+    soft_piece = [_soft_joint_piece(it, kd) for it, kd in zip(items, kinds)]
+    r_rows = ctx.get("r_rows")
+    wide = pol["wide_joint_cm"]
+
+    def joint_soft(k):
+        # junta k|k+1 mole: encosta num meio bloco / compensador / U_CUT de r ou no
+        # VAO de verdade; trecho livre sobre alvenaria de r que nao virou ancora (peca
+        # de r passando da borda da janela) mantem a junta dura de r
+        a, b = items[k], items[k + 1]
+        if a[0] == "A" and b[0] == "A":
+            return soft_piece[k] or soft_piece[k + 1]
+        if a[0] == "A":
+            return soft_piece[k] or not _r_neighbor_hard(r_rows, a[1], 1, wide)
+        if b[0] == "A":
+            return soft_piece[k + 1] or not _r_neighbor_hard(r_rows, b[1], -1, wide)
+        return True
+
+    softj = [joint_soft(k) for k in range(n - 1)]
+    absorbable = set(k for k in range(n) if kinds[k] == "H" and (
+        (k > 0 and kinds[k - 1] == "S" and softj[k - 1]) or (k + 1 < n and kinds[k + 1] == "S" and softj[k])))
+    # grupos independentes: junta dura (bloco inteiro x bloco inteiro / B54) e' sempre fronteira
+    clusters = []
+    k = 0
+    while k < n:
+        if kinds[k] == "S" or k in absorbable:
+            k0 = k
+            while k + 1 < n and (kinds[k + 1] == "S" or (k + 1) in absorbable) and softj[k]:
+                k += 1
+            if any(kinds[i] == "S" for i in range(k0, k + 1)):
+                clusters.append((k0, k))
+        k += 1
+    info = {"soft_anchors": sum(1 for it, kd in zip(items, kinds) if kd == "S" and it[0] == "A"),
+            "absorbed": 0, "clusters": len(clusters)}
+    if not clusters:
+        return items, info
+    out = []
+    cursor = 0
+    canonical = ctx["canonical"]
+    limit = int(pol.get("soft_max_absorbable", 8))
+    for k0, k1 in clusters:
+        out.extend(items[cursor:k0])
+        cand_h = [i for i in range(k0, k1 + 1) if i in absorbable]
+        memo = {}
+
+        def evaluate(chosen, k0=k0, k1=k1, memo=memo):
+            ck = tuple(sorted(chosen))
+            if ck not in memo:
+                lay = _soft_cluster_layout(ctx, items, kinds, softj, k0, k1, set(ck), x, y, x_flex, y_flex,
+                                           adj_joints)
+                memo[ck] = None if lay is None else (
+                    lay[1] + (tuple(sorted((i if canonical else -i) for i in ck)),), lay[0], len(ck))
+            return memo[ck]
+
+        best = None
+        m = len(cand_h)
+        if m <= limit:
+            for mask in range(1 << m):
+                cur = evaluate([cand_h[b] for b in range(m) if mask & (1 << b)])
+                if cur is not None and (best is None or cur[0] < best[0]):
+                    best = cur
+        else:
+            # muitos blocos abrangiveis (raro): ate' 2 + melhoria gulosa um a um
+            chosen_best = []
+            for combo in [[]] + [[h] for h in cand_h] + [list(p) for p in itertools.combinations(cand_h, 2)]:
+                cur = evaluate(combo)
+                if cur is not None and (best is None or cur[0] < best[0]):
+                    best, chosen_best = cur, list(combo)
+            improved = True
+            while improved:
+                improved = False
+                for h in cand_h:
+                    trial = [i for i in chosen_best if i != h] if h in chosen_best else chosen_best + [h]
+                    cur = evaluate(trial)
+                    if cur is not None and (best is None or cur[0] < best[0]):
+                        best, chosen_best, improved = cur, trial, True
+        if best is None:
+            return None, None
+        out.extend(best[1])
+        info["absorbed"] += best[2]
+        cursor = k1 + 1
+    out.extend(items[cursor:])
+    return out, info
+
+
 def _channel_flags(items, zones):
     flags = []
     for it in items:
@@ -516,12 +861,19 @@ def _flank_clean_right(y, y_next_lo, zhi, anchors, pol):
 # --------------------------------------------------------------------------
 def _split_b54(anchor, adj_joints, pol):
     """B54 de preenchimento sob canaleta -> U34+U19 (ou U19+U34) com a junta nova
-    o mais longe possivel das juntas de c-1/c+1 (86.7). None sem desencontro."""
+    o mais longe possivel das juntas de c-1/c+1 (86.7). None sem desencontro.
+    SECAO 86.14 (meia canaleta proibida): U39 + U_CUT 14 (ou o inverso)."""
     j = pol["joint_cm"]
     best = None
-    for l1 in pol["split_b54_lengths_cm"]:
+    allow_half = _orf.half_channel_allowed()
+    lengths = pol["split_b54_lengths_cm"] if allow_half else (
+        pol.get("split_b54_lengths_no_half_cm") or _orf.SPLIT_B54_NO_HALF_LENGTHS_CM)
+    min_part = 18.95 if allow_half else pol["min_cut_cm"] - 0.05
+    for l1 in lengths:
         l2 = (anchor["hi"] - anchor["lo"]) - l1 - j
-        if l2 < 18.95 or l2 > 39.05:
+        if l2 < min_part or l2 > 39.05:
+            continue
+        if not allow_half and (_orf.is_half_channel_length(l1) or _orf.is_half_channel_length(l2)):
             continue
         joint = anchor["lo"] + l1 + j / 2.0
         stagger = min([abs(joint - t) for t in adj_joints] or [1e9])
@@ -554,11 +906,11 @@ def _group_members(members, cpol):
         options = []
         if groups and row["lo"] - groups[-1][-1]["hi"] <= gap:
             length = row["hi"] - groups[-1][0]["lo"]
-            if length <= max_len + 0.05:
+            if _orf._merge_length_ok(length, max_len):
                 options.append((0 if _orf._standard_code_for_length(length) else 1, 0, "LEFT"))
         if k + 1 < n and members[k + 1]["lo"] - row["hi"] <= gap:
             length = members[k + 1]["hi"] - row["lo"]
-            if length <= max_len + 0.05:
+            if _orf._merge_length_ok(length, max_len):
                 options.append((0 if _orf._standard_code_for_length(length) else 1, 1, "RIGHT"))
         options.sort()
         if not options:
@@ -669,7 +1021,7 @@ def _short_kind(items, flags, k, s, e, fl, fr, pol, catalog):
         if 0 <= m < len(items) and items[m][0] == "A" and flags[m] and items[m][1]["code"] != "B54":
             a = items[m][1]
             total = (e - a["lo"]) if m == k - 1 else (a["hi"] - s)
-            if total <= pol["max_cut_cm"] + 0.05:
+            if _orf._merge_length_ok(total, pol["max_cut_cm"]):
                 merge_any = True
                 if _orf._standard_code_for_length(total) is not None:
                     merge_std = True
@@ -721,7 +1073,16 @@ def _evaluate(ctx, lc, rc, anchors, zones, seg_rows, adj_joints):
     items = _build_items(x, y, x_prev_hi, y_next_lo, anchors, pol)
     if items is None:
         return None
-    items = _absorb_compensators(items, zones, pol, x, y, x_prev_hi is not None, y_next_lo is not None)
+    soft_info = None
+    if _orf.half_channel_allowed():
+        items = _absorb_compensators(items, zones, pol, x, y, x_prev_hi is not None, y_next_lo is not None)
+    else:
+        # SECAO 86.14: meio bloco / compensador / B54 / U_CUT de r nao sao seguidos -
+        # entram no trecho livre (U39/U34 + no maximo um U_CUT, sem meia canaleta)
+        items, soft_info = _soften_items(ctx, items, zones, x, y, x_prev_hi is not None, y_next_lo is not None,
+                                         adj_joints)
+        if items is None:
+            return None
     flags = _channel_flags(items, zones)
     if _islands(items, flags, zones):
         return None
@@ -746,7 +1107,13 @@ def _evaluate(ctx, lc, rc, anchors, zones, seg_rows, adj_joints):
             if e - s <= 0.0:
                 return None
             k = len(fills)
-            short = _short_kind(items, flags, k, s, e, fl, fr, pol, ctx.get("catalog"))
+            meta = it[5] if len(it) > 5 else None
+            if meta is not None:
+                # SECAO 86.14: o trecho ja' foi decidido por `_soften_items` (so'
+                # fechamento de jamba; fusao com vizinha = bloco abrangido)
+                short = meta.get("closure")
+            else:
+                short = _short_kind(items, flags, k, s, e, fl, fr, pol, ctx.get("catalog"))
             if short is None:
                 return None
             if short[0] == "CLOSURE":
@@ -770,7 +1137,15 @@ def _evaluate(ctx, lc, rc, anchors, zones, seg_rows, adj_joints):
                 abs(keep[-1][1] - e) > pol["sync_tolerance_cm"] or any(
                     b[0] - a[1] > pol["max_joint_cm"] + 1e-6 for a, b in zip(keep, keep[1:])):
             keep = None
-        res = _fill_canonical(s, e, fl, fr, adj_joints, pol, keep, ctx["canonical"], ctx["fill_cache"])
+        if keep and not _orf.half_channel_allowed() and any(
+                x[2] == "B19" or _orf.is_half_channel_length(x[1] - x[0])
+                or (x[2] == FREE_CUT and x[1] - x[0] < pol["min_cut_cm"] - 1e-6) for x in keep):
+            # SECAO 86.14: a canaleta original com meia canaleta, ou com U_CUT abaixo de
+            # 9 cm (a "pastilha de canaleta" que acompanha o compensador), nao concorre
+            keep = None
+        meta = it[5] if len(it) > 5 else None
+        res = _fill_canonical(s, e, fl, fr, adj_joints, pol, keep, ctx["canonical"], ctx["fill_cache"],
+                              meta.get("free_spans") if meta is not None else None)
         if res is None:
             return None
         fills.append(res)
@@ -783,8 +1158,12 @@ def _evaluate(ctx, lc, rc, anchors, zones, seg_rows, adj_joints):
     growth = max(0.0, zones[0][0] - ch_lo) + max(0.0, ch_hi - zones[-1][1])
     width = y - x
     score = (total[0], total[2], total[1], flank_free, round(growth, 3), -round(width, 3), total[3], total[4])
+    if soft_info is not None:
+        # SECAO 86.14: menos blocos inteiros abrangidos pelo trecho livre, depois o resto
+        score = score[:5] + (soft_info["absorbed"],) + score[5:]
     return {"items": items, "flags": flags, "fills": fills, "score": score, "window": (x, y),
-            "window_idx": (i_first, i_last), "x_prev_hi": x_prev_hi, "y_next_lo": y_next_lo}
+            "window_idx": (i_first, i_last), "x_prev_hi": x_prev_hi, "y_next_lo": y_next_lo,
+            "soft": soft_info}
 
 
 def _materialize(ctx, chosen, seg_rows, zones, adj_joints, wall_idx, course_index, source_course):
@@ -838,12 +1217,15 @@ def _materialize(ctx, chosen, seg_rows, zones, adj_joints, wall_idx, course_inde
                     members.append({"lo": lo, "hi": hi, "code": "KEEP", "cand": orig, "kind": "KEEP",
                                     "channel": True})
                 continue
+            meta = it[5] if len(it) > 5 else None
+            # SECAO 86.14: trecho que cobre peca mole de r (meio bloco, compensador...)
+            kind = SOFT_KIND if (meta is not None and meta.get("soft")) else "FREE"
             for lo, hi, code in fill["pieces"]:
-                members.append({"lo": lo, "hi": hi, "code": code, "cand": template_c, "kind": "FREE",
+                members.append({"lo": lo, "hi": hi, "code": code, "cand": template_c, "kind": kind,
                                 "channel": True})
     # pecas: blocos copiados de r, canaletas agrupadas pela 51.3
     pieces = []
-    info = {"follow": 0, "free": 0, "cuts": 0, "kept": 0, "blocks_from_below": 0}
+    info = {"follow": 0, "free": 0, "cuts": 0, "kept": 0, "blocks_from_below": 0, "soft": 0}
     k = 0
     while k < len(members):
         m = members[k]
@@ -909,9 +1291,9 @@ def _materialize(ctx, chosen, seg_rows, zones, adj_joints, wall_idx, course_inde
             rows = []
             for x in g:
                 tpl = _template(x["cand"], course_value)
-                if x["kind"] == "FREE" or x["code"] in (FREE_CUT, FREE_SHORT):
+                if x["kind"] in ("FREE", SOFT_KIND) or x["code"] in (FREE_CUT, FREE_SHORT):
                     tpl["logical_code"] = x["code"] if x["code"] in ("B39", "B34", "B19") else FREE_CUT
-                    src_codes.append("FREE")
+                    src_codes.append(SOFT_KIND if x["kind"] == SOFT_KIND else "FREE")
                 elif x.get("split"):
                     tpl["logical_code"] = "TIE_SPLIT"
                     src_codes.append("B54_SPLIT")
@@ -926,6 +1308,9 @@ def _materialize(ctx, chosen, seg_rows, zones, adj_joints, wall_idx, course_inde
             piece_policy = dict(cpol)
             piece_policy["policy_version"] = rein.get("policy_version") or cpol.get("policy_version")
             new = _orf._channel_candidate_from_group(rows, walls, wall_idx, record, piece_policy)
+            if not _orf.half_channel_allowed() and _orf.is_half_channel_piece(new):
+                # SECAO 86.14: nenhuma meia canaleta (U19 / U_CUT de 19) - a faixa fica como estava
+                return None, "HALF_CHANNEL_FORBIDDEN"
             orig = by_extent.get((new["logical_code"], round(lo, 1), round(hi, 1)))
             if orig is not None and is_target_channel(orig):
                 pieces.append((lo, hi, orig))
@@ -935,9 +1320,17 @@ def _materialize(ctx, chosen, seg_rows, zones, adj_joints, wall_idx, course_inde
             new_rein = dict(rein)
             new_rein["source_codes"] = src_codes
             new_rein["cut"] = cut
-            new_rein["grid_follow"] = {"section": SECTION, "source_course": source_course,
-                                       "kind": "FREE" if all(c == "FREE" for c in src_codes) else (
-                                           "FOLLOW" if "FREE" not in src_codes else "FOLLOW+FREE")}
+            if all(c == "FREE" for c in src_codes):
+                gf_kind = "FREE"
+            elif SOFT_KIND in src_codes:
+                gf_kind = SOFT_KIND
+            elif "FREE" not in src_codes:
+                gf_kind = "FOLLOW"
+            else:
+                gf_kind = "FOLLOW+FREE"
+            new_rein["grid_follow"] = {"section": SECTION, "source_course": source_course, "kind": gf_kind}
+            if gf_kind == SOFT_KIND:
+                new_rein["grid_follow"]["no_half_channel"] = _orf.SECTION_NO_HALF_CHANNEL
             if not new_rein.get("strategy"):
                 new_rein["strategy"] = _orf.OPENING_REINFORCEMENT_CHANNEL
             if not new_rein.get("policy_version"):
@@ -948,7 +1341,9 @@ def _materialize(ctx, chosen, seg_rows, zones, adj_joints, wall_idx, course_inde
             pieces.append((lo, hi, new))
             if new["logical_code"] == _orf.CHANNEL_U_CUT:
                 info["cuts"] += 1
-            if "FREE" in src_codes:
+            if gf_kind == SOFT_KIND:
+                info["soft"] += 1
+            elif "FREE" in src_codes:
                 info["free"] += 1
             else:
                 info["follow"] += 1
@@ -976,6 +1371,8 @@ def _check_invariants(ctx, pieces, chosen, seg_rows, zones, squares):
     for lo, hi, cand in pieces:
         if _orf.is_channel_code(cand.get("logical_code")) and _orf._square_hit(lo, hi, squares, margin) is not None:
             return "CHANNEL_AT_NODE"
+    if not _orf.half_channel_allowed() and any(_orf.is_forbidden_half_channel_piece(c) for _lo, _hi, c in pieces):
+        return "HALF_CHANNEL"   # SECAO 86.14
     for z in zones:
         if not any(_orf.is_channel_code(c.get("logical_code")) for lo, hi, c in pieces
                    if min(hi, z[1]) - max(lo, z[0]) > 0.05):
@@ -1005,10 +1402,13 @@ def plan_channel_grid_follow(course_candidates, walls_to_create, num_courses, no
     out_cc = dict((ci, list(pcs or [])) for ci, pcs in (course_candidates or {}).items())
     counts = {"courses_checked": 0, "segments_checked": 0, "windows_changed": 0, "pieces_removed": 0,
               "pieces_created": 0, "channel_pieces_created": 0, "block_pieces_from_below": 0,
-              "cuts_created": 0, "free_fills": 0, "jamb_closures": 0, "unresolved": 0, "flank_mismatch": 0}
+              "cuts_created": 0, "free_fills": 0, "jamb_closures": 0, "unresolved": 0, "flank_mismatch": 0,
+              # SECAO 86.14: canaletas sobre peca mole de r e blocos inteiros abrangidos
+              "soft_pieces": 0, "soft_absorbed_whole_blocks": 0}
     report = {"enabled": True, "section": SECTION, "policy": pol, "windows": [], "unresolved": [],
               "findings": [], "counts": counts, "source_courses": {}, "runs_touched": [],
-              "course_candidates": out_cc}
+              "course_candidates": out_cc, "half_channel_allowed": _orf.half_channel_allowed(),
+              "no_half_channel_section": _orf.SECTION_NO_HALF_CHANNEL}
     courses = sorted(ci for ci in out_cc if any(is_target_channel(c) for c in out_cc.get(ci) or []))
     runs_touched = set()
     for ci in courses:
@@ -1049,7 +1449,9 @@ def plan_channel_grid_follow(course_candidates, walls_to_create, num_courses, no
             margin = pol["node_square_margin_cm"]
             anchors = [a for a in (_anchor_of(x, wall_idx, squares, margin) for x in rows_r) if a is not None]
             ctx = {"pol": pol, "cpol": cpol, "walls": walls_to_create, "catalog": catalog,
-                   "canonical": _canonical_axis(walls_to_create, wall_idx), "fill_cache": {}}
+                   "canonical": _canonical_axis(walls_to_create, wall_idx), "fill_cache": {},
+                   # SECAO 86.14: pecas reais de r (juntas duras/moles junto do trecho livre)
+                   "r_rows": rows_r}
             for i0, i1, prev_hi, next_lo in _segments(rows_c, wall_idx, squares, pol):
                 seg_rows = rows_c[i0:i1 + 1]
                 zones = _subzones(seg_rows, pol)
@@ -1111,6 +1513,8 @@ def plan_channel_grid_follow(course_candidates, walls_to_create, num_courses, no
                 counts["cuts_created"] += info["cuts"]
                 counts["jamb_closures"] += info.get("jamb_closures", 0)
                 counts["free_fills"] += sum(1 for it in chosen["items"] if it[0] == "F")
+                counts["soft_pieces"] += info.get("soft", 0)
+                counts["soft_absorbed_whole_blocks"] += (chosen.get("soft") or {}).get("absorbed", 0)
                 if chosen.get("flank_mismatch"):
                     counts["flank_mismatch"] += 1
                 for c in new:
@@ -1133,6 +1537,8 @@ def plan_channel_grid_follow(course_candidates, walls_to_create, num_courses, no
             report["source_courses"][ci] = out_cc[ci]
             out_cc[ci] = new_course
     report["runs_touched"] = sorted(runs_touched)
+    # SECAO 86.14: auditoria independente das meias canaletas na saida do passe
+    report["half_channel_audit"] = _orf.half_channel_audit(out_cc)
     return report
 
 
