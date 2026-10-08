@@ -20608,24 +20608,22 @@ def main():
                         "abaixo da base - subiu {:.1f} cm (altura do vao preservada).".format(
                             item["wall_idx"], item["opening_index"], -item["sill_cm_before"], item["delta_cm"]))
 
-    # SECAO 86.9 / 87.3: sobra de eixo de ate' STUB_OVERSHOOT_TRIM_MAX_CM alem
-    # da face da parede que cruza (erro de desenho do CAD, mesmo com testa) e'
-    # aparada ANTES do grafo - mesma ordem do fluxo de paredes existentes
-    # (assign -> trim -> extend -> grafo), para o solver ver a mesma geometria.
-    walls_to_create, openings_per_wall, stub_trims = trim_wall_end_stubs(walls_to_create, openings_per_wall)
-    if stub_trims:
-        _trim_items = stub_trim_corpus_items(
-            stub_trims, None, ["cad#{}".format(i) for i in range(len(walls_to_create))])
-        setup["corpus_selection"]["trimmed"] = list(setup["corpus_selection"].get("trimmed") or []) + _trim_items
-        output.print_md("**Sobra de eixo aparada (secao 86.9/87.3)**: {} ponta(s) - a parede termina na "
-                        "face da que cruza.".format(len(stub_trims)))
-        for item in _trim_items:
-            output.print_md("- eixo {} ponta {}: {:.1f} cm alem da face da parede #{} ({:.0f} -> {:.0f} cm)".format(
-                item["axis_key"], item["end_index"], item["trimmed_cm"], item["crossing_wall_index"],
-                item["length_cm"], item["new_length_cm"]))
-        walls_to_create, wall_junction_map = extend_wall_ends_to_junctions(
-            walls_to_create, JUNCTION_FACE_SEARCH_FT
-        )
+    # SECAO 86.9 / 87.3: a sobra de eixo de ate' STUB_OVERSHOOT_TRIM_MAX_CM alem
+    # da face da parede que cruza NAO e' aparada aqui: as Walls nascem fieis ao
+    # CAD e o handler da Tela 2 corta no primeiro refresh
+    # (_refresh_geometry_from_document -> _reapply_stub_trims), reancorando as
+    # aberturas uma unica vez - e' o desenho da secao 86.9. Aparar ANTES de
+    # criar as Walls faria o refresh (que mede o corte na Wall do documento)
+    # achar corte zero e devolver as aberturas ao t sem aparo (medido no
+    # BUTANTA, 2026-10-08: +5 cm na W8).
+
+    # SECAO 87.2: a selecao pela referencia reindexa a lista de eixos - refaz o
+    # fechamento dos encontros (sem efeito geometrico: as pontas ja' estao nas
+    # faces) para o mapa de encontros apontar para os indices do corpus
+    # selecionado, como no fluxo de paredes existentes.
+    walls_to_create, wall_junction_map = extend_wall_ends_to_junctions(
+        walls_to_create, JUNCTION_FACE_SEARCH_FT
+    )
 
     # 4b1. ETAPA 2 - grafo de paredes: classifica cada encontro (ponta livre,
     # continuacao reta, canto L, T ou cruz X) a partir do MESMO calculo
