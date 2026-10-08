@@ -1,0 +1,7 @@
+compensador logo atras de bloco encostado no vao: 20
+  W0 jamba 395 fiadas [6, 8, 10] (B39|C09)
+  W0 jamba 464 fiadas [4, 6, 8, 10] (B19|C09)
+  W0 jamba 1630 fiadas [5, 7, 9] (B39|C04)
+  W3 jamba 1565 fiadas [5, 6, 7, 8, 9, 10] (B19|C09)
+  W11 jamba 409 fiadas [5, 7] (B34|C04)
+  W27 jamba 86 fiadas [2, 4] (B19|C09)

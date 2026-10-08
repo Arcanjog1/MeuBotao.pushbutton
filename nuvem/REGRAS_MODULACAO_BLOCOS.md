@@ -11588,6 +11588,7 @@ está marcado CONFLITO. As subseções 86.2–86.10 seguem a numeração das reg
   | + R7A/R8 cinta de topo e passagem livre (86.7/86.8) | 54,4 % | 6 474 | 433 | 190 | 354 |
   | + R9 tocos (86.9) | 54,5 % | 6 428 | 427 | 110 | 360 |
   | + R6/R10 jambas com trava de prisma (86.6/86.10) = **criado no Revit em 2026-10-05** | **56,2 %** | 6 428 | 417 | 107 | 360 |
+  | Correções do usuário de 2026-10-05/08 (86.9 tocos modulados, 86.12–86.16) = **criado no Revit em 2026-10-08** | **56,5 %** | 6 526 | 342 | 83 | 395 |
   | HUMANO (piso de ruído da régua) | — | 6 634 | 407 | 60 | 486 |
 
 - Maior perda medida: paredes inteiras com as fiadas pares/ímpares trocadas em relação ao humano (W18 sai idêntica

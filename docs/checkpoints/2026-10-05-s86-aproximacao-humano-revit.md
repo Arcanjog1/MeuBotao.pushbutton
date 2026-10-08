@@ -6,7 +6,7 @@ estado oficial nem aprovação normativa; as decisões pendentes abaixo são do 
 ```json
 {
   "date": "2026-10-05",
-  "scope": "current",
+  "scope": "historical",
   "branch": "claude/revit-butanta-modulation-8611b5",
   "head": "cfb8a60cfd33a969dec204f37169d2b639571e90",
   "base": "894e3f5278ffa9cb030efe01a70c7305b252af15",
