@@ -270,8 +270,12 @@ def test_door_gets_channel_course_on_head_and_nothing_else_changes_geometrically
         m.CHANNEL_GRID_FOLLOW_ENABLED = saved_follow
     for ci in range(NUM_COURSES):
         a = [(round(r["lo"], 3), round(r["hi"], 3)) for r in strip(legacy, walls, 0, ci)]
-        b = [(round(r["lo"], 3), round(r["hi"], 3)) for r in strip(planned, walls, 0, ci)]
-        assert [x for x in b if x not in a] == []  # nenhuma junta nova
+        novas = [r for r in strip(planned, walls, 0, ci) if (round(r["lo"], 3), round(r["hi"], 3)) not in a]
+        # nenhuma junta nova - exceto (SECAO 86.14, sem meia canaleta) a canaleta que o
+        # planejador recompoe com as vizinhas para nao deixar U19 nem U_CUT < 9 cm
+        # (`half_channel_resplit`); com a meia canaleta religada a regra antiga vale inteira
+        assert [(round(r["lo"], 3), round(r["hi"], 3)) for r in novas
+                if not (r["cand"].get("reinforcement") or {}).get("half_channel_resplit")] == [], ci
     # fluxo completo (com o arranjo): mesmos trechos cobertos em toda fiada (mesmas
     # pontas, nada entra no vao), auditoria limpa e sem mais especiais que o legado
     for ci in range(NUM_COURSES):

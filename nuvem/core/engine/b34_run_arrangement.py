@@ -364,6 +364,24 @@ def _is_channel_code(code):
         return str(code or "").upper().startswith("CHANNEL")
 
 
+def _channel_of_block(code):
+    """Canaleta de mesmo comprimento do bloco `code` na verga que segue a grade
+    (85.9). SECAO 86.14 (correcao do usuario 2026-10-05): sem a meia canaleta
+    (`opening_reinforcement.CHANNEL_HALF_U19_ENABLED = False`, o padrao) o B19
+    nao vira U19 - o layout com B19 dentro da verga e' recusado aqui e o trecho
+    fica para a 86.12/86.14 (U39/U34 sobre o meio bloco)."""
+    ch = CHANNEL_OF_BLOCK.get(code)
+    if ch is None:
+        return None
+    try:
+        from core.engine import opening_reinforcement as _reinforcement
+        if ch == _reinforcement.CHANNEL_U_19 and not _reinforcement.half_channel_allowed():
+            return None
+    except Exception:  # pragma: no cover - modulo sempre presente no motor
+        pass
+    return ch
+
+
 def _channel_logical_entry(code):
     """Entrada logica (sem Revit) da canaleta `code` - comprimento nominal, sem
     celula vertical; {} quando o codigo nao e' canaleta conhecida."""
@@ -1946,9 +1964,9 @@ class _Wall(object):
             for (lo, hi), (code, sd) in zip(pos, lay):
                 inside = any(min(hi, ch.hi) - max(lo, ch.lo) > FACE_TOLERANCE_CM for ch in channels)
                 if inside and not _is_channel_code(code):
-                    ch = CHANNEL_OF_BLOCK.get(code)
+                    ch = _channel_of_block(code)
                     if ch is None or self._tpl(ch) is None:
-                        return None  # B19/pastilha na verga: nao
+                        return None  # pastilha na verga: nao; B19 tambem nao sem a meia canaleta (86.14)
                     out.append((ch, 0))
                 elif inside or _is_channel_code(code):
                     if not _is_channel_code(code):

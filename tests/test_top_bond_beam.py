@@ -290,7 +290,12 @@ def _peca(code, lo, hi, reason="STANDARD_FILL", z=241.0, wall_idx=0):
     return ws._make_block_candidate(code, CAT[code], TOP, origin, m.XYZ(1.0, 0.0, 0.0), reason, wall_idx=wall_idx)
 
 
-def test_planejador_funde_compensador_divide_b54_de_preenchimento_e_mantem_amarracao():
+@pytest.mark.parametrize("half", [True, False])
+def test_planejador_funde_compensador_divide_b54_de_preenchimento_e_mantem_amarracao(half, monkeypatch):
+    """half=True: contrato original da 86.7 (B54 -> U34+U19, B19+C09 -> U_CUT 29) com a
+    meia canaleta religada. half=False (padrao, SECAO 86.14): sem meia canaleta - B54 ->
+    U_CUT 14 + U39 e o B19+C09 completado com o B39 vizinho em U34+U34 (sem U_CUT)."""
+    monkeypatch.setattr(orf, "CHANNEL_HALF_U19_ENABLED", half)
     walls = [(seg(0, 0, 400, 0), ft(14.0), (False, False))]
     verga = dict(_peca("B39", 300.0, 339.0), logical_code=orf.CHANNEL_U_39,
                  reinforcement={"roles": [orf.ROLE_ABOVE_OPENING], "run_id": "x"})
@@ -308,14 +313,23 @@ def test_planejador_funde_compensador_divide_b54_de_preenchimento_e_mantem_amarr
     assert ("CHANNEL_U_39", 35.0, 74.0) in got
     # C04 encostado no B34 seguinte: B34 + C04 = 39 (comprimento padrao, 51.3)
     assert ("CHANNEL_U_39", 75.0, 114.0) in got
-    # B54 de preenchimento -> U34+U19, junta nova longe das juntas de baixo (119,5 / 159,5)
     split = [g for g in got if 115.0 - 0.1 <= g[1] and g[2] <= 169.0 + 0.1]
-    assert sorted(g[0] for g in split) == ["CHANNEL_U_19", "CHANNEL_U_34"]
     nova = [g[2] + 0.5 for g in split if g[2] < 168.0][0]
-    assert min(abs(nova - j) for j in (119.5, 159.5)) >= 1.5
-    # B19 + C09 = 29: canaleta cortada (51.3), a verga fica como esta'
-    assert ("CHANNEL_U_CUT", 170.0, 199.0) in got
-    assert ("CHANNEL_U_39", 200.0, 239.0) in got and ("CHANNEL_U_39", 300.0, 339.0) in got
+    assert min(abs(nova - j) for j in (119.5, 159.5)) >= 1.5   # junta nova longe das de baixo
+    if half:
+        # B54 de preenchimento -> U34+U19, junta nova longe das juntas de baixo (119,5 / 159,5)
+        assert sorted(g[0] for g in split) == ["CHANNEL_U_19", "CHANNEL_U_34"]
+        # B19 + C09 = 29: canaleta cortada (51.3), a verga fica como esta'
+        assert ("CHANNEL_U_CUT", 170.0, 199.0) in got
+        assert ("CHANNEL_U_39", 200.0, 239.0) in got
+    else:
+        # 86.14: B54 -> U_CUT 14 + U39 (sem U19) e B19 + C09 + B39 = U34 + U34 (sem U_CUT)
+        assert sorted(g[0] for g in split) == ["CHANNEL_U_39", "CHANNEL_U_CUT"]
+        assert ("CHANNEL_U_34", 170.0, 204.0) in got and ("CHANNEL_U_34", 205.0, 239.0) in got
+        assert not any(orf.is_half_channel_piece(r["cand"]) for r in rows)
+        assert orf.half_channel_audit(plano["course_candidates"])["counts"]["total"] == 0
+        assert plano["counts"]["half_channel_resplits"] == 1
+    assert ("CHANNEL_U_39", 300.0, 339.0) in got                 # a verga fica como esta'
     c = plano["counts"]
     assert c["kept_tie"] == 1 and c["b54_split"] == 1 and c["shared_with_opening"] == 1
     assert c["source_pieces_converted"] == 7
@@ -324,8 +338,14 @@ def test_planejador_funde_compensador_divide_b54_de_preenchimento_e_mantem_amarr
     assert all(x["reinforcement"]["roles"] == [orf.ROLE_TOP_BOND_BEAM] for x in beam)
     assert orf.channel_as_junction_bond(plano["course_candidates"]) == []
     cortada = [x for x in beam if x["logical_code"] == orf.CHANNEL_U_CUT][0]
-    assert cortada["instance_length_cm"] == pytest.approx(29.0)
-    assert cortada["reinforcement"]["source_codes"] == ["B19", "C09"]
+    if half:
+        assert cortada["instance_length_cm"] == pytest.approx(29.0)
+        assert cortada["reinforcement"]["source_codes"] == ["B19", "C09"]
+    else:
+        assert cortada["instance_length_cm"] == pytest.approx(14.0)
+        assert cortada["reinforcement"]["source_codes"] == ["B54_SPLIT"]
+        recomp = [x for x in beam if x["reinforcement"].get("half_channel_resplit")]
+        assert sorted(tuple(x["reinforcement"]["source_codes"]) for x in recomp) == [("B19", "C09", "B39"), ("B39",)]
     assert sorted(x["reinforcement"]["source_codes"][0] for x in beam
                   if "B54_SPLIT" in x["reinforcement"]["source_codes"]) == ["B54_SPLIT", "B54_SPLIT"]
 

@@ -3938,6 +3938,9 @@ OPENING_STRUCTURAL_REINFORCEMENT_ENABLED = True
 # CHANNEL), depois da verga/contraverga e do arranjo, com ocupacao unica
 # (51.10). Precisa das familias de canaleta (as mesmas da verga). Desligada =
 # ultima fiada de bloco, como antes. Ver opening_reinforcement.plan_top_bond_beam.
+# SECAO 86.14 (correcao do usuario 2026-10-05): o B19->U19 / B54->U34+U19 acima
+# so' vale com opening_reinforcement.CHANNEL_HALF_U19_ENABLED = True; no padrao
+# (False) nao existe meia canaleta - o trecho fecha com U39/U34 (+ um U_CUT >= 9).
 TOP_BOND_BEAM_ENABLED = True
 # SECAO 86.12 (correcao do usuario 2026-10-05, REGRA OBRIGATORIA) - A CANALETA
 # SEGUE A GRADE DA FIADA DE MESMA PARIDADE ABAIXO: em toda fiada com canaleta
@@ -3951,6 +3954,11 @@ TOP_BOND_BEAM_ENABLED = True
 # da verga/contraverga, da cinta e do arranjo, antes da reauditoria. Desligada =
 # comportamento anterior. Ver core/engine/channel_grid_follow.py e a secao 86.12
 # de nuvem/REGRAS_MODULACAO_BLOCOS.md.
+# SECAO 86.14 (correcao do usuario 2026-10-05, chave
+# opening_reinforcement.CHANNEL_HALF_U19_ENABLED = False): SEM MEIA CANALETA - so'
+# as juntas DURAS de c-2 (entre dois blocos inteiros) sao seguidas; meio bloco,
+# compensador, B54 e U_CUT de c-2 entram no trecho livre (U39/U34 + no maximo um
+# U_CUT >= 9 cm, de preferencia sobre o vao).
 CHANNEL_GRID_FOLLOW_ENABLED = True
 # SECAO 86.13 (integracao 2026-10-05): SEGUNDA passada da jamba (84/85/86.6/86.13) DEPOIS do alinhamento das
 # canaletas (86.12) no caminho geral, e a 86.12 de novo se a jamba mudou. Na primeira passada a verga ainda

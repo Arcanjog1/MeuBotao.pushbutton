@@ -11930,6 +11930,12 @@ verga; a U19 é `MEIA CANALETA - 14x19x19` em `CHANNEL_FAMILY_CATALOG_DEFINITION
 
 **Conflitos / atualizações registrados:**
 
+- **ATUALIZADA pela §86.14 (correção do usuário 2026-10-05, REGRA OBRIGATÓRIA — "isso não existe, pode parar"):** o
+  B19→U19 (MEIA CANALETA) e o B54→U34+U19 do item 1 deixaram de valer. Com a chave
+  `CHANNEL_HALF_U19_ENABLED = False` (padrão) a cinta não usa meia canaleta em nenhuma forma (nem U_CUT de 19 cm):
+  o B19 é fundido à vizinha como compensador (B19+C04 = U_CUT 24, B19+C09 = U_CUT 29, B19+B19 = U39) e o que sobra
+  sozinho é refeito com as vizinhas em U39/U34 + no máximo um U_CUT ≥ 9 cm; o B54 de preenchimento vira U39 +
+  U_CUT 14. Trecho de 19 cm sem recomposição fica bloco (`TOP_BOND_BEAM_HALF_BLOCK_KEPT`). Detalhes na §86.14.
 - §51.10 ("a estratégia CHANNEL não gera TOP_BOND_BEAM", cinta PENDENTE no item F de 2026-09-14): a cinta passa a
   ser gerada como mecanismo **separado** do reforço de abertura, nos dois caminhos; a separação de papéis e a
   ocupação única continuam.
@@ -12158,6 +12164,13 @@ própria verga até o topo; a fase que não fecha é absorvida SOBRE O VÃO, nun
 
 **Conflitos / atualizações registrados (a orientação mais recente do usuário prevalece):**
 
+- **ATUALIZADA pela §86.14 (correção do usuário 2026-10-05, REGRA OBRIGATÓRIA):** os itens 1 e 2 desta subseção
+  valem agora SEM a meia canaleta: B19→U19, B54→U34+U19 e o U19 do trecho livre deixaram de existir (chave
+  `CHANNEL_HALF_U19_ENABLED = False`). A junta da canaleta continua coincidindo com as juntas DURAS de c−2 (entre
+  dois blocos inteiros B39/B34); meio bloco, compensador, B54 e U_CUT de c−2 são peças MOLES — a canaleta não as
+  acompanha: entram no trecho livre (com o vão vizinho e, se preciso, com o bloco inteiro vizinho) e fecham só com
+  U39/U34 + no máximo um U_CUT ≥ 9 cm, de preferência sobre o vão. O exemplo `B34 | B19 | jamba` → `U34 | U19` do
+  item 1 virou `U39 …` sobre o B34 + B19 + vão (fixture da §86.12). Detalhes, critérios e medições na §86.14.
 - §51.3 ("a corrida é feita com as peças da própria fiada, sem junta nova; juntas não mudam") e §86.7 ("troca no
   lugar; a última fiada já é a grade da fiada de mesma paridade abaixo"): ATUALIZADAS — na extensão da corrida as
   juntas da canaleta passam a ser as da fiada c−2 (sobre alvenaria) e livres sobre o vão. Nós, amarrações e paridade
@@ -12303,3 +12316,107 @@ espelhamento e divisão do B54).
   `test_jamb_remnant_catalog.py`, `test_b34_run_arrangement.py` e `test_script.py` continuam verdes.
 
 - **Integração (2026-10-05) — SEGUNDA PASSADA DA JAMBA depois da §86.12** (`JAMB_SECOND_PASS_AFTER_GRID_FOLLOW = True`, caminho geral): com as canaletas já alinhadas à grade, o passe da jamba roda de novo e, se mudar alguma peça, a §86.12 realinha as canaletas. Cálculo completo do BUTANTÃ (13 fiadas): compensador logo atrás de bloco encostado no vão 51 (Revit anterior) → 22 (86.13) → **20** (com a segunda passada; resolve a W2 porta 1160, que alternava a pastilha); furos quebrados 325 → 320; septos sem apoio 91 → 83. **Sem solução sem quebrar o prisma (prisma primeiro):** W0 pilarete 395–464 (contraverga da janela esquerda entra no pilarete na fiada 4), W3 janela 1565, W11 jamba 409, W27 (shaft). O caso W0 1630 que a régua lista é o pilarete de 54 do catálogo (faixa C04+C09 encostada no vão da direita), não é defeito.
+
+### 86.14 SEM MEIA CANALETA — o meio bloco, o compensador e o B54 de baixo NÃO são acompanhados pela canaleta; o trecho fecha com U39/U34 (correção do usuário, 2026-10-05) — REGRA OBRIGATÓRIA; IMPLEMENTADO (chave `CHANNEL_HALF_U19_ENABLED = False` = meia canaleta proibida)
+
+- **Rótulo**: **REGRA OBRIGATÓRIA** — AMARRAÇÃO (junta vertical entre a canaleta e a fiada de mesma paridade
+  abaixo; continuidade da grade). **Substitui** o B19→U19 e o B54→U34+U19 da §86.7 (item 1) e da §86.12 (itens 1
+  e 2) e o U19 do trecho livre da §86.12. Notas de atualização gravadas nas duas subseções.
+- **Correção do usuário (2026-10-05, print do Revit com MEIA CANALETA U19 na cinta/verga sobre uma coluna de
+  pastilha C04 + meio bloco B19)**, palavras dele: "isso não existe, pode parar; a continuação das canaletas não
+  serve para os meio bloco; quando houver um meio bloco nas fiadas abaixo deve ser completado por bloco de 34 ou
+  39".
+- **Como foi descoberto**: print do usuário + o último cálculo completo do BUTANTÃ (`rows_r5jp2_13.json`, régua
+  nova `u19_survey`): **128 U19** (f11 52, f12 76) — 71 sobre B19 da fiada c−2, 43 sobre o VÃO (o trecho livre da
+  §86.12 escolhia U19), 8 sobre C09, 4 sobre C04, 1 sobre C09+C04, 1 sobre B34.
+- **A regra**:
+  1. A MEIA CANALETA (`CHANNEL_U_19`, família "MEIA CANALETA - 14x19x19") **não é usada** em nenhuma fiada de
+     canaleta (verga, contraverga, cinta de topo) — **nem como U_CUT de 19 cm** (a mesma peça cortada de uma U39;
+     tolerância 0,5 cm).
+  2. **Juntas DURAS**: junta da fiada c−2 entre dois blocos INTEIROS (B39/B34, ou U39/U34 de uma canaleta de c−2)
+     continua obrigatória na canaleta (§86.12): a canaleta nunca a atravessa; ponta de canaleta nunca cai no meio
+     de um bloco inteiro que tem bloco inteiro encostado dos dois lados.
+  3. **Peças MOLES**: meio bloco (B19), compensador (C04/C09), U_CUT e B54 de preenchimento da fiada c−2 **não são
+     acompanhados** pela canaleta. A junta que encosta num B19, num compensador, num U_CUT ou no vão é MOLE e pode
+     ser atravessada; a junta do B54 com um bloco inteiro continua dura (o B54 é dividido por dentro, ou entra no
+     trecho do vão/peça mole vizinha). "Vão" é o vão DE VERDADE (nada na fiada c−2): trecho livre que fica sobre
+     alvenaria de c−2 que não virou âncora (peça de c−2 passando da borda da janela — o flanco que não segue a
+     grade, `flank_mismatch` da §86.12) não amolece a junta: a junta de c−2 ali continua dura (achado na
+     mini-planta: W0 f4 com U34 U34 atravessando a junta B39|B39 de c−2 em 1619,5 — corrigido).
+  4. Cada grupo de peças moles contíguas (com o vão livre vizinho, se houver) vira **trecho livre**, que fecha só
+     com **U39/U34 e no máximo UM U_CUT (≥ 9 cm, nunca 19)**. O bloco inteiro vizinho de uma peça mole (encostado
+     pela junta mole) **pode entrar** no trecho — "a canaleta cobre o meio bloco e avança sobre a peça vizinha ou
+     sobre o vão" — quando isso evita junta coincidente ou U_CUT. Critério, nesta ordem: juntas da faixa (as novas
+     dentro do trecho e as entre o trecho e as peças mantidas, cada junta física uma vez) coincidentes com as fiadas
+     c−1/c+1 (regra #1); número de U_CUT; blocos inteiros
+     abrangidos; U_CUT minúscula (< 19 cm); número de peças; **U_CUT fora do vão** (o corte vai para cima do vão — a
+     fase que não fecha fica sobre o vão, nunca no pilarete, §85.10); desempate no sentido canônico do mundo.
+  5. **B54 de preenchimento** sob canaleta: sem U19. Entre dois blocos inteiros vira **U39 + U_CUT 14** (junta
+     nova longe das juntas vizinhas); encostado no vão/peça mole entra no trecho livre e a junta vai para o vão
+     ("prefira resolver deslocando a junta para o vão").
+  6. **Continuam valendo**: bloco de amarração no quadrado do nó (variante A, §75 — canaleta nunca amarra), apoio
+     mínimo da verga (19 cm; 40 cm preferencial para vão ≥ 140), juntas desencontradas das fiadas c−1/c+1 (regra
+     #1), sem invadir abertura, sem colisão; a corrida só cresce.
+  7. **Corridas trocadas no lugar** (verga/contraverga da §51.3, cinta da §86.7 — o que sobra quando a §86.12 não
+     age: fiada sem c−2, faixa sem solução, chave da §86.12 desligada): o B19 é fundido à vizinha como
+     compensador (B19+C04 = U_CUT 24, B19+C09 = U_CUT 29, C09+B19+C04 = U34, B19+B19 = U39); B19 que sobra sozinho
+     é refeito com até 2 grupos vizinhos em U39/U34 + no máximo um U_CUT ≥ 9; compensador sozinho que viraria
+     U_CUT < 9 cm (C04 entre dois B39) também; meio bloco fundido em U_CUT é refeito se uma janela com as vizinhas
+     fecha estritamente melhor (B19+C09+B39 = U34+U34). Trecho de 19 cm sem recomposição: na cinta fica BLOCO
+     (`TOP_BOND_BEAM_HALF_BLOCK_KEPT`); na verga vira achado de erro `CHANNEL_HALF_PIECE_UNAVOIDABLE`.
+  8. O arranjo da jamba (§85.9, verga que segue a grade da jamba) não troca mais B19 por U19 — o layout com B19
+     dentro da verga é recusado ali e o trecho fica para a §86.12/§86.14.
+- **CONFLITO registrado (humano × usuário)**: o projeto humano BUTANTÃ R08_LT usa **15 U19 na cinta** (f12) e
+  B54→U34+U19 em 11/16 (§86.7). **Vale a correção do usuário** (orientação mais recente): sem meia canaleta. A
+  régua de semelhança com o humano (§86.0, `r4_score.py`) vai perder essas peças — é esperado, não regressão.
+- **Implementação** (chave `opening_reinforcement.CHANNEL_HALF_U19_ENABLED`; `True` = comportamento anterior da
+  §86.7/§86.12 com U19, para medição A/B):
+  - `opening_reinforcement`: `half_channel_allowed`, `is_half_channel_length/_piece`, `half_channel_audit`;
+    `_standard_code_for_length` não reconhece 19; `_channel_candidate_from_group` não gera U19; `_group_run_members`
+    funde o B19 e nunca cria grupo de 19 cm; `_avoid_half_channel_groups` (recomposição no lugar) em
+    `plan_channel_reinforcement` e `plan_top_bond_beam`; `_tie_split_rows` sem parte de 19; B54 da cinta U39 +
+    U_CUT 14 (`split_b54_lengths_no_half_cm`); validação nova `CHANNEL_HALF_PIECE` (portão maiúsculo).
+  - `channel_grid_follow`: `_soften_items` / `_soft_cluster_layout` (peças moles, juntas duras/moles, blocos
+    abrangidos), trecho livre só 39/34 com U_CUT ≠ 19 e preferindo o vão (`free_spans`), canaleta original com
+    U19 ou U_CUT < 9 não concorre (`keep`), conferência final `INVARIANT_HALF_CHANNEL`, materialização recusa meia
+    canaleta (`HALF_CHANNEL_FORBIDDEN`); relatório `counts.soft_pieces`, `counts.soft_absorbed_whole_blocks`,
+    `half_channel_audit`, peça com `grid_follow.kind = "SOFT"`.
+  - `b34_run_arrangement._channel_of_block` (§85.9 sem U19).
+- **Medido (offline, sem tocar no Revit; o cálculo completo NÃO foi rodado — memória da máquina)**:
+  - Fixture da §86.12 (parede 700, janelas [109,250]/[330,471]): verga f11 sobre o pilarete `B34 | B19 | jamba`
+    era `U34 | U19 | U34…`; agora `U34 ×8 | U39 …` (B34 + B19 + vão no mesmo trecho, junta dura 54,5 mantida), cinta
+    f12 sem U19, 0 U_CUT, 0 junta coincidente com f10/f12, validação limpa, regra 75 vazia.
+  - Mini-planta BUTANTÃ (corpus 4, 7, 9, 19, 20, 21; aberturas; 13 fiadas; strategy None), legado → 86.14:
+    U19 **15 → 0**; U_CUT {4, 9, 29, 29} → {9, 9, 14, 24} (nenhum < 9); sobre B19 de c−2: {U19 11, U_CUT 1} →
+    {U39 9, U34 2, U_CUT 1}; juntas duras atravessadas 0 → 0; pontas no meio de bloco inteiro entre inteiros 0 → 0;
+    juntas de canaleta coincidentes com c−1/c+1 **20/162 → 0/155**; validação limpa, 86.12 sem caso sem solução,
+    regra 75 vazia, 0 colisão, auditorias de amarração aprovadas.
+  - Mini-planta BUTANTÃ (corpus 0, 1, 3, 4 — as "paredes boas"; aberturas; 13 fiadas; strategy None), legado →
+    86.14: U19 **76 → 0**; U_CUT {4, 9, 29, 29} → {9, 9, 24, 24, 29}; sobre B19 de c−2: {U19 51, U_CUT 1} → {U39 24,
+    U34 28}; juntas duras atravessadas 0 → 0; pontas no meio de bloco inteiro entre inteiros 2 → 2 (as mesmas:
+    flanco que não segue a grade da §86.12 — W0 f4 U_CUT 1620–1649 e W2 f4 U34 1185–1219, já existiam); juntas de
+    canaleta coincidentes com c−1/c+1 **106/532 → 9/501** (as 9 restantes também estão no legado: vêm da grade de
+    bloco do motor, f9/f10 já coincidentes, copiada como junta dura); validação limpa, 86.12 sem caso sem solução,
+    regra 75 vazia, 0 colisão. (Medido com a versão anterior ao último refinamento da contagem de juntas da faixa;
+    a mini-planta de 6 paredes, refeita depois do refinamento, deu números idênticos.)
+- **Casos que ficam com U_CUT (≥ 9, último recurso)**: compensador na PONTA da parede entre a ponta e uma junta
+  dura (mini-planta W1 f12 `C09[0-9] | B39 | B39` → U_CUT 9 sobre o C09 — abranger o B39 não evita o corte); trecho
+  B19+vão+C09 de 89 cm (W1 f12) → U_CUT 14 sobre o vão; B19 na ponta (W5 f12) → U34 + U_CUT 24.
+- **DOCUMENTADO — pendências**:
+  1. A família "MEIA CANALETA - 14x19x19" continua na lista obrigatória de `CHANNEL_FAMILY_CATALOG_DEFINITIONS`
+     (a falta dela ainda bloqueia o reforço com `CHANNEL_FAMILY_MISSING`), embora o motor não a use mais —
+     tirar da lista é decisão de integração (pendência de código aberta).
+  2. Medição no pavimento: o integrador roda o cálculo completo e mede U19 = 0 (`half_channel_audit` /
+     `CHANNEL_HALF_PIECE`), juntas duras atravessadas = 0 e U_CUT (régua `diag_soft.py`, ao lado de `diag_user.py`
+     sobre o mesmo `rows_*.json`), além de `diag_user.py` e `r4_score.py`. A régua antiga `diag_joints.py` (junta de
+     canaleta no meio de peça da c−2) passa a contar de propósito as travessias de peça mole — só as de bloco
+     inteiro entre inteiros são defeito.
+- Testes: `tests/test_sem_meia_canaleta_86_14.py` (nenhum U19 em verga/contraverga/cinta; B19 de baixo completado
+  por U34/U39; juntas duras alinhadas; regra #1; nó com bloco e validação; apoio ≥ 19; chave religada = U19 da
+  §86.12; determinismo; unidades do trecho livre, do corte sobre o vão, do B54 e do compensador, recomposição no
+  lugar da cinta). Ajustados: `tests/test_channel_grid_follow_86_12.py` (os testes que fixam B19→U19/B54→U34+U19
+  rodam com a chave religada; a régua de desalinho tem o modo novo — só juntas duras),
+  `tests/test_top_bond_beam.py` (planejador isolado nos dois modos) e
+  `tests/test_channel_reinforcement.py::test_door_gets_channel_course_on_head_and_nothing_else_changes_geometrically`
+  ("o planejador nunca cria junta nova" vale agora exceto na canaleta recomposta pela 86.14, marcada
+  `half_channel_resplit` — ali o C04 sozinho na ponta deixou de ser U_CUT 4 e virou U34 + U_CUT 9).
