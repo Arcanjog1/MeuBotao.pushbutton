@@ -7599,6 +7599,14 @@ comportamento de transacoes/familias reais, que depende do beta futuro.
 
 ## 49. Filtro por LAYER DE REFERÊNCIA ESTRUTURAL (2026-09-11, decisão do usuário)
 
+> **ATUALIZAÇÃO 2026-10-08 (§87.2) — vale a orientação mais recente:** no fluxo CAD→Walls a regra 49 passou a **só
+> classificar** (`clip_axes_to_reference_lines(..., trim=False)`, como na §49.1): o eixo com cobertura < 30 % é
+> excluído do corpus e os demais seguem **intactos** — o item (b) abaixo ("aparado ao envelope coberto") está
+> **revogado nos dois fluxos de produto** (os tocos são modulados, §86.9; só a sobra de CAD ≤ 10 cm é aparada, §87.3).
+> A função mantém `trim=True` apenas para bancada/testes históricos. O layer de referência pode vir de **outro
+> import** do documento (rótulo "<import> | <layer>" na Tela de Configuração) e a classificação roda **depois** do
+> fechamento dos encontros, sobre a geometria que o solver vê.
+
 **Problema medido (BUTANTÃ, via MCP):** o DWG `1 PAV` do doc de teste é uma
 exportação arquitetônica do Revit — os layers são `Paredes`, `Estrutura _1_`,
 `Substrato _2_`, `Acabamento`… (nomes de camadas de parede do Revit) e o
@@ -11996,6 +12004,12 @@ analistas preveem as duas vergas idênticas ao humano); contagem de `CHANNEL_STO
 
 ### 86.9 Tocos de eixo além da face da parede que cruza (R9) — PADRÃO OBSERVADO (5/5); IMPLEMENTADO, chave `STUB_TRIM_ENABLED`
 
+> **§87.3 (2026-10-08):** no modo *sobra de CAD* (`STUB_TRIM_ENABLED = False`, só a sobra ≤ `STUB_OVERSHOOT_TRIM_MAX_CM`)
+> a **testa do CAD não protege a ponta** (`ignore_locks`): a sobra de poucos cm além da face da parede que cruza é erro
+> de desenho mesmo quando o CAD fecha a parede ali — BUTANTÃ W8 (5 cm). A testa continua impedindo a EXTENSÃO. O
+> fluxo CAD→Walls passou a aparar a sobra em `main()` (assign → peitoril na base → sobra → extend → grafo), na mesma
+> ordem do fluxo de paredes existentes — o "NÃO aplicado em main" mais abaixo está superado.
+
 > **CORREÇÃO DO USUÁRIO (2026-10-05, revisão do pavimento recriado no Revit) — REGRA OBRIGATÓRIA, SUBSTITUI a regra abaixo:** "algumas paredes não foram moduladas porque no projeto humano não foi modulado" — corrigir. Os tocos de eixo além da face da parede que cruza **SÃO modulados** como qualquer trecho de parede (a parede do Revit existe e tem de receber blocos), mesmo que o humano não os module. `STUB_TRIM_ENABLED = False` (wall_pairing.py); a função `trim_wall_end_stubs` fica disponível só para estudo. **Exceção de tolerância geométrica (decisão de integração, 2026-10-05):** a sobra de eixo de até 10 cm além da face (`STUB_OVERSHOOT_TRIM_MAX_CM`) não é parede, é erro de desenho do CAD, e continua aparada — no BUTANTÃ só a W8 (5 cm além da W29; o humano também começa a fiada 0 em 5 cm). Sem isso a parede inteira fica deslocada 5 cm e surgem 80 septos sem apoio. O texto abaixo continua como registro do padrão observado no humano (não é mais regra).
 
 
@@ -12591,3 +12605,102 @@ espelhamento e divisão do B54).
   bloco; gates aprovam; nenhuma U19 fora do B54 da cinta; junta pela c−1 e pela grade; chave desligada;
   determinismo); `tests/test_top_bond_beam.py` (planejador nos modos legado / 86.14 sem a 86.16 / 86.16).
 
+
+## 87. O botão reproduz a modulação aprovada a partir do arquivo CRU (2026-10-08, IMPLEMENTADO)
+
+**Pedido do usuário (2026-10-08):** a modulação do `butanta testes` chegou a um resultado satisfatório (lote
+`20261008-143828`, 6 526 peças, motor `06ecb87`, cálculo `r7_13`, §86), mas o botão não a reproduzia a partir do
+arquivo cru — transformar em lógica do script o que diferia, sem copiar coordenadas da planta.
+
+**Causa medida (diagnóstico, não hipótese):** a referência aprovada foi gerada pelo fluxo *paredes existentes* sobre
+46 Walls recriadas de JSON (as 46 "históricas" de 2026-09-10), com a seleção 49.1 pelo import estrutural, tocos
+modulados (§86.9) e aberturas do corpus. O fluxo CAD→Walls do botão divergia em seis pontos, todos medidos no
+arquivo cru (`butanta testes cru.rvt`, cópia `butanta testes cru - TESTE S87 2026-10-08.rvt`):
+
+1. **Layer de paredes errado.** O layer `Paredes` do import arquitetônico (`151.06-ARQ-EX-0103-TIP-R02`, 2 738 linhas) é
+   o **acabamento**: faces quebradas nas portas e nos encontros → 71 pares → 52 eixos, 7 paredes partidas (y=487:
+   1629 → 419 + 791; y=652: 584 → 209, porta 8079008 sem parede; y=1087: 494 → 120 + 60; três de 99 → 64) e 3 eixos
+   falsos. O layer **`Estrutura _1_`** (1 111 linhas) forma exatamente **46 pares = as 46 paredes históricas**
+   (0 cm de desvio) — era ele a origem das Walls de 2026-09-10 (a "Tela 2 órfã… layer Estrutura _1_" do checkpoint de
+   2026-09-11).
+2. **Referência estrutural só do próprio import.** A Tela de Configuração só listava layers do import selecionado; as
+   faces da alvenaria estão em OUTRO import (`1 PAV`, layer `ARQ-STR-BLOCO`, 11 499 linhas) → a regra 49 nunca rodava
+   no botão e os 12 eixos não estruturais entravam (11 nós T falsos, §49.1).
+3. **Regra 49 aparando.** No fluxo CAD a regra 49 aparava o eixo ao envelope coberto (33 eixos aparados, 99 → 64 cm nas
+   três curtas, 2517 → 2514…); a referência aprovada usou só classificação (§49.1) e tocos modulados (§86.9).
+4. **Sobra de 5 cm protegida pela testa.** A W8 (x=1142, 730 → 1449) passa 5 cm além da face da W28 (y=1437); no CAD
+   essa ponta tem testa (`locks`) e a §86.9 a respeitava → a parede inteira ficava 5 cm deslocada (80 septos sem
+   apoio, §86.9). A referência aprovada (Walls sem lock) aparou.
+5. **Porta 1 cm abaixo do piso.** A porta 8078997 (x=497, y≈1999) está inserida a −1 cm do nível (Peitoril 0, Altura
+   221): lida crua vira o único vão 220 de topo com peitoril −1 e muda a banda da verga; o corpus aprovado a trata como
+   0/221, igual às outras portas.
+6. **Configuração da RUN perdida.** `main()` não passava `setup` ao handler da Tela 2 → `corpus_selection` (49.1) e os
+   tocos aparados não iam para o `solve_result`/relatório.
+
+### 87.1 Layer das paredes: `Estrutura _1_` — REGRA OBRIGATÓRIA (configuração)
+
+Em DWG exportado do Revit arquitetônico, o layer de paredes para o CAD→Walls é o da **camada estrutural** da parede
+(`Estrutura _1_`), nunca o acabamento (`Paredes`): só ele tem as duas faces contínuas da alvenaria. É escolha do
+usuário na Tela de Configuração (lembrada no `modulacao_automatica_setup.json`); o teste
+`tests/test_cad_flow_butanta_s87.py` protege os dois lados (46 pares com `Estrutura _1_`; `Paredes` fragmenta).
+
+### 87.2 Referência de qualquer import + só classificação — REGRA OBRIGATÓRIA; IMPLEMENTADO
+
+- `collect_reference_layers_from_document(doc, import_selecionado, linhas)`: todos os layers com linha reta de TODOS
+  os `ImportInstance` do documento entram no combo "Layer de referência estrutural" — o import selecionado com o nome
+  puro do layer, os outros como **"<import> | <layer>"** (`reference_layer_label`); `ask_setup(..., reference_layers=)`
+  e `_SetupForm(..., reference_layers=)` (sem o argumento, comportamento antigo). Escolha lembrada pelo rótulo.
+- Em `main()`, a regra 49 roda **depois** de `deduplicate_walls` + `extend_wall_ends_to_junctions` (geometria que o
+  solver vê) com `trim=False`: 46 → **34 selecionados / 12 excluídos** (coberturas 3–8 %), nenhum eixo encurtado;
+  o corpus 49.1 (`detected/selected/excluded`) é gravado no `setup` e, com a correção 6, chega ao handler
+  (`_show_post_creation_window(..., setup=setup)`).
+- **CONFLITO registrado com a §49 (b):** o aparo ao envelope está revogado nos fluxos de produto (vale a orientação
+  mais recente — tocos modulados, §86.9). A função continua aceitando `trim=True` para bancada.
+
+### 87.3 Sobra de CAD ≤ 10 cm aparada mesmo com testa — REGRA OBRIGATÓRIA (complementa a §86.9); IMPLEMENTADO
+
+- `find_wall_end_stubs(..., ignore_locks)` / `trim_wall_end_stubs(..., ignore_locks=None)`: no modo *sobra de CAD*
+  (`STUB_TRIM_ENABLED = False`, `STUB_OVERSHOOT_TRIM_MAX_CM = 10`) `ignore_locks` vale `True` — a testa do CAD não
+  protege a sobra (ela continua impedindo a extensão). No modo pleno (`enabled=True`) a testa protege, como antes.
+- `main()` apara a sobra na **mesma ordem** do fluxo de paredes existentes: `assign_openings_to_walls` → §87.4 →
+  `trim_wall_end_stubs` → `extend_wall_ends_to_junctions` → `build_wall_graph`; o que foi aparado vai para
+  `corpus_selection["trimmed"]` e para o output. BUTANTÃ: 1 ponta (eixo `cad#8`, 5,0 cm, 719 → 714 cm).
+
+### 87.4 Peitoril até 2 cm ABAIXO da base sobe para a base — REGRA OBRIGATÓRIA (tolerância geométrica); IMPLEMENTADO
+
+- `snap_openings_to_wall_base(openings_per_wall, base_z_abs, tolerance_cm=OPENING_SILL_BELOW_BASE_SNAP_CM)` em
+  `core/engine/wall_pairing.py` (`OPENING_SILL_BELOW_BASE_SNAP_CM = 2.0`): quando `0 < base − peitoril ≤ 2 cm`, o
+  peitoril sobe para a base e a verga sobe a mesma diferença (**altura do vão preservada**); abaixo da base não há
+  parede, então nada do vão é perdido. Acima de 2 cm é uma abertura rebaixada de verdade e fica como está.
+- Chamada nos **dois** fluxos logo após `assign_openings_to_walls` (antes do aparo da sobra, que reancora o `t`).
+  BUTANTÃ: parede #4 abertura #1 (porta 8078997) −1,0 → 0,0 cm, verga 220 → 221. Registro no output.
+
+### 87.5 Verificação (2026-10-08)
+
+- **Offline** (`tests/test_cad_flow_butanta_s87.py`, evidência em
+  `docs/checkpoints/evidence/2026-10-08-s87-cad-flow/`): `Estrutura _1_` → 46 pares / 46 eixos; referência → 34/12
+  sem aparar; sobra W8 5 cm aparada (com e sem testa); peitoril −1 → 0; **34 eixos + aberturas iguais aos da
+  referência aprovada** (pior desvio 0,0 cm; aberturas ≤ 0,5 cm); determinístico à ordem das linhas; combo de
+  referência com rótulos de outro import; `Paredes` fragmenta (52 eixos).
+- **Revit, fluxo real do botão no arquivo cru** (cópia de teste, `main()` com as telas respondidas por script —
+  import 8079028, `Estrutura _1_`, 14 cm, 1º PAVIMENTO, 2,60 m, aberturas automáticas, referência
+  `1 PAV | ARQ-STR-BLOCO`, sem reforço adicional): Etapa 1 em 10,8 s — 46 pares, 34 eixos, 55 nós, 44 aberturas,
+  145 Walls (modo segmentado, 34 eixos); `Analisar paredes` em 12,8 s (21 avisos do analisador legado da Etapa 3B,
+  nenhum auto-corrigível — informativos, a Tela 2 resolve); geometria lida pelo handler da Tela 2 **idêntica** à
+  entrada do cálculo aprovado (34 eixos, 0,0 cm; 44 aberturas, 0 divergência; 13 fiadas; estratégia `None`,
+  canaletas disponíveis). Resultado das peças: ver o checkpoint
+  `docs/checkpoints/2026-10-08-s87-botao-reproduz-aprovado.md`.
+
+### 87.6 Como rodar no botão (BUTANTÃ ou planta equivalente)
+
+1. Abrir o arquivo cru (0 Walls, aberturas como Mobiliário no nível, import estrutural na escala/posição das paredes).
+2. Botão → "CAD → paredes" → selecionar o import **arquitetônico** → Tela de Configuração: layer **`Estrutura _1_`**,
+   espessura 14 cm, nível do pavimento, altura (13 fiadas = 2,60 m), aberturas automáticas, referência estrutural
+   **`1 PAV | ARQ-STR-BLOCO`**, reforço "Sem reforço adicional" → Executar.
+3. Tela de revisão → "Analisar paredes" (avisos da Etapa 3B são informativos) → Tela 2 → "Calcular" → "Criar blocos".
+
+**Limites registrados:** (a) o analisador da Etapa 3B (solver legado de 2 fiadas) reporta avisos que o solver
+multi-fiada da Tela 2 não tem — candidato a revisão futura; (b) no modo segmentado nascem 145 Walls (34 eixos) e não
+46 Walls contínuas como na referência — o solver lê a geometria por eixo (`_refresh_geometry_from_document`), então o
+resultado não depende disso; (c) `len([...])` substituiu um `sum(gerador)` em `main()` porque o engine IronPython
+(caminho MCP/headless) quebrava ali — sem efeito no CPython do botão.
