@@ -937,7 +937,7 @@ def install():
         "FilteredElementCollector", "Level", "Wall", "WallType", "WallKind",
         "WallUtils", "WallLocationLine", "BuiltInCategory",
         "MaterialFunctionAssignment", "FamilyInstance", "LocationPoint",
-        "LocationCurve", "CompoundStructure", "Solid", "ViewDetailLevel", "Opening",
+        "LocationCurve", "CompoundStructure", "Solid", "ViewDetailLevel", "Opening", "ImportInstance",
         "OverrideGraphicSettings", "FillPatternElement", "IUpdater",
         "UpdaterId", "UpdaterRegistry", "ChangePriority", "SubTransaction",
         "Element", "ElementClassFilter",

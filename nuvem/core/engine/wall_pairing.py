@@ -64,6 +64,7 @@ __all__ = [
     "STUB_TRIM_TOLERANCE_CM", "STUB_TRIM_FACE_CLEARANCE_CM",
     "STUB_TRIM_CONTACT_TOLERANCE_FT", "STUB_TRIM_RULE_ID",
     "find_wall_end_stubs", "trim_wall_end_stubs", "stub_trim_corpus_items",
+    "OPENING_SILL_BELOW_BASE_SNAP_CM", "snap_openings_to_wall_base",
     # ---- associacao abertura -> parede (extraido junto com a "arquitetura
     # do modelador externo", 2026-08-26 - ver build_capture_payload em
     # ModulacaoAutomatica/.../core/capture_export.py, que serializa as
@@ -1419,7 +1420,7 @@ def _stub_rects_overlap(r1, r2):
     return True
 
 
-def find_wall_end_stubs(walls_to_create, openings_per_wall=None, max_cm=None):
+def find_wall_end_stubs(walls_to_create, openings_per_wall=None, max_cm=None, ignore_locks=False):
     """Lista os TOCOS (secao 86.9) das pontas de `walls_to_create`, sem alterar
     nada. Cada item: {"wall_idx", "end_index", "crossing_wall_idx", "stub_ft",
     "stub_cm", "length_cm", "new_length_cm"} (`new_length_cm` ja' desconta os
@@ -1436,7 +1437,13 @@ def find_wall_end_stubs(walls_to_create, openings_per_wall=None, max_cm=None):
          do eixo de entrada) entra no toco;
       4. nenhuma OUTRA parede (fora a que cruza) encosta no toco - pela
          lateral, pela ponta ou atravessando-o (pegada com a espessura).
-    `openings_per_wall` None = nenhuma abertura conhecida."""
+    `openings_per_wall` None = nenhuma abertura conhecida.
+    `ignore_locks` (secao 87.3, 2026-10-08): a testa do CAD (`locks`) deixa de
+    proteger a ponta - usado pelo modo SOBRA DE CAD (<= STUB_OVERSHOOT_TRIM_MAX_CM):
+    uma sobra de poucos cm alem da face da parede que cruza e' erro de desenho
+    mesmo quando o CAD fecha a parede ali com uma testa (BUTANTA W8: 5 cm com
+    testa; a referencia aprovada apara). A testa continua impedindo a EXTENSAO
+    (extend_wall_ends_to_junctions), nunca o aparo da sobra."""
     if max_cm is None:
         max_cm = STUB_TRIM_MAX_CM
     max_ft = _stub_cm_to_ft(float(max_cm) + STUB_TRIM_TOLERANCE_CM)
@@ -1461,7 +1468,7 @@ def find_wall_end_stubs(walls_to_create, openings_per_wall=None, max_cm=None):
         thickness_ft = walls_to_create[idx][1]
         locks = walls_to_create[idx][2] or (False, False)
         for end_index in (0, 1):
-            if locks[end_index]:
+            if locks[end_index] and not ignore_locks:
                 continue
             if end_index == 0:
                 p_end, outward = p0, XYZ(-u.X, -u.Y, 0.0)
@@ -1550,14 +1557,18 @@ def find_wall_end_stubs(walls_to_create, openings_per_wall=None, max_cm=None):
     return found
 
 
-def trim_wall_end_stubs(walls_to_create, openings_per_wall=None, enabled=None, max_cm=None):
+def trim_wall_end_stubs(walls_to_create, openings_per_wall=None, enabled=None, max_cm=None,
+                        ignore_locks=None):
     """Apara os tocos da secao 86.9 (ver find_wall_end_stubs). Devolve
     (walls, openings_per_wall, tocos): `walls` com o eixo de cada parede
     encurtado ate' a face da parede que cruza (as duas pontas, se for o caso),
     `openings_per_wall` com o t das aberturas reancorado no NOVO p0 quando a
     ponta 0 foi aparada (o t e' medido a partir do p0 do eixo), e a lista de
     tocos aparados. Desligada (`enabled` False, ou None com STUB_TRIM_ENABLED
-    False) devolve copias intactas e lista vazia. Nunca muta a entrada."""
+    False) devolve copias intactas e lista vazia. Nunca muta a entrada.
+    `ignore_locks` None = no modo SOBRA DE CAD (STUB_TRIM_ENABLED False, so' a
+    sobra <= STUB_OVERSHOOT_TRIM_MAX_CM) a testa do CAD NAO protege a ponta
+    (secao 87.3); no modo pleno (86.9 ligada) a testa protege, como antes."""
     walls = list(walls_to_create or [])
     openings = None if openings_per_wall is None else list(openings_per_wall)
     if enabled is None:
@@ -1566,9 +1577,11 @@ def trim_wall_end_stubs(walls_to_create, openings_per_wall=None, enabled=None, m
             # correcao do usuario (2026-10-05): tocos sao modulados; so' a sobra minima de CAD e' aparada
             enabled = True
             max_cm = STUB_OVERSHOOT_TRIM_MAX_CM if max_cm is None else min(max_cm, STUB_OVERSHOOT_TRIM_MAX_CM)
+            if ignore_locks is None:
+                ignore_locks = True  # secao 87.3: a testa do CAD nao protege a sobra
     if not enabled or not walls:
         return walls, openings, []
-    stubs = find_wall_end_stubs(walls, openings, max_cm=max_cm)
+    stubs = find_wall_end_stubs(walls, openings, max_cm=max_cm, ignore_locks=bool(ignore_locks))
     cuts = {}
     for item in stubs:
         cuts.setdefault(item["wall_idx"], {})[item["end_index"]] = item["stub_ft"]
@@ -1586,6 +1599,52 @@ def trim_wall_end_stubs(walls_to_create, openings_per_wall=None, enabled=None, m
             openings[idx] = [tuple([op[0] - cut0, op[1] - cut0] + list(op[2:]))
                              for op in openings[idx]]
     return walls, openings, stubs
+
+
+# SECAO 87.4 (2026-10-08): abertura cujo peitoril fica ATE' esta distancia
+# ABAIXO da base da parede e' tratada como peitoril NA base, preservando a
+# ALTURA do vao (a verga sobe junto). Medido no BUTANTA: a porta 8078997 esta'
+# inserida a -1 cm do nivel (Peitoril 0, Altura 221) - lida crua, vira o unico
+# vao de 220 de topo e muda a banda da verga; a referencia aprovada (corpus)
+# a trata como 0/221, igual a's outras portas. Abaixo da base nao ha' parede,
+# entao nada do vao e' perdido; acima de 2 cm e' uma abertura rebaixada de
+# verdade e fica como esta'.
+OPENING_SILL_BELOW_BASE_SNAP_CM = 2.0
+
+
+def snap_openings_to_wall_base(openings_per_wall, base_z_abs, tolerance_cm=None):
+    """Devolve (openings_per_wall novo, [itens ajustados]). Cada entrada e'
+    (t_lo, t_hi, sill_z_abs, head_z_abs, ...); quando 0 < base - sill <=
+    `tolerance_cm` o peitoril sobe para `base_z_abs` e a verga sobe a mesma
+    diferenca (altura do vao preservada). Nunca muta a entrada; sem
+    aberturas, ou com `base_z_abs` None, devolve uma copia intacta."""
+    if tolerance_cm is None:
+        tolerance_cm = OPENING_SILL_BELOW_BASE_SNAP_CM
+    tol_ft = float(tolerance_cm) / 100.0 * FEET_PER_METER
+    result = []
+    adjusted = []
+    for wall_idx, row in enumerate(openings_per_wall or []):
+        if not row or base_z_abs is None:
+            result.append(list(row) if row else row)
+            continue
+        new_row = []
+        for opening_index, op in enumerate(row):
+            op = tuple(op)
+            if len(op) < 4:
+                new_row.append(op)
+                continue
+            sill, head = op[2], op[3]
+            delta = base_z_abs - sill
+            if 1e-9 < delta <= tol_ft + 1e-9:
+                new_row.append(tuple([op[0], op[1], sill + delta, head + delta] + list(op[4:])))
+                adjusted.append({"wall_idx": wall_idx, "opening_index": opening_index,
+                                 "delta_cm": delta / FEET_PER_METER * 100.0,
+                                 "sill_cm_before": (sill - base_z_abs) / FEET_PER_METER * 100.0,
+                                 "rule_id": "REGRA_87_4_SILL_SNAP"})
+            else:
+                new_row.append(op)
+        result.append(new_row)
+    return result, adjusted
 
 
 def stub_trim_corpus_items(stubs, wall_ids=None, axis_keys=None):

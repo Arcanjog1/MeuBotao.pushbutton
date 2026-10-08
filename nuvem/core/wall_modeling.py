@@ -127,7 +127,7 @@ from Autodesk.Revit.DB import (
     Options, Line, PolyLine, GeometryInstance, GraphicsStyle, XYZ, ElementId,
     FilteredElementCollector, Level, Wall, WallType, WallKind, WallUtils,
     WallLocationLine, Transaction, BuiltInParameter, MaterialFunctionAssignment,
-    FamilyInstance, LocationPoint, LocationCurve, CompoundStructure,
+    FamilyInstance, LocationPoint, LocationCurve, CompoundStructure, ImportInstance,
     Curve, Solid, ViewDetailLevel, OverrideGraphicSettings, FillPatternElement,
     # `Opening` e' o elemento de Abertura de Parede - o que
     # Document.Create.NewOpening devolve e o que a uniao de paredes
@@ -13071,7 +13071,7 @@ class _SetupForm(Form):
     e como identificar portas/janelas. MODAL de proposito - nada existe no
     modelo ainda, nao ha' o que conferir no Revit enquanto se decide."""
 
-    def __init__(self, lines_by_layer, level_names, defaults=None):
+    def __init__(self, lines_by_layer, level_names, defaults=None, reference_layers=None):
         # OBRIGATORIO no engine CPython (pythonnet) - ver Script.py: ao
         # contrario do IronPython classico, subclassar um tipo .NET (Form)
         # em CPython/pythonnet NAO inicializa o objeto CLR sozinho so' por
@@ -13291,11 +13291,23 @@ class _SetupForm(Form):
         self._reference_combo.Font = _ui_font(10.0)
         self._reference_combo.DropDownStyle = ComboBoxStyle.DropDownList
         self._reference_combo.Items.Add(REFERENCE_LAYER_NONE_LABEL)
-        for name in ordered_layers:
+        # SECAO 87.2 (2026-10-08): o layer de referencia pode vir de OUTRO import
+        # do documento (no BUTANTA as faces da alvenaria estao no import
+        # estrutural '1 PAV', nao no arquitetonico que tem o layer de paredes).
+        # `reference_layers` = {rotulo: linhas} de todos os imports (ver
+        # collect_reference_layers_from_document); sem ele, so' os layers do
+        # import selecionado, como antes.
+        if reference_layers:
+            reference_names = sorted(reference_layers.keys(),
+                                     key=lambda name: (-len(reference_layers[name]), name))
+        else:
+            reference_names = list(ordered_layers)
+        self._reference_names = reference_names
+        for name in reference_names:
             self._reference_combo.Items.Add(name)
         remembered_reference = defaults.get("reference_layer")
-        if remembered_reference in ordered_layers:
-            self._reference_combo.SelectedIndex = ordered_layers.index(remembered_reference) + 1
+        if remembered_reference in reference_names:
+            self._reference_combo.SelectedIndex = reference_names.index(remembered_reference) + 1
         else:
             self._reference_combo.SelectedIndex = 0
         reference_label = _build_section_label(
@@ -13639,7 +13651,70 @@ def _format_exception_detail(ex):
     return "\n".join(parts)
 
 
-def ask_setup(lines_by_layer, level_names):
+def cad_import_display_name(import_instance):
+    """Nome legivel de um ImportInstance (nome do tipo = arquivo importado);
+    nunca lanca - cai no ElementId."""
+    try:
+        import_type = import_instance.Document.GetElement(import_instance.GetTypeId())
+        param = import_type.get_Parameter(BuiltInParameter.SYMBOL_NAME_PARAM) if import_type is not None else None
+        name = param.AsString() if param is not None else None
+        if name:
+            return name
+    except Exception:
+        pass
+    try:
+        return "import {}".format(_eid_int(import_instance.Id))
+    except Exception:
+        return "import"
+
+
+def reference_layer_label(import_name, layer_name):
+    """Rotulo de um layer de OUTRO import no combo de referencia (secao 87.2)."""
+    return u"{} | {}".format(import_name, layer_name)
+
+
+def collect_reference_layers_from_document(target_doc, selected_import, selected_lines_by_layer):
+    """SECAO 87.2 (2026-10-08): {rotulo: linhas} de todos os layers com linha
+    reta de TODOS os ImportInstance do documento, para o layer de referencia
+    estrutural da regra 49 poder vir de outro import (no BUTANTA, as faces da
+    alvenaria estao no import estrutural `1 PAV`, layer `ARQ-STR-BLOCO`, e o
+    layer de paredes no import arquitetonico). O import selecionado entra com
+    o nome puro do layer (compatibilidade com a escolha lembrada); os outros
+    com "<import> | <layer>". So' leitura; qualquer import ilegivel e'
+    ignorado, nunca derruba a execucao."""
+    result = {}
+    for name, lines in (selected_lines_by_layer or {}).items():
+        if lines:
+            result[name] = lines
+    try:
+        selected_id = selected_import.Id if selected_import is not None else None
+    except Exception:
+        selected_id = None
+    try:
+        imports = list(FilteredElementCollector(target_doc).OfClass(ImportInstance).ToElements())
+    except Exception:
+        imports = []
+    for inst in imports:
+        try:
+            if selected_id is not None and inst.Id == selected_id:
+                continue
+            options = Options()
+            options.IncludeNonVisibleObjects = True
+            geometry = inst.get_Geometry(options)
+            if geometry is None:
+                continue
+            by_layer = {}
+            extract_lines_by_layer(geometry, by_layer)
+            import_name = cad_import_display_name(inst)
+            for layer_name, lines in by_layer.items():
+                if lines:
+                    result[reference_layer_label(import_name, layer_name)] = lines
+        except Exception:
+            continue
+    return result
+
+
+def ask_setup(lines_by_layer, level_names, reference_layers=None):
     """Abre a janela de configuracao unica (WinForms, `_SetupForm`) e
     devolve o dict de configuracao, ou None se o usuario cancelar. Qualquer
     falha ao montar essa janela (uma versao de Revit/pyRevit em que algum
@@ -13647,7 +13722,13 @@ def ask_setup(lines_by_layer, level_names):
     antiga de caixas do pyRevit em vez de derrubar o script - ver
     _ask_setup_legacy."""
     try:
-        window = _SetupForm(lines_by_layer, level_names, _recall_setup_defaults())
+        # `reference_layers` so' viaja quando existe (secao 87.2) - mantem a
+        # assinatura antiga para quem substitui _SetupForm (testes/dubles).
+        if reference_layers:
+            window = _SetupForm(lines_by_layer, level_names, _recall_setup_defaults(),
+                                reference_layers=reference_layers)
+        else:
+            window = _SetupForm(lines_by_layer, level_names, _recall_setup_defaults())
         window.ShowDialog()
         if window.result:
             _remember_setup_defaults(window.result)
@@ -18212,6 +18293,12 @@ def run_modulation_on_existing_walls(preselected=None):
     }
     openings_per_wall = assign_openings_to_walls(walls_to_create, all_openings, opening_diagnostics)
     unassigned_openings = opening_diagnostics["unassigned_openings"]
+    # SECAO 87.4: peitoril ate' 2 cm abaixo da base sobe para a base (altura preservada)
+    openings_per_wall, sill_snaps = snap_openings_to_wall_base(openings_per_wall, base_z_abs)
+    for item in sill_snaps:
+        output.print_md("- peitoril na base (secao 87.4): parede #{} abertura #{} estava {:.1f} cm "
+                        "abaixo da base - subiu {:.1f} cm (altura do vao preservada).".format(
+                            item["wall_idx"], item["opening_index"], -item["sill_cm_before"], item["delta_cm"]))
 
     opening_modulation_results = evaluate_opening_modulation(all_openings)
     opening_incompatible_modulation = [r for r in opening_modulation_results if not r["compatible"]]
@@ -20152,7 +20239,18 @@ def main():
     # altura e modo de identificacao das portas/janelas (ver _SetupForm; a
     # sequencia antiga de cinco caixas encadeadas continua disponivel como
     # plano B dentro de ask_setup).
-    setup = ask_setup(cad_lines_by_layer, sorted(level_dict.keys()))
+    # SECAO 87.2: layers de referencia estrutural de TODOS os imports do
+    # documento (o import selecionado entra com o nome do layer; os outros
+    # com "<import> | <layer>"), para a regra 49 poder usar o desenho
+    # estrutural mesmo quando ele e' outro import.
+    t_step = _perf_begin("Lendo layers dos outros imports (referencia estrutural)")
+    reference_lines_by_label = collect_reference_layers_from_document(doc, cad_ref, cad_lines_by_layer)
+    t_step = _perf_mark(
+        t_step, "Leitura dos layers de referencia (collect_reference_layers_from_document)",
+        "{} layer(s) candidatos".format(len(reference_lines_by_label))
+    )
+    setup = ask_setup(cad_lines_by_layer, sorted(level_dict.keys()),
+                      reference_layers=reference_lines_by_label)
     if not setup:
         return
 
@@ -20289,53 +20387,10 @@ def main():
         )
     )
 
-    # Secao 49 (2026-09-11): LAYER DE REFERENCIA ESTRUTURAL (opcional). O
-    # layer arquitetonico de paredes traz tambem o que NAO e' alvenaria
-    # estrutural (drywall, muretas, vigas projetadas) e alonga paredes
-    # atraves da vizinha; quando o DWG (ou outro import) tem um layer com as
-    # faces da alvenaria estrutural, cada eixo e' mantido/aparado/descartado
-    # pela cobertura geometrica dessas linhas - nunca por nome, ID ou
-    # posicao. Sem layer escolhido (ou sem linhas nele) nada muda.
-    reference_layer = setup.get("reference_layer")
-    reference_report = None
+    # Paredes detectadas no CAD (pares validos) ANTES de deduplicar/estender -
+    # e' a base do corpus da RUN (secao 49.1); a regra 49 roda mais abaixo,
+    # sobre os eixos ja' fechados nos encontros (secao 87.2).
     detected_axes_cad = len(walls_to_create)
-    if reference_layer and cad_lines_by_layer.get(reference_layer):
-        before_ref = len(walls_to_create)
-        walls_to_create, reference_report = clip_axes_to_reference_lines(
-            walls_to_create, cad_lines_by_layer[reference_layer]
-        )
-        output.print_md(
-            "**Layer de referencia estrutural '{}'**: {} eixo(s) analisados, "
-            "{} mantido(s), {} aparado(s), {} descartado(s) por cobertura "
-            "< {:.0f}% (nao sao alvenaria estrutural).".format(
-                reference_layer, before_ref, reference_report["kept"],
-                len(reference_report["trimmed"]), len(reference_report["dropped"]),
-                REFERENCE_LAYER_MIN_COVERAGE * 100.0
-            )
-        )
-        for item in reference_report["dropped"]:
-            output.print_md("- descartado: eixo #{} de {:.0f} cm, cobertura {:.0f}%".format(
-                item["index"], item["length_cm"], item["coverage"] * 100.0))
-        for item in reference_report["trimmed"]:
-            output.print_md("- aparado: eixo #{} de {:.0f} cm -> {:.0f} cm".format(
-                item["index"], item["length_cm"], item["new_length_cm"]))
-    # SECAO 49.1: corpus da RUN tambem no fluxo CAD -> Walls
-    if reference_report is not None:
-        _excluded_cad = [{
-            "axis_index": item["index"], "axis_key": "cad#{}".format(item["index"]), "wall_id": None,
-            "reason": ("cobertura {:.0f}% pelo layer de referencia estrutural '{}' < {:.0f}%: "
-                       "o eixo nao e' alvenaria estrutural (secao 49)".format(
-                           item["coverage"] * 100.0, reference_layer, REFERENCE_LAYER_MIN_COVERAGE * 100.0)),
-            "rule_id": CORPUS_RULE_REFERENCE_LAYER, "source_layer": reference_layer,
-            "geometry_summary": {"length_cm": round(item["length_cm"], 1), "coverage": round(item["coverage"], 3),
-                                 "min_coverage": float(REFERENCE_LAYER_MIN_COVERAGE)},
-        } for item in reference_report["dropped"]]
-        setup["corpus_selection"] = corpus_selection_record(
-            "cad", detected_axes_cad, len(walls_to_create), _excluded_cad, reference_layer=reference_layer,
-            rule_id=CORPUS_RULE_REFERENCE_LAYER, trimmed=reference_report["trimmed"])
-    else:
-        setup["corpus_selection"] = corpus_selection_record(
-            "cad", detected_axes_cad, len(walls_to_create), [], reference_layer=None, rule_id=CORPUS_RULE_NONE)
 
     # Paredes DETECTADAS no AutoCAD = pares validos (paralelismo + espessura
     # + sobreposicao + linhas de fechamento) encontrados por find_wall_pairs
@@ -20441,16 +20496,55 @@ def main():
         "{} parede(s) no total".format(len(walls_to_create))
     )
 
-    # 4b1. ETAPA 2 - grafo de paredes: classifica cada encontro (ponta livre,
-    # continuacao reta, canto L, T ou cruz X) a partir do MESMO calculo
-    # geometrico que acabou de fechar os encontros acima (`wall_junction_map`
-    # - ver o docstring de extend_wall_ends_to_junctions e build_wall_graph).
-    # So' leitura - nao altera walls_to_create nem cria nada no Revit ainda;
-    # o grafo e' consumido pelas proximas etapas (ajuste de aberturas perto
-    # de encontro, e o solver de blocos L/T/X).
-    t_step = _perf_begin("Montando o grafo de encontros entre paredes")
-    wall_graph_nodes, wall_end_to_node = build_wall_graph(walls_to_create, wall_junction_map)
-    t_step = _perf_mark(t_step, "Grafo de paredes (build_wall_graph)", "{} no(s)".format(len(wall_graph_nodes)))
+    # Secao 49 (2026-09-11) + 87.2 (2026-10-08): LAYER DE REFERENCIA
+    # ESTRUTURAL (opcional). O layer arquitetonico de paredes traz tambem o
+    # que NAO e' alvenaria estrutural (drywall, muretas, vigas projetadas);
+    # quando algum import do documento tem um layer com as faces da
+    # alvenaria estrutural, cada eixo e' mantido ou EXCLUIDO pela cobertura
+    # geometrica dessas linhas - nunca por nome, ID ou posicao. So'
+    # classificacao (trim=False, como no fluxo de paredes existentes, secao
+    # 49.1): o eixo NAO e' aparado ao envelope coberto - os tocos sao
+    # modulados (secao 86.9) e so' a sobra de CAD de ate' 10 cm e' aparada
+    # mais abaixo (trim_wall_end_stubs). Roda sobre os eixos JA' fechados nos
+    # encontros, para a cobertura ser medida na geometria que o solver vai
+    # ver. Sem layer escolhido (ou sem linhas nele) nada muda.
+    reference_layer = setup.get("reference_layer")
+    reference_report = None
+    reference_lines = ((reference_lines_by_label or {}).get(reference_layer)
+                       or cad_lines_by_layer.get(reference_layer) or []) if reference_layer else []
+    if reference_layer and reference_lines:
+        before_ref = len(walls_to_create)
+        walls_to_create, reference_report = clip_axes_to_reference_lines(
+            walls_to_create, reference_lines, trim=False
+        )
+        output.print_md(
+            "**Layer de referencia estrutural '{}'** (secao 49, sem aparar): {} eixo(s) analisados, "
+            "{} selecionado(s), {} excluido(s) por cobertura < {:.0f}% (nao sao alvenaria "
+            "estrutural).".format(
+                reference_layer, before_ref, reference_report["kept"],
+                len(reference_report["dropped"]), REFERENCE_LAYER_MIN_COVERAGE * 100.0
+            )
+        )
+        for item in reference_report["dropped"]:
+            output.print_md("- excluido: eixo #{} de {:.0f} cm, cobertura {:.0f}%".format(
+                item["index"], item["length_cm"], item["coverage"] * 100.0))
+    # SECAO 49.1: corpus da RUN tambem no fluxo CAD -> Walls
+    if reference_report is not None:
+        _excluded_cad = [{
+            "axis_index": item["index"], "axis_key": "cad#{}".format(item["index"]), "wall_id": None,
+            "reason": ("cobertura {:.0f}% pelo layer de referencia estrutural '{}' < {:.0f}%: "
+                       "o eixo nao e' alvenaria estrutural (secao 49)".format(
+                           item["coverage"] * 100.0, reference_layer, REFERENCE_LAYER_MIN_COVERAGE * 100.0)),
+            "rule_id": CORPUS_RULE_REFERENCE_LAYER, "source_layer": reference_layer,
+            "geometry_summary": {"length_cm": round(item["length_cm"], 1), "coverage": round(item["coverage"], 3),
+                                 "min_coverage": float(REFERENCE_LAYER_MIN_COVERAGE)},
+        } for item in reference_report["dropped"]]
+        setup["corpus_selection"] = corpus_selection_record(
+            "cad", detected_axes_cad, len(walls_to_create), _excluded_cad, reference_layer=reference_layer,
+            rule_id=CORPUS_RULE_REFERENCE_LAYER, trimmed=[])
+    else:
+        setup["corpus_selection"] = corpus_selection_record(
+            "cad", detected_axes_cad, len(walls_to_create), [], reference_layer=None, rule_id=CORPUS_RULE_NONE)
 
     # 4b2. Validacao final: extend_wall_ends_to_junctions so' alonga pontas
     # em direcao a paredes PERPENDICULARES (nunca paralelas - ver a propria
@@ -20476,7 +20570,9 @@ def main():
                 return True
         return False
 
-    out_of_bounds_count = sum(1 for centerline, _, _ in walls_to_create if _wall_out_of_bounds(centerline))
+    # lista explicita em vez de gerador dentro de sum(): o gerador-closure aqui quebra no
+    # engine IronPython (caminho MCP/headless) com 'Sequence contains no elements' (2026-10-08)
+    out_of_bounds_count = len([1 for centerline, _, _ in walls_to_create if _wall_out_of_bounds(centerline)])
 
     # 4d. `all_openings' ja foi coletado antes (ver acima, usado tambem por
     # merge_collinear_fragments). Cada parede a criar sera fatiada para
@@ -20502,6 +20598,46 @@ def main():
         t_step, "Associacao de aberturas as paredes (assign_openings_to_walls)",
         "{} parede(s) x {} abertura(s)".format(len(walls_to_create), len(all_openings))
     )
+
+    # SECAO 87.4: peitoril ate' 2 cm ABAIXO da base da parede sobe para a base
+    # (altura do vao preservada) - abaixo da base nao ha' parede.
+    openings_per_wall, sill_snaps = snap_openings_to_wall_base(
+        openings_per_wall, _level_internal_elevation_ft(selected_level))
+    for item in sill_snaps:
+        output.print_md("- peitoril na base (secao 87.4): parede #{} abertura #{} estava {:.1f} cm "
+                        "abaixo da base - subiu {:.1f} cm (altura do vao preservada).".format(
+                            item["wall_idx"], item["opening_index"], -item["sill_cm_before"], item["delta_cm"]))
+
+    # SECAO 86.9 / 87.3: sobra de eixo de ate' STUB_OVERSHOOT_TRIM_MAX_CM alem
+    # da face da parede que cruza (erro de desenho do CAD, mesmo com testa) e'
+    # aparada ANTES do grafo - mesma ordem do fluxo de paredes existentes
+    # (assign -> trim -> extend -> grafo), para o solver ver a mesma geometria.
+    walls_to_create, openings_per_wall, stub_trims = trim_wall_end_stubs(walls_to_create, openings_per_wall)
+    if stub_trims:
+        _trim_items = stub_trim_corpus_items(
+            stub_trims, None, ["cad#{}".format(i) for i in range(len(walls_to_create))])
+        setup["corpus_selection"]["trimmed"] = list(setup["corpus_selection"].get("trimmed") or []) + _trim_items
+        output.print_md("**Sobra de eixo aparada (secao 86.9/87.3)**: {} ponta(s) - a parede termina na "
+                        "face da que cruza.".format(len(stub_trims)))
+        for item in _trim_items:
+            output.print_md("- eixo {} ponta {}: {:.1f} cm alem da face da parede #{} ({:.0f} -> {:.0f} cm)".format(
+                item["axis_key"], item["end_index"], item["trimmed_cm"], item["crossing_wall_index"],
+                item["length_cm"], item["new_length_cm"]))
+        walls_to_create, wall_junction_map = extend_wall_ends_to_junctions(
+            walls_to_create, JUNCTION_FACE_SEARCH_FT
+        )
+
+    # 4b1. ETAPA 2 - grafo de paredes: classifica cada encontro (ponta livre,
+    # continuacao reta, canto L, T ou cruz X) a partir do MESMO calculo
+    # geometrico que fechou os encontros (`wall_junction_map` - ver o
+    # docstring de extend_wall_ends_to_junctions e build_wall_graph). So'
+    # leitura - nao altera walls_to_create nem cria nada no Revit ainda; o
+    # grafo e' consumido pelas proximas etapas (ajuste de aberturas perto de
+    # encontro, e o solver de blocos L/T/X). Montado DEPOIS da selecao pela
+    # referencia e do aparo da sobra (secao 87.2/87.3), sobre a geometria final.
+    t_step = _perf_begin("Montando o grafo de encontros entre paredes")
+    wall_graph_nodes, wall_end_to_node = build_wall_graph(walls_to_create, wall_junction_map)
+    t_step = _perf_mark(t_step, "Grafo de paredes (build_wall_graph)", "{} no(s)".format(len(wall_graph_nodes)))
 
     # A antiga ETAPA 1 (ajuste previo de abertura ANTES da criacao, com
     # janela modal de confirmacao) foi REMOVIDA - decisao explicita do
@@ -21601,7 +21737,10 @@ def main():
                     precreated_event=stage2_external_event, precreated_handler=stage2_handler,
                     created_cuts_by_axis=created_cuts_by_axis,
                     opening_reinforcement_strategy=_opening_reinforcement_strategy_from_ui_value(
-                        setup.get("opening_reinforcement"))
+                        setup.get("opening_reinforcement")),
+                    # secao 87: a configuracao da RUN (layer, referencia, corpus 49.1, tocos) viaja
+                    # com o handler e vai para o solve_result/relatorio, como no fluxo de paredes existentes
+                    setup=setup
                 )
             except Exception as ex:
                 # NUNCA mostrar `summary` (o resumo da Etapa 1, "tudo certo")

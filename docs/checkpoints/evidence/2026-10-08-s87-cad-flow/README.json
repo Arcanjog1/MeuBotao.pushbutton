@@ -1,0 +1,24 @@
+{
+ "source_doc": "butanta testes cru - TESTE S87 2026-10-08 (copia do butanta testes cru.rvt, 2026-10-08)",
+ "import_architectural": {
+  "id": 8079028,
+  "type_name": "151.06-ARQ-EX-0103-TIP-R02",
+  "layer_walls": "Estrutura _1_",
+  "lines_z_ft": [
+   0.4593
+  ]
+ },
+ "import_structural": {
+  "id": 7097743,
+  "type_name": "1 PAV",
+  "layer_reference": "ARQ-STR-BLOCO",
+  "import_scale_type": 10.0
+ },
+ "level": "1º PAVIMENTO",
+ "wall_height_m": 2.6,
+ "thickness_cm": 14.0,
+ "num_courses": 13,
+ "units": "cm, XY do modelo (Z achatado); aberturas: centro XY, largura, peitoril e verga em cm RELATIVOS ao nivel",
+ "approved_reference": "lote 20261008-143828 do butanta testes (motor 06ecb87, calculo r7_13): 34 eixos + aberturas por parede em docs/checkpoints/evidence/2026-10-08-s87-cad-flow/approved_axes_cm.json",
+ "note_paredes_layer": "o layer 'Paredes' do mesmo import e' o acabamento arquitetonico: forma 71 pares / 52 eixos fragmentados - NAO reproduz a referencia (secao 87.1)"
+}
