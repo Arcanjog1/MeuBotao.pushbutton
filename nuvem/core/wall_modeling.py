@@ -20072,6 +20072,43 @@ def run_merge_existing_walls():
 # EXECUCAO PRINCIPAL DO SCRIPT
 # ==========================================
 
+def _wall_segment_key(curve, height_ft, base_offset_ft):
+    """Chave geometrica de um segmento de Wall (secao 87.7): pontas em cm a
+    0,5 cm (ordenadas, Z achatado), altura e base em cm inteiros."""
+    a, b = curve.GetEndPoint(0), curve.GetEndPoint(1)
+    pa = (round(a.X / FEET_PER_METER * 200.0), round(a.Y / FEET_PER_METER * 200.0))
+    pb = (round(b.X / FEET_PER_METER * 200.0), round(b.Y / FEET_PER_METER * 200.0))
+    if pb < pa:
+        pa, pb = pb, pa
+    return (pa, pb, round(height_ft / FEET_PER_METER * 100.0), round(base_offset_ft / FEET_PER_METER * 100.0))
+
+
+def _index_existing_walls_by_segment(target_doc, level):
+    """{chave de segmento: Wall} das Walls retas JA' existentes no nivel
+    (secao 87.7). Nunca lanca - uma Wall ilegivel e' ignorada."""
+    index = {}
+    try:
+        walls = FilteredElementCollector(target_doc).OfClass(Wall).ToElements()
+    except Exception:
+        return index
+    for wall in walls:
+        try:
+            if level is not None and wall.LevelId != level.Id:
+                continue
+            location = wall.Location
+            if not isinstance(location, LocationCurve) or not isinstance(location.Curve, Line):
+                continue
+            height = wall.get_Parameter(BuiltInParameter.WALL_USER_HEIGHT_PARAM)
+            base = wall.get_Parameter(BuiltInParameter.WALL_BASE_OFFSET)
+            if height is None or base is None:
+                continue
+            key = _wall_segment_key(location.Curve, height.AsDouble(), base.AsDouble())
+            index.setdefault(key, wall)
+        except Exception:
+            continue
+    return index
+
+
 def main():
     # 0. Arma o validador AO VIVO (ver secao VALIDADOR AO VIVO... mais
     # acima) - registra os dois updaters uma unica vez por sessao (seguro
@@ -20727,6 +20764,13 @@ def main():
     # com seguranca fora da thread principal da API.
     wall_segment_geometry = {}
 
+    # SECAO 87.7 (2026-10-09): rodar o botao de novo no MESMO documento nao pode
+    # empilhar Walls iguais (medido: 302 Walls para 34 eixos depois de tres
+    # execucoes). Um segmento cuja Wall ja' existe (mesmo nivel, mesmas pontas
+    # a 0,5 cm, mesma altura e mesma base) e' REAPROVEITADO: entra em
+    # created_walls_by_axis como se tivesse sido criado agora, sem Wall nova.
+    existing_wall_index = _index_existing_walls_by_segment(doc, selected_level)
+    reused_wall_count = 0
     t_step = _perf_begin("Criando as paredes no Revit ({} eixo(s))".format(len(walls_to_create)))
     t = Transaction(doc, "Gerar Paredes Automaticas do CAD")
     t.Start()
@@ -20770,6 +20814,31 @@ def main():
             # dele), deixando trechos da parede sumidos sem nenhum aviso.
             for sub_line, seg_height_ft, seg_base_offset_ft, seg_origin in segments:
                 try:
+                    reused_wall = existing_wall_index.get(
+                        _wall_segment_key(sub_line, seg_height_ft, seg_base_offset_ft))
+                    if reused_wall is not None:
+                        reused_wall_count += 1
+                        created_count += 1
+                        created_wall_ids_all.append(reused_wall.Id)
+                        created_walls_by_axis.setdefault(wall_idx, []).append((reused_wall.Id, seg_origin))
+                        try:
+                            _seg_curve = reused_wall.Location.Curve
+                            _seg_t_a = _axis_t_of_point(centerline, _seg_curve.GetEndPoint(0))
+                            _seg_t_b = _axis_t_of_point(centerline, _seg_curve.GetEndPoint(1))
+                            if _seg_t_a > _seg_t_b:
+                                _seg_t_a, _seg_t_b = _seg_t_b, _seg_t_a
+                            wall_segment_geometry.setdefault(wall_idx, []).append({
+                                "element_id": reused_wall.Id, "seg_origin": seg_origin,
+                                "t_a": _seg_t_a, "t_b": _seg_t_b,
+                            })
+                        except Exception:
+                            pass
+                        if seg_origin == "abertura":
+                            opening_segments_created += 1
+                            walls_with_opening_segments.add(wall_idx)
+                        else:
+                            cad_segments_created += 1
+                        continue
                     new_wall = Wall.Create(
                         doc,
                         sub_line,
@@ -21032,8 +21101,12 @@ def main():
         raise
     t_step = _perf_mark(
         t_step, "Criacao das paredes no Revit (Transaction + Wall.Create)",
-        "{} elemento(s) Wall criado(s)".format(created_count)
+        "{} elemento(s) Wall ({} reaproveitado(s) de execucao anterior - secao 87.7)".format(
+            created_count, reused_wall_count)
     )
+    if reused_wall_count:
+        output.print_md("**Paredes reaproveitadas (secao 87.7)**: {} segmento(s) ja' existiam no documento com a "
+                        "mesma geometria e NAO foram criados de novo.".format(reused_wall_count))
 
     # Arma o ESCOPO do validador ao vivo (ver secao VALIDADOR AO VIVO... e
     # _register_modulation_updaters_if_needed, mais acima).
