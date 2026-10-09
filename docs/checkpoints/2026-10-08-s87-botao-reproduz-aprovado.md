@@ -1,7 +1,7 @@
 # §87 — o botão reproduz a modulação aprovada do BUTANTÃ a partir do arquivo cru
 
 Estado CANDIDATO da branch `claude/script-modulation-blocks-469ec2` (= `claude/revit-butanta-modulation-8611b5`
-+ §87). PR [#50](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/50) (draft) para revisão; sem merge. **Resultado no Revit: 6 526/6 526 peças iguais ao aprovado.** Não é estado oficial nem aprovação normativa.
++ §87). PR [#50](https://github.com/Arcanjog1/MeuBotao.pushbutton/pull/50) — MERGED na main em 2026-10-09 (fast-forward até c9e30e0), autorizado pelo usuário. **Resultado no Revit: 6 526/6 526 peças iguais ao aprovado.** Não é estado oficial nem aprovação normativa.
 
 ```json
 {
