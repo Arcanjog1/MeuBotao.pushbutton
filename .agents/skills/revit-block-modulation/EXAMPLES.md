@@ -90,6 +90,62 @@ diferentes. Por isso `AMBIGUOUS` reserva espaço de amarração mesmo sem
 casar com T/X — ali existe peça de verdade, só que na outra faixa de
 altura (ver BONDING.md).
 
+## Faixa de compensação na jamba — medida no Revit (REGRAS §84, 2026-09-28)
+
+Arquivo de teste `butanta testes`, motor main `1db4876`, NONE, 14 fiadas.
+
+- **W1 (porta, jamba t = 79 cm, T no início do eixo)** — antes: fiada par
+  `B34(nó) | B34 | C09 | vão`, ímpar `B34 | C09 | B19 | vão` (C09 a 0 e a
+  20 cm do vão, vazado do B19 10,9 cm fora do vazado de baixo). Depois:
+  ímpar `B34 | B19 | C09 | vão` — C09 encostado nas 11 fiadas, vazado do
+  B19 a 0,9 cm do vazado de baixo.
+- **W0 (pilarete 975–1044 entre janelas)** — antes: `B39 | C09 | B19` sobre
+  `B19 | B39 | C09`; depois: `B39 | B19 | C09` — faixa de C09 na jamba de
+  1044 em todas as fiadas.
+- **Não é para mexer**: pilarete de 54 cm da W0 (800–854) fechado com
+  `B19 B34` sem compensador — a composição que tira compensador vem antes
+  do alinhamento.
+
+## Projeto humano BUTANTÃ R08_LT, 1º pavimento — medido em 2026-10-01 (REGRAS §86)
+
+Extração somente leitura do Revit (6 634 peças, 44 aberturas); `>`/`<` =
+vazado menor do B34 para t crescente/decrescente.
+
+- **Faixa de B34 equilibrada (§86.3)** — W21 (494 cm entre dois T): f0
+  `B34< B34< | 8×B39 | B34> B34> B34>`, f1 `B34> | 9×B39 | B34< B34<`. Corridas
+  P..P com 5 B34: humano 2+3 em 44/44 fiadas.
+- **Pilaretes entre janelas (§86.6)** — P = 54, W0 800–854: `B39 C04 C09` /
+  `B19 B34>`; P = 69, W0 395–464: `B19 B39 C09` / `B39 B19 C09`; P = 114, W0
+  1185–1299: `C09 B19 B54 B19 C09` / `C09 B39 B39 C09`.
+- **Cinta de topo (§86.7)** — f12 é canaleta em 34/34 paredes (U39 354, U34 184,
+  U19 15, U_CUT 5); o dono de cada nó na f12 é o mesmo da f0 em 99/100.
+
+## Correções do usuário no `butanta testes` — 2026-10-05/08 (REGRAS §86.13–§86.16)
+
+- **Compensador na face (§86.13)** — W6, porta 469: antes `B54 | C09 | B19 |
+  vão` nas pares; depois `B54 | B19 | C09 | vão` nas pares e `B39 | C09 | vão`
+  nas ímpares, C09 em 460–469 nas 11 fiadas (mini-planta).
+- **Sem meia canaleta (§86.14)** — sobre `B34 | B19 | jamba` a verga era
+  `U34 | U19 | U34…`; agora `U34 ×8 | U39 …`. Mini-planta (eixos 0, 1, 3, 4):
+  U19 76 → 0.
+- **T com toco (§86.15)** — W29 (99 cm, T em t = 50–64): antes, fiada que passa
+  `B34> [15–49] | B34< [50–84] | C09 | C04` e junta corrida em 49,5 nas 13
+  fiadas; depois `C04 [15–19] | C09 [20–29] | B54 [30–84] | C09 [85–94] |
+  C04 [95–99]`.
+- **B54 da cinta (§86.16)** — fixture `tee`: B54 de amarração [275–329] da f12
+  → `U34 [275–309] + U19 [310–329]`; no L o B34 da f12 continua bloco.
+
+## Botão a partir do arquivo cru — BUTANTÃ (REGRAS §87, 2026-10-08/09)
+
+- Layer `Estrutura _1_` → 46 pares = 46 paredes históricas (0 cm de desvio);
+  layer `Paredes` → 71 pares, 52 eixos, 7 paredes partidas.
+- Referência `1 PAV | ARQ-STR-BLOCO` → 34 eixos selecionados / 12 excluídos;
+  sobra da W8 (5 cm) aparada; porta 8078997 com peitoril −1 → 0 cm.
+- Resultado: 6 526/6 526 peças iguais ao lote aprovado — checkpoint
+  `docs/checkpoints/2026-10-08-s87-botao-reproduz-aprovado.md`.
+- §87.7: três execuções no mesmo documento deixavam 302 Walls para 34 eixos
+  antes da correção de 2026-10-09.
+
 ## Como registrar um novo exemplo
 
 Sempre que uma medição nova (via MCP) ou uma parede modulada à mão pelo

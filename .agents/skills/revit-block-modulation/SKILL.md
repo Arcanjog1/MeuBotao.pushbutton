@@ -51,6 +51,9 @@ que ela possa divergir da fonte** — em caso de dúvida ou atualização,
 o `REGRAS_MODULACAO_BLOCOS.md` manda, e esta Skill deve ser atualizada
 junto (ver "Como esta Skill aprende" abaixo).
 
+**Cobertura atual: REGRAS até a §87.7 (revisão de 2026-10-20).** Seção mais
+nova que isso ainda não está resumida aqui — ler direto no REGRAS.
+
 ## Estrutura
 
 | Arquivo | Conteúdo |

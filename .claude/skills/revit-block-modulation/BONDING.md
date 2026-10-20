@@ -8,7 +8,9 @@
 
 Fonte detalhada: REGRAS §5 (encontros L/T/X), §6 (limitações), §11
 (alinhamento vertical, regra #1), §12 (orientação de compensador, regra
-#3), §18.1/§18.5/§18.6/§18.7/§18.9 (revisão geral 2026-08-28).
+#3), §18.1/§18.5/§18.6/§18.7/§18.9 (revisão geral 2026-08-28), §75/§76
+(canaleta e compensador nunca amarram), §86.2/§86.3/§86.10/§86.15/§86.16
+(aproximação do projeto humano, 2026-10-01 a 2026-10-08).
 
 ## Tipos de encontro
 
@@ -73,6 +75,35 @@ alinhadas** (`validate_x_intersection`). Cobre cruzamento no meio de duas
 paredes contínuas e o caso raro de 4 pontas coincidindo. Não pode existir
 peça adicional ocupando o mesmo volume (REGRAS §18.1/§18.7).
 
+## Canaleta e compensador nunca amarram (REGRAS §75, §76/§76.1)
+
+- **Canaleta NUNCA exerce função de amarração** (§75, gate duro
+  `channel_as_junction_bond`) e **compensador NUNCA exerce função de
+  amarração** (§76/§76.1). Nó sem amarração válida fica NÃO RESOLVIDO, com
+  revisão humana — nunca fechado com canaleta ou compensador.
+- **Única exceção (§86.16, correção do usuário de 2026-10-08)**: o B54 da
+  última fiada (cinta de topo), inclusive o de amarração do nó T, vira
+  U34 + U19; os gates aceitam só essa peça marcada. O B34 de amarração do nó
+  na cinta continua bloco. Detalhes em OPENINGS.md.
+
+## T com toco: a peça que PASSA atravessa a face da parede que chega (REGRAS §86.15 — REGRA OBRIGATÓRIA)
+
+- Num T em que a principal continua além da parede que chega (toco ou trecho),
+  na fiada em que a principal passa a peça dela **nunca tem junta em nenhuma
+  das duas faces da que chega**: atravessa as duas faces (B54 centrado no nó,
+  célula central sobre o quadrado do nó); o toco fecha pela sobra (catálogo
+  da §86.6).
+- Causa provada do defeito (W29/W30/W31, junta corrida em X≈49,5 em 13
+  fiadas): o espaço do B54 era medido com a reserva de PIOR CASO do canto da
+  outra ponta (23 de 27 cm) e o T degradava para L ancorado na face. Agora,
+  quando o pior caso reprova, o espaço é medido de novo **só na fiada da peça
+  do T**, com a reserva por fiada da regra 11.14
+  (`T_MAIN_ROOM_IN_OWN_COURSE_ENABLED`), e a busca de fase (§86.2) penaliza a
+  relação que tira esse espaço.
+- CONFLITO com a §74 (os mesmos 3 T "reprovam por margem real") — vale a
+  §86.15. Pendente: toco entre 10 e 20 cm (nenhuma peça atravessa as duas
+  faces) — decisão do usuário.
+
 ## Regra #1 — alinhamento vertical obrigatório entre fiadas
 
 > Pedido explícito do usuário: "a junta vertical de uma fiada não pode
@@ -104,6 +135,42 @@ peça adicional ocupando o mesmo volume (REGRAS §18.1/§18.7).
   fora de L/T/X) ainda **não** alinha o vão menor entre Fiada A e Fiada B
   — orientação fixa, não otimizada por alinhamento cruzado (diferente do
   L_CORNER/T degradado, onde o alinhamento É garantido e validado).
+  **Atualizado:** tratado depois pela §52 (orientação do vazado menor,
+  `SMALL_VOID_ORIENTATION_ENABLED`), pelo arranjo §60–§65/§81 e pela faixa de
+  B34 equilibrada da §86.3 (abaixo).
+
+## Fase dos encontros por relação de trecho (REGRAS §86.2 — PADRÃO OBSERVADO; implementado no caminho geral)
+
+- *Fase* do nó = qual parede ocupa o quadrado do nó em cada fiada. Entre dois
+  nós consecutivos da mesma parede, a **relação** (mesma fiada ou alterna) é
+  escolhida pelo custo de fechar os dois trechos livres (C04 + C09 + B19
+  primeiro, depois B34), com as peças reais dos nós.
+- Medido no humano: trecho cego — `D_eixos mod 40 ≤ 15` → mesma fiada,
+  `≥ 20` → alterna (26/26); parede entre dois cantos L na mesma fiada (9/9);
+  porta libera a fase (peso 0), janela pesa 0,25.
+- **Convenção de fachada**: nos cantos do contorno externo, a fiada 0 fica
+  com a parede paralela ao lado maior da caixa do pavimento (8/8) — decide o
+  espelho do componente sem trocar bloco de trecho cego.
+- Busca exata por componente, decisão única por planta, só geometria (nenhum
+  id). Chave `GENERAL_PHASE_RELATION_ENABLED`.
+- **CONFLITO com a §30.5** (alternância obrigatória de papel entre os dois L):
+  no caminho geral com a chave ligada ela vira **preferência de custo**
+  (pedido do usuário de 2026-10-01 de aproximar o humano); o CHANNEL e a chave
+  desligada mantêm a §30.5. Rodar a regressão TGD/TP1 antes de mesclar
+  mudanças aqui. Shaft (§85.8 × humano): pendente de decisão do usuário.
+
+## Faixa de B34 EQUILIBRADA entre as âncoras (REGRAS §86.3 — PADRÃO OBSERVADO; implementado nó-a-nó sem abertura)
+
+- Numa corrida nó-a-nó, os B34 de ajuste ficam em **faixas coladas nas duas
+  âncoras** com `|kE − kD| ≤ 1`; os B39 ficam no miolo. Humano: P..P com 5 B34
+  em 2+3 (44/44).
+- Largura k igual nas fiadas pares e ímpares (k+1 na fiada que passa, contando
+  a peça de canto); vazado menor sobre vazado menor dentro da faixa.
+- B34 ímpar no **fim do eixo** é só desempate configurável
+  (`BALANCED_B34_STRIP_ODD_AT_AXIS_END`) — padrão ainda não confirmado (~73 %).
+- Só reordena a composição já escolhida (nenhuma peça nova), só composição
+  pura B39/B34, sem abertura na altura inteira e sem junta coincidente nova
+  (`BALANCED_B34_STRIP_ENABLED`). Corridas com abertura: pendência.
 
 ## Regra #2 — meio-bloco nunca perto de amarração
 
@@ -142,6 +209,11 @@ parede reprovada por compensadores em sequência.
 - ⚠️ Premissa física (`COMPENSATOR_CLOSED_SIDE_IS_PLUS_X_WHEN_UNMIRRORED`)
   **não confirmada contra a família real** — se a orientação sair
   invertida num projeto real, é uma constante a trocar, não um redesenho.
+  **Atualizado (§86.10):** o humano BUTANTÃ tem 129/129 C09 encostados no vão
+  com o +X local para LONGE do vão; com
+  `COMPENSATOR_ORIENTATION_FROM_HUMAN_R08 = True` a premissa passa a False
+  (lado fechado = −X local) e a pastilha C04 fica isenta (simétrica).
+  Confirmação pela geometria sólida da família: pendente.
 
 ## Padronização entre fiadas (REGRAS §18.4)
 
@@ -178,3 +250,7 @@ reais por fiada).
   recalculam junto.
 - Nunca inventar orientação de compensador sem checar se ele encosta
   numa abertura de verdade.
+- Nunca usar canaleta ou compensador como peça de amarração (§75/§76) —
+  a única exceção é o B54 da cinta de topo (§86.16).
+- Nunca deixar junta na face da parede que chega na fiada em que a principal
+  passa o nó (§86.15).

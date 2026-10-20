@@ -72,6 +72,11 @@ Via `mcp__revit-pyrevit__*` (ou equivalente disponível na sessão):
   confirmar; se divergir, registrar a divergência (não modular com peça
   inexistente).
 - **Não assumir que o novo projeto tem a mesma arquitetura do anterior.**
+- No fluxo do botão a partir de arquivo cru (CAD → Walls), conferir a
+  entrada antes do solver [REGRAS §87]: layer de paredes = camada
+  estrutural (`Estrutura _1_` no BUTANTÃ, nunca o acabamento `Paredes`);
+  referência estrutural pode vir de outro import; regra 49 só classifica;
+  aberturas na posição original [REGRAS §86.1]. Ver VALIDATION.md, 7a.
 
 ### Etapa 3 — Analisar antes de modelar
 
@@ -105,6 +110,10 @@ Só depois da solução geométrica validada logicamente:
 atomicamente o lote anterior daquele conjunto de paredes, nunca soma um
 segundo lote por cima [REGRAS §13.4 — bug real já corrigido, não
 reintroduzir].
+
+O mesmo vale para as Walls do fluxo CAD → Walls: rodar o botão de novo no
+mesmo documento reaproveita a Wall que já existe com a mesma geometria em vez
+de criar outra por cima [REGRAS §87.7].
 
 ### Etapa 5 — Validação automática
 

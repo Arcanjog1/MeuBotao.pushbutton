@@ -12708,3 +12708,34 @@ multi-fiada da Tela 2 não tem — candidato a revisão futura; (b) no modo segm
 46 Walls contínuas como na referência — o solver lê a geometria por eixo (`_refresh_geometry_from_document`), então o
 resultado não depende disso; (c) `len([...])` substituiu um `sum(gerador)` em `main()` porque o engine IronPython
 (caminho MCP/headless) quebrava ali — sem efeito no CPython do botão.
+
+### 87.7 Rodar o botão de novo no mesmo documento reaproveita as Walls iguais — IMPLEMENTADO (commit `b951aad`, 2026-10-09; registrado aqui em 2026-10-20)
+
+- **Como foi descoberto (medição no Revit, 2026-10-09, relatada na mensagem do commit `b951aad`):** três
+  execuções do botão (fluxo CAD→Walls) no **mesmo documento** deixaram **302 Walls para 34 eixos** — os mesmos
+  segmentos criados de novo 2 a 4 vezes, porque `main()` sempre chamava `Wall.Create`. É o equivalente, nas Walls,
+  do lote de blocos criado por cima do anterior (§13.4, §50). O código entrou na `main` só com a mensagem do commit;
+  esta subseção registra a regra no documento oficial (pendência apontada na geração do cofre de regras de
+  2026-10-19).
+- **A regra:** antes da transação de criação das Walls, um segmento cuja Wall **já existe** no documento com a mesma
+  geometria é **reaproveitado** — não nasce Wall nova. "Mesma geometria" = mesma chave
+  (`_wall_segment_key`):
+  - Wall **reta** (`LocationCurve` com `Line`) no **nível selecionado** (`LevelId`);
+  - pontas em X/Y arredondadas numa grade de **0,5 cm**, sem Z e sem sentido (as duas pontas são ordenadas);
+  - altura (`WALL_USER_HEIGHT_PARAM`) e base (`WALL_BASE_OFFSET`) iguais em centímetros inteiros.
+- **Implementação** (`nuvem/core/wall_modeling.py`): `_index_existing_walls_by_segment(doc, selected_level)` monta
+  o índice uma vez, antes de `Transaction("Gerar Paredes Automaticas do CAD")` — Wall ilegível ou sem os dois
+  parâmetros é ignorada e o índice nunca lança erro; Walls criadas na mesma execução não entram nele. No laço de
+  criação, a Wall reaproveitada entra em `created_walls_by_axis`, `created_wall_ids_all` e `wall_segment_geometry`
+  exatamente como uma Wall recém-criada, e conta em `created_count` e na contagem do segmento (`cad` ou
+  `abertura`). O output informa "N elemento(s) Wall (M reaproveitado(s) de execução anterior - secao 87.7)" e, com
+  M > 0, "Paredes reaproveitadas (secao 87.7): M segmento(s) já existiam no documento com a mesma geometria e NÃO
+  foram criados de novo".
+- **Limites (lidos no código, não medidos):** Wall editada depois de criada (pontas movidas mais que a grade de
+  0,5 cm, outra altura ou base) não casa e nasce uma Wall nova; Wall de execução anterior que não corresponde a
+  nenhum segmento atual **não é apagada** (o código não remove Walls); Wall curva nunca é reaproveitada. Os blocos
+  seguem as próprias regras de lote (§13.4, §50) — esta subseção trata só das Walls.
+- **Verificação:** nenhuma medição no Revit **depois** da correção e nenhum teste automatizado foram registrados
+  (`tests/` não cita `_wall_segment_key` nem `_index_existing_walls_by_segment`). **DOCUMENTADO — pendência de
+  verificação aberta**: rodar o botão duas vezes no mesmo arquivo cru e conferir que a contagem de Walls não muda e
+  que o output da segunda execução reporta os segmentos reaproveitados.

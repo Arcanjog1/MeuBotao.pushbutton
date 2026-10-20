@@ -3,7 +3,9 @@
 Fonte detalhada: REGRAS §7 (ajuste geométrico), §9 (testes), §11.4/§11.5
 (validação de alinhamento), §13 (pipeline+relatório), §14 (auditoria de
 conformidade), §16 (regra #2 vs. desencontro), §17 (bugs de relatório),
-§18.7/§18.8/§18.10/§18.11 (checklist final).
+§18.7/§18.8/§18.10/§18.11 (checklist final), §75/§76 (gates de amarração),
+§84–§86 (jamba, prisma, canaletas, cinta), §87 (entrada do botão a partir do
+arquivo cru).
 
 Nenhuma modulação é considerada concluída apenas porque os blocos foram
 posicionados. Ela só é válida depois de passar por todas as checagens
@@ -55,6 +57,11 @@ Verificar **individualmente** cada L/T/X/ponta:
   o ajuste; amarrações recalculadas; fiadas continuam alinhadas; blocos
   perto de quinas/encontros também atualizados).
 - Cada tipo (L/T/X) obedece às regras específicas de BONDING.md.
+- Canaleta e compensador nunca amarram: `channel_as_junction_bond` vazio
+  (§75) e auditoria §76.1 sem caso novo — a única peça aceita é o B54 da
+  cinta convertido em U34 + U19 (§86.16, contado à parte).
+- T com toco (§86.15): `wall_bond_audits` sem `CONTINUOUS_VERTICAL_JOINT`
+  na face da parede que chega.
 
 ## 4. Alinhamento vertical entre fiadas (regra #1)
 
@@ -83,6 +90,43 @@ Verificar **individualmente** cada L/T/X/ponta:
 - Bloco `CORTADO` perto de abertura só é erro se não houver justificativa
   geométrica próxima (REGRAS §10.5).
 
+- **Faixa de compensação na jamba (REGRAS §84)**: em cada lateral com
+  compensador, ele fica encostado no vão e na mesma posição em todas as
+  fiadas — `result["jamb_compensator_alignment"]["census"]` (`alternating`
+  tem de tender a 0; `touching_all` sobe). Os casos restantes aparecem em
+  `conflicts` com o motivo (`FIXED_PIECE_BETWEEN`,
+  `PRISM_39_19_WOULD_BREAK`, `NEW_COINCIDENT_JOINT`, `STACKED_JOINT`) e são
+  revisão humana, não falha silenciosa. Conferir também que a contagem por
+  código não mudou (a regra só permuta).
+
+- **Prisma pela área / B19 / aberturas (REGRAS §85)**: `result["prism_free_area"]`
+  (interfaces ok/estreitas/interrompidas e colunas das jambas na altura
+  inteira), `prism_free_area.column_census` (células em coluna contínua,
+  quebradas, juntas a prumo em 3+ fiadas) e
+  `result["jamb_compensator_alignment"]["half_block_census"]` (B19 fora de
+  fechamento = incompatibilidade registrada, nunca aceita). Conferir sempre as
+  quatro coisas separadas: vazado contínuo, amarração, fechamento, sem
+  sobreposição/invasão. Aberturas movidas: `MICROAJUSTE off=… orig=…` no
+  comentário, total ≤ 10 cm da original, largura/altura/peitoril iguais.
+  **Desde a §86.1** as aberturas ficam na posição ORIGINAL: no fluxo do botão
+  não deve aparecer `MICROAJUSTE`.
+
+- **Jamba (REGRAS §86.6/§86.13)**: falha dura
+  `B34_PLUS_COMPENSATOR_WHERE_B39_FITS` (`C09 | B34` onde `C04 | B39` fecha);
+  compensador fora da face do vão = `COMPENSATOR_NOT_AT_JAMB_FACE` em
+  `jamb_conflicts` — caso sem solução registrado (o prisma venceu), revisão
+  humana, nunca falha silenciosa.
+
+- **Canaletas (REGRAS §86.12/§86.14)**: `result["channel_grid_follow"]`
+  (`unresolved` com o motivo, `support_drops`) e `half_channel_audit` /
+  `CHANNEL_HALF_PIECE` = 0 — a U19 do B54 da cinta conta à parte
+  (`CHANNEL_U_19_B54_CINTA`). Junta dura de c−2 nunca atravessada.
+
+- **Cinta de topo (REGRAS §86.7/§86.16)**: `result["top_bond_beam"]["audit"]`
+  com `TOP_BOND_BEAM_CHANNEL_AT_NODE` e `_TIE_ROLE` = 0 (o B54 da cinta conta
+  à parte em `b54_cinta_at_node`); achado `TOP_BOND_BEAM_B54_JOINT_COINCIDENT`
+  é informativo (junta na face do T, a confirmar com o usuário).
+
 ## 7. Relatório final consolidado
 
 `build_final_modulation_report` junta as duas fontes de problema (Etapa
@@ -104,6 +148,24 @@ No modelador externo, os candidatos ligados a uma Wall reprovada ficam em
 vermelho e carregam o código/motivo da reprovação. Esse destaque é uma
 obrigação de diagnóstico — não transforma uma solução inválida em aprovada
 (REGRAS §22).
+
+## 7a. Entrada do botão a partir do arquivo cru (REGRAS §87)
+
+Antes de culpar o solver, conferir a ENTRADA — no BUTANTÃ a divergência era
+toda de entrada:
+
+- layer das paredes = camada **estrutural** (`Estrutura _1_` no BUTANTÃ: 46
+  pares = 46 paredes históricas); `Paredes` é acabamento e fragmenta (52 eixos);
+- referência estrutural pode vir de **outro** import (`1 PAV | ARQ-STR-BLOCO`)
+  e a regra 49 só classifica (34 selecionados / 12 excluídos), sem aparar;
+- sobra de CAD ≤ 10 cm aparada no primeiro refresh da Tela 2 (não em `main()`);
+- peitoril até 2 cm abaixo da base sobe para a base, altura do vão preservada;
+- rodar o botão de novo no mesmo documento **não** pode aumentar a contagem de
+  Walls: segmento com Wall igual é reaproveitado e o output diz quantos
+  (§87.7 — verificação no Revit depois da correção ainda pendente).
+
+A semelhança com o projeto humano (F1 da régua da §86.0, `r4_score.py`) é
+medição, não regra.
 
 ## 8. Cuidados de método (evitar falso positivo/negativo no próprio validador)
 

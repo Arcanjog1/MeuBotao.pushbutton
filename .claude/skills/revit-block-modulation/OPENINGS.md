@@ -1,6 +1,7 @@
 # Aberturas — portas, janelas, pilaretes
 
-Fonte detalhada: REGRAS §3, §4, §10, §18.2, §18.3.
+Fonte detalhada: REGRAS §3, §4, §10, §18.2, §18.3, §51 (CHANNEL), §80 (verga e
+contraverga estruturais), §84, §85, §86.1/§86.6–§86.8/§86.10/§86.12–§86.14/§86.16.
 
 ## Zona de exclusão absoluta — porta sem peitoril (REGRAS §3)
 
@@ -55,6 +56,12 @@ diagnóstico); 10.2/10.3/10.6/10.7 continuam só documentados — **não
 implementar geração de geometria nova para eles sem primeiro reconfirmar
 com mais projetos** (regra do próprio REGRAS: nada entra no script sem
 estar documentado e confirmado antes).
+
+> **Atualização (§51, §80, §86):** a geração de canaleta já existe por
+> outras seções — estratégia CHANNEL (§51), verga e contraverga em canaleta
+> como reforço estrutural nas duas estratégias (§80), cinta de topo e
+> alinhamento das canaletas (§86.7, §86.12–§86.16, abaixo). O que segue é o
+> registro da §10 (medição dos dois sistemas).
 
 - **Sistema 1 (convencional)**: famílias `VERGA JANELA` (acima do vão) e
   `CONTRAVERGA`/`CONTRAVERGA1` (abaixo).
@@ -146,6 +153,8 @@ separado de amarração, fechamento e sobreposição.
   `b19_misplaced` na frente) e pelo movedor `apply_opening_micro_adjustments`
   (marca `MICROAJUSTE off=… orig=x,y`, teto sobre o total). Ação explícita
   `micro_adjust`; nunca efeito colateral de calcular/criar.
+  **SUPERADO pela §86.1 (2026-10-01):** aberturas ficam na posição ORIGINAL;
+  o deslocamento virou autorização desligada (`MICRO_ADJUST_IN_BUTTON_FLOW = False`).
 - **Grade de B34 (REGRAS §85.9, desenho do usuário na W4)**: B34 empilhado com
   os vazados casados (menor sobre menor, grande sobre grande/principal) é
   preferível a pastilha + B19; a fiada da verga e as fiadas-ponte SEGUEM a grade
@@ -154,6 +163,68 @@ separado de amarração, fechamento e sobreposição.
   geométrica de 0,5 mm (menor sobre menor dá 8,986 cm). Junta do B19 de
   fechamento isenta só contra junta que não é de fechamento de B19 (B19 sobre
   B19 = a prumo, proibido).
+
+## Aproximação do projeto humano BUTANTÃ — aberturas, jambas e canaletas (REGRAS §86, 2026-10-01 a 2026-10-08)
+
+Resumo por subseção; o texto, os números e as chaves estão no REGRAS.
+
+- **Aberturas na posição ORIGINAL (§86.1 — REGRA OBRIGATÓRIA, reconfirma a
+  §25.1)**: nenhuma abertura é deslocada para a modulação fechar; o desvio é
+  absorvido na jamba. Humano 44/44 na posição original.
+- **Jamba fechada pela SOBRA da grade (§86.6 — PADRÃO OBSERVADO, implementado)**:
+  a jamba continua a grade da fiada cheia de mesma paridade abaixo do peitoril;
+  a sobra cortada pela face fecha pelo catálogo, contado **a partir da face**
+  (o compensador sempre encosta no vão): 0 → a peça continua; 4 → C04; 9 → C09;
+  14 → C09 + C04 (C09 na face); 19 → B19; 24 → C04 + B19; 29 → C09 + B19;
+  34 → B34. Humano 244/254.
+  - **REGRA OBRIGATÓRIA (85.8, com código na §86.6)**: proibido `C09 | B34`
+    onde `C04 | B39` fecha o mesmo comprimento, e `C04 | B34` onde cabe B39.
+  - **Forma A** (`C09 C04` encostados + B34 com o vazado menor sobre a faixa
+    na outra paridade): ligada (`JAMB_HUMAN_A_FORM_ENABLED`), em CONFLITO com
+    a §84 item 3 e a §85.8 — **pendente de confirmação do usuário**.
+  - Trava de prisma por parede (`JAMB_B34_GUARD_PRISM_GATE`): fica a versão
+    com menos células quebradas na parede inteira.
+- **Compensador e pastilha ENCOSTADOS no vão, B19 ATRÁS (§86.13 — REGRA
+  OBRIGATÓRIA, reafirma §84/§85.2/§86.6)**: compensador a até 60 cm da jamba
+  fica encostado no vão, na mesma faixa em todas as fiadas; o B19 vai atrás
+  (`B54 | B19 | C09 | vão`). Proibido `B54 | C09 | B19 | vão`,
+  `B39 | C09 | B19 | vão` e pastilha solta atrás de bloco. O prisma continua
+  falha dura: se não couber, a lateral fica como está e o caso é registrado
+  (`COMPENSATOR_NOT_AT_JAMB_FACE`). Segunda passada da jamba depois da §86.12.
+- **Orientação do C09 na jamba (§86.10 — PADRÃO OBSERVADO, implementado)**:
+  humano 129/129 com o +X local para LONGE do vão →
+  `COMPENSATOR_ORIENTATION_FROM_HUMAN_R08 = True`; a pastilha C04 é simétrica
+  e não é espelhada. Confirmação pela geometria sólida da família: pendente.
+- **Cinta de topo na última fiada (§86.7 — implementado, variante A)**: a
+  última fiada vira canaleta contínua, também sobre os vãos, trocando peça a
+  peça (B39 → U39, B34 → U34, compensador fundido pela §51.3); no quadrado de
+  cada nó continua o **bloco** de amarração (canaleta nunca amarra, §75). Com
+  13 fiadas e topo dos vãos em 221, verga na f11 e cinta na f12. A variante B
+  (canaleta sobre o nó, como o humano) está só documentada.
+  `DECISION-TOP-BOND-BEAM` continua PENDING.
+- **Passagem livre sem CHANNEL e apoio de 40 cm (§86.8)**: a passagem livre da
+  §51.9 vale também em "Sem reforço adicional"; verga de vão ≥ 140 cm busca
+  apoio de 40 cm (preferencial — o mínimo medido continua 19 cm).
+- **Canaleta segue a grade de MESMA PARIDADE abaixo (§86.12 — REGRA
+  OBRIGATÓRIA)**: em verga, contraverga e cinta, onde a fiada c−2 tem
+  alvenaria as juntas da canaleta repetem as de c−2; sobre o vão a grade é
+  livre e absorve a fase (juntas desencontradas de c−1/c+1). No quadrado do
+  nó continua bloco; a corrida da verga só cresce.
+- **SEM MEIA CANALETA (§86.14 — REGRA OBRIGATÓRIA)**: a U19 não é usada em
+  verga, contraverga nem cinta — nem como U_CUT de 19 cm. Junta de c−2 entre
+  dois blocos inteiros é **dura** (a canaleta não a atravessa); meio bloco,
+  compensador, U_CUT e B54 de preenchimento de c−2 são **moles** e não são
+  acompanhados: o trecho fecha com U39/U34 e no máximo um U_CUT ≥ 9 cm, de
+  preferência sobre o vão. Palavras do usuário: "quando houver um meio bloco
+  nas fiadas abaixo deve ser completado por bloco de 34 ou 39". O humano usa
+  U19 na cinta — vale a correção do usuário.
+- **B54 da ÚLTIMA fiada = U34 + U19 (§86.16 — REGRA OBRIGATÓRIA)**: todo B54
+  da cinta, inclusive o de amarração do nó T, vira U34 + U19 (a única U19
+  permitida); o B34 de amarração do nó continua bloco. Exceção à §75/§76.1 e
+  à §86.14 só para essa peça. Junta U34|U19: desencontrada de c−1 (≥ 1,5 cm)
+  → coincidente com a grade de c−2 → a mais desencontrada; se coincidir mesmo
+  assim, sai com `TOP_BOND_BEAM_B54_JOINT_COINCIDENT` (junta na face do T:
+  PADRÃO OBSERVADO a confirmar com o usuário).
 
 ## Pilaretes — tratamento independente (REGRAS §18.2)
 
@@ -186,3 +257,7 @@ existente, nunca inventar uma nova.
   abertura/encontro.
 - Nunca deixar pilarete sem modulação por não ter tentado a combinação
   local antes de desistir.
+- Nunca deslocar abertura para a modulação fechar (§86.1).
+- Nunca deixar compensador/pastilha atrás do B19 junto do vão (§86.13).
+- Nunca usar meia canaleta (U19) fora do B54 da última fiada (§86.14,
+  §86.16).

@@ -1,6 +1,7 @@
 # Catálogo de blocos
 
-Fonte detalhada: `nuvem/REGRAS_MODULACAO_BLOCOS.md` §1, §2 (REGRAS §1/§2).
+Fonte detalhada: `nuvem/REGRAS_MODULACAO_BLOCOS.md` §1, §2 (REGRAS §1/§2);
+canaletas §51.11, §86.14, §86.16; B19 só em fechamento §85.2; fiadas §86.5.
 Implementação: `BLOCK_FAMILY_CATALOG_DEFINITIONS` / `load_fixed_block_
 catalog` em `core/wall_modeling.py`.
 
@@ -30,7 +31,24 @@ geométrico do bloco.
   ficar posicionado/alinhado conforme a amarração (ver BONDING.md). Nunca
   tratar B34/B54 como peça simétrica.
 - **C09 e C04**: maciços (sem célula), mas têm **orientação** (lado
-  aberto / lado fechado) — ver BONDING.md, regra do compensador.
+  aberto / lado fechado) — ver BONDING.md, regra do compensador. A §86.10
+  trata a pastilha C04 como simétrica (não é espelhada).
+
+## Canaletas — catálogo SEPARADO (REGRAS §51.11, §86.14, §86.16)
+
+O solver nunca usa canaleta como bloco comum; elas só aparecem em verga,
+contraverga e cinta de topo.
+
+| Código | Família | Uso |
+|---|---|---|
+| U39 (`CHANNEL_U_39`) | CANALETA INTEIRA - 14x19x39 | Canaleta padrão |
+| U34 (`CHANNEL_U_34`) | CANALETA 34 - 14x19x34 | Canaleta de 34 |
+| U19 (`CHANNEL_U_19`) | MEIA CANALETA - 14x19x19 | **Só** no B54 da última fiada (U34 + U19, §86.16); proibida no resto (§86.14) |
+| U_CUT (`CHANNEL_U_CUT`) | BLOCO CANALETA CORTADO - 14x19xVAR | Comprimento no parâmetro de instância `Comprimento_bloco`; no máximo um por trecho, ≥ 9 cm e nunca 19 (§86.14) |
+
+Canaleta J não é usada. Família ausente ou com dimensão divergente →
+`MISSING_FAMILY_MAPPING` / `CHANNEL_FAMILY_MISSING` (a MEIA CANALETA continua
+obrigatória por causa da §86.16).
 
 ## Constantes geométricas
 
@@ -49,6 +67,10 @@ geométrico do bloco.
   alterar esta fórmula sem reconfirmar no Revit real primeiro].
 - `course_index` na criação é a fiada **física** (par=A, ímpar=B) — cada
   índice só recebe candidatos da letra correspondente.
+- Número de fiadas = `floor(H / 20)` (PADRÃO OBSERVADO, §86.5: o BUTANTÃ
+  humano tem 13 fiadas, z = 261). Sobrando ≥ 9 cm, o humano põe uma camada de
+  C09 deitado (`COMPENSADOR 14x19x9 (deitado)`) — **pendência de código**: a
+  família existe, mas não tem código no catálogo.
 
 ## Prioridade de preenchimento comum (trechos livres — meio de parede)
 
@@ -76,6 +98,12 @@ fechar [REGRAS §2]:
 > compensador **antes** de B19 sem ponta aberta (inverteu a ordem antiga
 > — ver ERROR_HISTORY.md). B19 sem ponta aberta é **últimíssimo** recurso.
 
+> **Atualizado (§85.2, 2026-09-29):** pela regra, B19 só em fechamento (ver
+> abaixo) — o tier 5 (B19 sem ponta aberta) deixou de ser resultado aceitável.
+> No código, o recompositor da §85 trata o B19 fora de fechamento como falha
+> dura (`HALF_BLOCK_NOT_ADMISSIBLE`) e o que sobrar vira incompatibilidade
+> registrada (`half_block_census`), nunca aceita em silêncio.
+
 ## Regra do meio-bloco (B19) — resumo
 
 - **Nunca no meio de um trecho**, em hipótese alguma — mesmo quando as
@@ -87,6 +115,12 @@ fechar [REGRAS §2]:
   do B34 tem prioridade (ver BONDING.md).
 - Rede de segurança independente na validação (`HALF_BLOCK_NEAR_TIE`) —
   ver VALIDATION.md.
+- **REGRA OBRIGATÓRIA (§85.2)**: B19 só é admissível (a) encostado numa
+  jamba **ativa** daquela fiada, (b) numa ponta **livre** de parede, ou
+  (c) **logo atrás da faixa de compensação encostada no vão**
+  (`B54 | B19 | C09 | vão`, §84/§86.13). Encostar numa peça de nó não basta;
+  a exceção da §35 (B19 residual junto de nó) foi **revogada**
+  (`B19_RESIDUAL_FILL_REPAIR_ENABLED = False`).
 
 ## Regra dos compensadores/pastilhas (C09/C04) — resumo
 
@@ -97,6 +131,12 @@ fechar [REGRAS §2]:
 - **Orientação obrigatória** (regra #3): o lado fechado do compensador
   tem que ficar voltado para a abertura, quando ele encosta numa de
   verdade — ver BONDING.md.
+- Junto de abertura: compensador **encostado no vão** e na mesma faixa em
+  todas as fiadas (§84, §86.13). O par `C09 C04` encostado no vão, com o C09
+  na face, é UMA faixa (catálogo da sobra da §86.6), não "2 em sequência".
+- Proibido compensador isolado colado num B34 quando o compensador menor +
+  B39 fecha o mesmo comprimento: `C09 | B34` → `C04 | B39`; `C04 | B34` →
+  `B39` (§85.8/§86.6).
 
 ## Nunca fazer
 
@@ -108,3 +148,5 @@ fechar [REGRAS §2]:
 - Nunca empilhar 2+ compensadores em sequência.
 - Nunca alterar a fórmula de cota Z (fiada 1 / passo de 20cm) sem
   reconfirmar contra o Revit real primeiro.
+- Nunca usar canaleta como bloco de preenchimento comum, nem meia canaleta
+  (U19) fora do B54 da última fiada.
