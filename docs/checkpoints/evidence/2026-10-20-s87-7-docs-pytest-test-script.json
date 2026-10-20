@@ -1,0 +1,24 @@
+{
+  "started_utc": "2026-10-20T12:50:29.214610+00:00",
+  "cwd": "C:\\Users\\CIVIX\\OneDrive\\\u00c1rea de Trabalho\\Scripts.extension\\MinhaAba.tab\\MeuPainel.panel\\MeuBotao.pushbutton\\.claude\\worktrees\\modulation-rules-organization-28450d",
+  "head": "19ec07d6e7d5fbad018c099b8c9fc1eeba509ff2",
+  "tree": "773b5ed2f9107832ef0f9e7526ab5f8e88064dfc",
+  "status_before": "",
+  "command": [
+    "py",
+    "-3",
+    "-m",
+    "pytest",
+    "tests/test_script.py",
+    "-q"
+  ],
+  "timeout_seconds": 1500,
+  "python": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+  "state": "completed",
+  "log": "2026-10-20-s87-7-docs-pytest-test-script.txt",
+  "pid": 17880,
+  "exit_code": 0,
+  "elapsed_seconds": 121.092,
+  "status_after": "?? docs/checkpoints/2026-10-20-s87-7-docs-skill-ate-87.md\n?? docs/checkpoints/evidence/2026-10-20-s87-7-docs-pytest-test-script.json\n?? docs/checkpoints/evidence/2026-10-20-s87-7-docs-pytest-test-script.txt",
+  "log_sha256": "18d9157a3c56de9789628c29e9dcb576aaaed87a9943a56f80055a658e628ead"
+}
