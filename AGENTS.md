@@ -39,6 +39,25 @@ NUNCA criar por iniciativa propria: check-in horario, monitoramento de
 PR, polling, tarefa recorrente ou rechecagem agendada. So' fazer isso se
 o usuario pedir explicitamente.
 
+## Regras de modulacao moram no cofre (2026-10-23)
+
+Pedido do usuario (2026-10-23): as regras sairam do GitHub. A fonte
+oficial passou a ser o cofre `T:\CIVIX IA\MODULAÇÃO`:
+
+- documento oficial (antes `nuvem/REGRAS_MODULACAO_BLOCOS.md`):
+  `T:\CIVIX IA\MODULAÇÃO\Original (editar aqui)\REGRAS_MODULACAO_BLOCOS.md` — e' ESTE arquivo que se edita;
+- `PADRAO_MODULACAO.md`, `rules/`, `decisions/` (antes `docs/decisions/`)
+  e a skill `revit-block-modulation` completa: `T:\CIVIX IA\MODULAÇÃO\Original (editar aqui)\`;
+- uma nota por secao em `T:\CIVIX IA\MODULAÇÃO\Regras\` e os indices `01`-`05` na raiz
+  do cofre, gerados pelo `_Sistema\gerar_cofre.py`. Depois de editar um
+  original, regenerar o cofre (`_Sistema\LEIA-ME — como atualizar.md`);
+  nunca editar as notas geradas.
+
+Nao recriar arquivos de regra no repositorio. A ultima versao que esteve
+no GitHub fica na tag `regras-github-final` (commit c855397). Sem acesso
+a `T:` (ex.: sessao na nuvem), avisar o usuario em vez de inventar regra.
+Abaixo, "REGRAS" quer dizer o `REGRAS_MODULACAO_BLOCOS.md` do cofre.
+
 ## Recuperacao progressiva de contexto
 
 Mesma politica descrita em `CLAUDE.md` ("Recuperacao progressiva de
@@ -47,7 +66,7 @@ atual, mas nunca deixar de investigar por economia quando houver duvida
 razoavel sobre uma regra/contrato relevante. Buscar por termo exato,
 depois sinonimo/pt-BR-EN, depois entidade relacionada, depois heading,
 antes de ler um arquivo inteiro ou concluir que uma regra nao existe.
-`nuvem/REGRAS_MODULACAO_BLOCOS.md` continua sendo a fonte oficial —
+O `REGRAS_MODULACAO_BLOCOS.md` do cofre (ver "Regras de modulacao moram no cofre") e' a fonte oficial —
 localizar a secao antes de ler o arquivo inteiro.
 
 ## Documentacao da API RevitAPI
@@ -65,13 +84,13 @@ informacao e' considerada uma ATUALIZACAO OFICIAL das regras do projeto.
 Depois de implementar ou analisar a correcao pedida, a regra
 correspondente DEVE ser adicionada ou atualizada no arquivo:
 
-`nuvem/REGRAS_MODULACAO_BLOCOS.md`
+`REGRAS_MODULACAO_BLOCOS.md` do cofre
 
 ### Procedimento obrigatorio
 
 1. Identificar toda correcao ou nova orientacao do usuario relacionada
    a' modulacao.
-2. Verificar se essa regra ja' existe no `nuvem/REGRAS_MODULACAO_BLOCOS.md`.
+2. Verificar se essa regra ja' existe no `REGRAS_MODULACAO_BLOCOS.md` do cofre.
 3. Se nao existir, adicionar a nova regra de forma clara e objetiva.
 4. Se ja' existir, atualizar a regra existente para refletir corretamente
    a orientacao mais recente do usuario.
@@ -79,14 +98,14 @@ correspondente DEVE ser adicionada ou atualizada no arquivo:
 6. Em caso de conflito com uma regra anterior, a orientacao mais recente
    do usuario tem prioridade.
 7. Antes de qualquer alteracao futura na logica de modulacao, consultar
-   o `nuvem/REGRAS_MODULACAO_BLOCOS.md` e garantir que todas as regras e
+   o `REGRAS_MODULACAO_BLOCOS.md` do cofre e garantir que todas as regras e
    correcoes ja' definidas sejam respeitadas.
 
 ### Regra fundamental
 
 Nenhuma correcao feita pelo usuario sobre a modulacao dos blocos pode
 ficar apenas na conversa ou apenas no codigo. Toda correcao relevante
-deve ser registrada permanentemente no `nuvem/REGRAS_MODULACAO_BLOCOS.md`,
+deve ser registrada permanentemente no `REGRAS_MODULACAO_BLOCOS.md` do cofre,
 para que nao seja esquecida nem perdida em alteracoes futuras do sistema.
 
 ## TODO conhecimento de AMARRACAO deve ser guardado
@@ -95,7 +114,7 @@ Pedido explicito do usuario (2026-08-28). A amarracao e' o nucleo do
 sistema: e' o que diferencia uma parede de alvenaria ESTRUTURAL de um
 empilhamento de blocos. Por isso, qualquer conhecimento novo sobre
 amarracao - venha de onde vier - e' registro OBRIGATORIO em
-`nuvem/REGRAS_MODULACAO_BLOCOS.md`, antes ou junto da implementacao,
+`REGRAS_MODULACAO_BLOCOS.md` do cofre, antes ou junto da implementacao,
 nunca depois nem "quando sobrar tempo".
 
 Conta como conhecimento de amarracao:
@@ -115,7 +134,7 @@ Conta como conhecimento de amarracao:
 
 ### Como registrar
 
-1. Escrever a regra em `nuvem/REGRAS_MODULACAO_BLOCOS.md` com o rotulo de
+1. Escrever a regra em `REGRAS_MODULACAO_BLOCOS.md` do cofre com o rotulo de
    confianca que ela merece (REGRA OBRIGATORIA / PREFERENCIAL / EXCECAO
    PERMITIDA / PADRAO OBSERVADO AINDA NAO CONFIRMADO / CONFLITO).
 2. Registrar COMO aquilo foi descoberto: medicao no Revit, print do
@@ -132,8 +151,8 @@ e' considerado falha do processo, nao do solver.
 
 ## Navegação consolidada (2026-09-10)
 
-START_HERE é a entrada. rules/ e benchmark/ são índices; reference_projects/
-separa evidência humana, com primários legados. docs/decisions registra
+START_HERE é a entrada. benchmark/ é índice; regras, rules/ e decisions moram no cofre T:; reference_projects/
+separa evidência humana, com primários legados. decisions (no cofre) registra
 contratos pendentes; merge documental não é aprovação normativa.
 Citar arquivo + SHA para seções de branches diferentes.
 Pedido de 2026-09-10 autoriza somente #33/#35 evidenciais e o PR consolidado

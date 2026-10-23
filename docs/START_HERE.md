@@ -11,9 +11,9 @@ propostas documentais; integração não transforma proposta em contrato aprovad
 | Pergunta | Fonte |
 |---|---|
 | Onde está o solver? | reforço de aberturas CHANNEL: [opening_reinforcement.py](../nuvem/core/engine/opening_reinforcement.py) ([arquitetura](architecture/channel-strategy-implementation.md)); [wall_stepper.py](../nuvem/core/engine/wall_stepper.py), [wall_modeling.py](../nuvem/core/wall_modeling.py); Script.py é entrada/loader |
-| Quais regras valem? | [Índice](../rules/README.md), autoridade em [REGRAS](../nuvem/REGRAS_MODULACAO_BLOCOS.md), status por seção |
+| Quais regras valem? | Cofre `T:\CIVIX IA\MODULAÇÃO` (desde 2026-10-23 fora do GitHub): ler `01 LEIA-ME PARA IA.md`; autoridade em `Original (editar aqui)\REGRAS_MODULACAO_BLOCOS.md` (uma nota por seção em `Regras\`). Última versão no GitHub: tag `regras-github-final` |
 | Como rodar o botão no BUTANTÃ cru? | REGRAS §87.6: import arquitetônico, layer **`Estrutura _1_`** (nunca `Paredes`), 14 cm, 2,60 m, referência **`1 PAV \| ARQ-STR-BLOCO`**, sem reforço adicional |
-| Decisões do usuário? | [Registros PENDING](decisions/README.md) |
+| Decisões do usuário? | Registros PENDING no cofre: `Original (editar aqui)\decisions\` (notas em `Decisões\`) |
 | Benchmark oficial? | [Índice](../benchmark/README.md), [manifesto](../nuvem/benchmark/golden/manifest.json), caminhos preservados |
 | Referências humanas? | [TORRE EASY e BUTANTÃ](../reference_projects/README.md), evidência/não norma; [comparação](../reference_projects/COMPARISON.md) |
 | Candidato em teste? | PR #40 `claude/butanta-channel-reference-implementation` (estratégia CHANNEL, regras 30.8/51), ready for review, sem merge. #39 (fill|tie), #38, #37 e Beta 1 **já estão na main**; #31 N1 continua NO-GO; [estado 2026-09-12](GITHUB_STATE_2026-09-12.md) |

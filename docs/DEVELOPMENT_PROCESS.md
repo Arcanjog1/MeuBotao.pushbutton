@@ -10,8 +10,8 @@ Nova sessão? Comece por `docs/START_HERE.md` (roteador por domínio).
 
 ## Fonte de verdade
 
-- regras de domínio (modulação de blocos):
-  `nuvem/REGRAS_MODULACAO_BLOCOS.md`
+- regras de domínio (modulação de blocos), desde 2026-10-23 fora do repo:
+  `T:\CIVIX IA\MODULAÇÃO\Original (editar aqui)\REGRAS_MODULACAO_BLOCOS.md`
 - estado do projeto (atual):
   `docs/PROJECT_STATUS.md`
 - histórico de CRs e log cronológico:
@@ -178,8 +178,8 @@ nao autoridade superior ao codigo ou ao usuario.
 ## Evidência e propostas (2026-09-10)
 
 reference_projects contém portais; primários em docs/revit_reference_extraction
-com inventário/hash/limites. rules/ e benchmark/ não são fontes concorrentes.
-docs/decisions mantém STATUS/autorização. Nenhuma promoção normativa automática.
+com inventário/hash/limites. benchmark/ não é fonte concorrente.
+Regras, rules/ e decisions moram no cofre T: desde 2026-10-23 (decisions mantém STATUS/autorização). Nenhuma promoção normativa automática.
 
 Ao alterar portais/acervo, executar também
 python tools/documentation/verify_reference_inventory.py --protected-base <SHA>

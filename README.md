@@ -7,11 +7,11 @@ nuvem/core/wall_modeling.py.
 **Comece por [docs/START_HERE.md](docs/START_HERE.md).**
 
 - [Estado oficial e candidatos](docs/PROJECT_STATUS.md)
-- [Regras vigentes](rules/README.md)
+- Regras vigentes: cofre `T:\CIVIX IA\MODULAÇÃO` (desde 2026-10-23 fora do GitHub; original editável em `Original (editar aqui)\REGRAS_MODULACAO_BLOCOS.md`)
 - [Benchmark oficial](benchmark/README.md)
 - [Referências humanas — evidência, não norma](reference_projects/README.md)
 - [Arquitetura proposta](docs/architecture/README.md)
-- [Decisões pendentes](docs/decisions/README.md)
+- Decisões pendentes: cofre `T:\CIVIX IA\MODULAÇÃO`, pasta `Decisões\`
 - [Backlog A/B/C/D/E](docs/BETA2_BACKLOG.md)
 
 Beta 1: **CANDIDATO — VALIDAÇÃO REVIT PENDENTE**.

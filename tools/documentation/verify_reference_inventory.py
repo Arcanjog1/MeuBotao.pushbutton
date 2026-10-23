@@ -55,11 +55,14 @@ def verify(root, protected_base):
     changed = git(root, 'diff', '--name-only', protected_base, '--', *protected).decode('utf-8').strip()
     if changed:
         raise ValueError('protected production/benchmark/test/workflow changed:\n' + changed)
+    # Desde 2026-10-23 as regras moram no cofre T:\CIVIX IA\MODULACAO (fora do
+    # repo); a checagem de preservacao so' vale enquanto o arquivo existir aqui.
     rules_path = 'nuvem/REGRAS_MODULACAO_BLOCOS.md'
-    original_rules = canonical(git(root, 'show', protected_base + ':' + rules_path))
-    current_rules = canonical((root / rules_path).read_bytes())
-    if not current_rules.startswith(original_rules.rstrip(b'\n')):
-        raise ValueError('existing rule text was edited instead of preserving historical authority')
+    if rules_path in tracked:
+        original_rules = canonical(git(root, 'show', protected_base + ':' + rules_path))
+        current_rules = canonical((root / rules_path).read_bytes())
+        if not current_rules.startswith(original_rules.rstrip(b'\n')):
+            raise ValueError('existing rule text was edited instead of preserving historical authority')
     return {'result': 'PASS', 'json_files': len(seen), 'projects': counts,
             'protected_base': protected_base, 'protected_paths': protected,
             'hash_format': 'UTF-8 with LF line endings',

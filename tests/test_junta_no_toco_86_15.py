@@ -364,12 +364,20 @@ def test_corpus_butanta_so_os_tres_T_das_paredes_de_99_cm_mudam():
 
 
 # ============================================ 4. chave e IronPython 2.7
-def test_chave_ligada_no_produto_e_citada_na_regra():
+def test_chave_ligada_no_produto_e_citada_no_codigo():
     assert ws.T_MAIN_ROOM_IN_OWN_COURSE_ENABLED is True
-    regras = io.open(os.path.join(ROOT, "nuvem", "REGRAS_MODULACAO_BLOCOS.md"), encoding="utf-8").read()
-    assert "### 86.15" in regras and "T_MAIN_ROOM_IN_OWN_COURSE_ENABLED" in regras
     fonte = io.open(os.path.join(ROOT, "nuvem", "core", "engine", "wall_stepper.py"), encoding="utf-8").read()
     assert "SECAO 86.15" in fonte
+
+
+def test_chave_citada_na_regra_do_cofre():
+    # desde 2026-10-23 as regras moram no cofre MODULACAO, fora do repo
+    regras_path = os.path.join(os.environ.get("MODULACAO_COFRE", u"T:\\CIVIX IA\\MODULA\u00c7\u00c3O"),
+                               "Original (editar aqui)", "REGRAS_MODULACAO_BLOCOS.md")
+    if not os.path.exists(regras_path):
+        pytest.skip("cofre MODULACAO indisponivel nesta maquina: " + regras_path)
+    regras = io.open(regras_path, encoding="utf-8").read()
+    assert "### 86.15" in regras and "T_MAIN_ROOM_IN_OWN_COURSE_ENABLED" in regras
 
 
 def test_modulo_tocado_compativel_com_ironpython27():
