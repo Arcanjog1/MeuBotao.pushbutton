@@ -12739,3 +12739,91 @@ resultado não depende disso; (c) `len([...])` substituiu um `sum(gerador)` em `
   (`tests/` não cita `_wall_segment_key` nem `_index_existing_walls_by_segment`). **DOCUMENTADO — pendência de
   verificação aberta**: rodar o botão duas vezes no mesmo arquivo cru e conferir que a contagem de Walls não muda e
   que o output da segunda execução reporta os segmentos reaproveitados.
+
+## 88. DONA FRANCISCA — planta de estudo de massa levada para a grade de 5 cm (2026-10-23, EM ANDAMENTO)
+
+**Contexto:** primeiro projeto rodado no botão que **não nasceu modular** (estudo de massa `DONA FRANCISCAv2 - Folha
+C01`, AVIZ Studio, 2 torres, planta tipo 45,86 × 13,56 m, 10 AP/andar, pé-direito 2,72 m piso a piso → alvenaria
+2,60 m = 13 fiadas, confirmado pelo usuário). CAD `C01 - LIMPO`, layer `A-WALL`, 14 cm, nível `00. 000`; 99
+aberturas (família `Abertura de janela para paredes de blocos`, Mobiliário). Tudo medido via MCP/headless
+(`execute_code` na porta 48884, `main()` real com as telas respondidas por script — receita da §87.6).
+
+### 88.1 CAD com coordenadas quebradas → 161 Walls em VERMELHO — PADRÃO OBSERVADO; DOCUMENTADO — pendência de código
+
+- O DWG tem faces em 27807,7 / 28122,4 / 32393,6 cm (décimos de cm). `main()` cria as Walls fiéis ao CAD → 352
+  Walls, **161 vermelhas** (comprimento quebrado), 34 azuis. Nenhuma regra do botão arredonda a entrada.
+- Correção aplicada (fora do produto, patch de bancada em `extract_lines_by_layer`): **arredondar cada ponta de
+  linha do CAD para o cm inteiro antes de parear** → as faces (14 cm entre si) continuam pareando e todo eixo
+  nasce em cm inteiro (0 vermelhas na rodada seguinte). As aberturas também foram levadas ao cm inteiro
+  (origem da família arredondada) — com isso as bonecas ficam inteiras, porque a origem da família está a 60 cm
+  da jamba esquerda (centro = jamba + largura/2).
+- **Pendência de código:** `main()` deveria oferecer esse arredondamento (ou avisar) — hoje o usuário só descobre
+  pelo vermelho na vista.
+
+### 88.2 Regras de fechamento MEDIDAS no motor (oráculo em salas sintéticas) — PADRÃO OBSERVADO
+
+Medido com `solve_building_blocks_all_courses` (2–13 fiadas, estratégia NONE, catálogo real do projeto) em
+geometrias mínimas (`scratchpad/oracle.py` da sessão). "Fecha" = `non_modular` vazio; "limpo" = sem C09/C04.
+
+| Situação | Fecha quando | Limpo (sem compensador) quando |
+|---|---|---|
+| Sala retangular, 4 cantos L, distância entre eixos D | D mod 5 ∈ {0, 1, 2} (falha em 3 e 4) | idem (280–341 testados) |
+| Parede chegando em T a T cm do canto (D = 640) | T mod 5 = 0 (falha em 1–4) | idem |
+| Janela 121 / porta 81 / porta 91 / porta 101 numa parede de 640 entre dois L, jamba esquerda a J do eixo do canto | J mod 5 = 2 (= boneca da face interna múltipla de 5) | boneca da face múltipla de 20 (J = 107: 100 cm) — J = 97/102/112 fecham com 4–22 compensadores |
+| Porta 91 espremida entre canto L e parede que cruza (eixos a 125 cm = 111 cm livres) | J = 7 (jamba **encostada na face interna do canto**, 20 cm até a parede que cruza) | J = 7 fecha com 4 compensadores e **passa na validação**; J = 27 (encostada na parede que cruza) fecha mas **reprova** |
+| Duas paredes paralelas cruzando a mesma parede (nós X), eixos a G cm | G ≥ 56 (54 e 55 dão trecho de −1 cm entre as reservas de 28 cm dos nós) | G = 56, 70, 75 limpos; 60, 65, 80 com 6 compensadores |
+| Parede com ponta livre cruzada por outras | o trecho da ponta livre até a reserva do 1º nó tem de fechar (82/62 cm não fecham; ±2 cm resolve) | — |
+
+Consequência prática (regra usada nesta planta): **todos os eixos paralelos numa grade de 5 cm** (atende L e T ao
+mesmo tempo), **centros de abertura em 2,5 (mod 5)** no mesmo referencial (jamba a 5k da face), larguras de abertura
+terminando em 1 (41/61/81/91/121/321 — todas já eram). Compensadores só somem quando as bonecas são múltiplas de 20,
+o que não é possível para toda parede ao mesmo tempo numa planta que não nasceu modular.
+
+### 88.3 Quem julga: o solver de 13 fiadas, não a Etapa 3B — PADRÃO OBSERVADO
+
+- `analyze_created_walls_for_errors` (Etapa 3B, stepper de 2 fiadas) reprovou **106 de 106** eixos e
+  `find_wall_group_shift_fixes` (3C) devolveu **0 planos em 123 s**; reprovou inclusive eixos que o solver de 13
+  fiadas aprova. Numa planta não modular a 3B não serve de juiz nem de corretor (limite já anotado na §87.6-a).
+- O solver completo custa: 79 eixos × 13 fiadas = **1 988 s em CPython** (bandas em 13 s; o resto é
+  `_apply_opening_structural_reinforcement` → `arrange_b34_runs` / `_orient_small_voids_final` e
+  `_tie_parity_prism_rounds` — perfil de 3 fiadas: 166 s). No IronPython do Revit seria inviável; usado o caminho
+  offline + injeção (§87).
+- Sequência que convergiu (medida com 2 fiadas, 94 s por rodada): 1 798 trechos não modulares (CAD cru) → 37
+  (grade de 5 cm; sobraram portas de 91 a **10 cm** de uma parede que cruza, paredes paralelas a 55 cm e pontas
+  livres de 82/62 cm) → 8 (portas movidas 10 cm: jamba encostada no canto — regra da tabela) → **0** (paredes do
+  poço/armário de 510 → 505 e 758 → 765, G = 60 — o usuário pediu para não afastar as paredes do original: G = 70
+  exigia 15 cm, e G = 56 a ±1 cm sai da grade de 5 cm e reabre 22 trechos nas paredes longas; escada de −2 a 1272).
+
+### 88.4 O que mudou no modelo (todas as alterações ≤ 2 cm, salvo as apontadas)
+
+Grade: 49 eixos (27 V + 22 H) movidos ≤ 2 cm (média 1,1 cm; 11 não mudaram); 92 aberturas ≤ 2 cm.
+Pontuais: 11 portas de 91 cm (entradas dos apartamentos) ±10 cm; 4 paredes do poço/armário −5/+7 cm; 2 paredes da
+escada (pontas livres) −2/+3 cm; 10 porta-janelas de 321 cm de 60–300 para **60–220** (peitoril 60 + 160 — mesma
+verga de todo o projeto; usuário escolheu manter 2,60 m e ajustar as janelas); 3 janelas duplicadas apagadas e 10
+larguras quebradas (312,99/321,23/321,26) → 321. Paredes **unidas pelo usuário** (79 Walls contínuas) antes do ajuste. Os 126 recortes nativos (`Opening`) que a
+união criou ficaram nas posições antigas quando as aberturas foram movidas ("dentes" nos cortes): todos apagados e
+refeitos pelo motor (`build_wall_opening_cuts`/`create_wall_opening_cuts`) — 99 cortes, um por abertura; pontas de
+parede conferidas contra as faces (0 dentes).
+
+### 88.5 Resultado no Revit (2026-10-23, cópia `DONA FRANCISCA - MODULACAO 2026-10-23.rvt`)
+
+- Estratégia **CHANNEL** (pedido do usuário: "com canaletas"); o caminho CHANNEL pula o reforço §80, e o solve de
+  13 fiadas caiu de 33–90 min para **161 s** (CPython 3.14; PyPy 3.11 v8.0.1 roda o mesmo motor 2× mais rápido com
+  resultado idêntico — medido no solve de 2 fiadas: 70 s → 33 s).
+- Três ajustes a mais depois da grade: (a) nas 4 paredes de 434 cm da fachada a porta de 81 ficava exatamente no
+  nó T da parede do banheiro (incoerência do CAD) — entre o T e o canto L há 91 cm livres, a porta foi encostada
+  na face interna do canto (boneca 0; regra da tabela 88.2) e as 32 invasões de vão sumiram; (b) duas paredes em T
+  nos dois lados da mesma parede, a 10 cm uma da outra (y 80/90), degradavam para L e colidiam — alinhadas em y 85
+  (5 cm cada) virando um X, colisões 2 → 0; (c) parede curta do poço em 30549 (fora da grade por erro meu) → 30550,
+  20 trechos → 0.
+- Solve final: **16 791 peças**, 0 trechos não modulares, 0 colisões, 0 invasões de porta, 558 amarrações de nó sem
+  peça (`missing_required_junction_bond`, maioria `NO_BOND_PIECE`), 41 de 79 paredes reprovadas na validação de
+  qualidade (junta vertical coincidente / compensadores adjacentes nas bonecas de 20 cm — bonecas que só fecham com
+  compensador, ver 88.2).
+- Criação pelo caminho do produto (`_execute_create`, regra 48): **16 767 instâncias criadas**, 24 puladas pelo plano
+  de materialização, 8 amarrações não resolvidas, 40 vergas/contravergas sem solução, 3 154 peças marcadas em
+  vermelho para revisão; `structurally_resolved = False`. Composição: B39 6 925, B34 ≈4 000, C09 ≈1 600, C04 ≈800,
+  B19 ≈780, B54 667, canaletas ≈1 800 (U39/U34/U19/CUT). Original `DONA FRANCISCA.rvt` em disco intocado.
+- **Pendências desta planta (DOCUMENTADO):** revisar as 3 154 peças em vermelho; as 41 paredes com boneca de 20 cm
+  só ficam limpas com boneca múltipla de 20 nos dois lados (exige redimensionar cômodos — decisão de projeto);
+  `math.isfinite` não existe no IronPython 2.7 (`controlled_beta_preflight` quebra no caminho MCP; shim na bancada).

@@ -153,3 +153,13 @@ usuário confirmar, refutar ou detalhar uma regra: adicionar aqui a
 medição bruta (ou apontar para `nuvem/diagnosticos/`), o projeto de
 origem, a data, e qual regra ela confirma/refuta — nunca só "funcionou",
 sempre com o número/posição medido quando houver.
+
+## Planta não modular levada para a grade de 5 cm — DONA FRANCISCA (REGRAS §88, 2026-10-23)
+
+Regras de fechamento medidas no motor com salas sintéticas (não deduzidas):
+eixos paralelos numa grade de 5 cm (L: D mod 5 ∈ {0,1,2}; T: 0), jamba a 5k
+da face interna (limpo com boneca múltipla de 20), porta espremida encostada
+no canto L (nunca na parede que cruza), paredes paralelas cruzando a mesma
+parede a ≥ 56 cm (70/75 limpos). Na planta real: 1 798 → 0 trechos não
+modulares com deslocamentos ≤ 2 cm (grade) e 3 ajustes pontuais de 10–15 cm.
+A Etapa 3B/3C não serve de juiz numa planta assim — só o solver de 13 fiadas.
