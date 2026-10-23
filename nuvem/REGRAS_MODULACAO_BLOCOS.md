@@ -12827,3 +12827,18 @@ parede conferidas contra as faces (0 dentes).
 - **Pendências desta planta (DOCUMENTADO):** revisar as 3 154 peças em vermelho; as 41 paredes com boneca de 20 cm
   só ficam limpas com boneca múltipla de 20 nos dois lados (exige redimensionar cômodos — decisão de projeto);
   `math.isfinite` não existe no IronPython 2.7 (`controlled_beta_preflight` quebra no caminho MCP; shim na bancada).
+
+### 88.6 Segunda rodada (2026-10-23, mesma cópia): ajustes "sem mudar cômodo" e o que restou
+
+- Aplicados: janela da parede y=90 a 17 cm do T → 22 cm; as 6 paredes de 122 cm dos banheiros (x 29155/29850/31060)
+  movidas 10 cm com as próprias portas, para o T ficar a 57 cm da jamba das portas das paredes de 254 cm. Cortes
+  refeitos (99), 0 dentes. Lote anterior apagado e recriado pelo produto: **16 928 planejadas / 16 904 criadas**,
+  24 puladas (W47, invasão de vão por peça de nó `JUNCTION_UNRESOLVED_FILL`/`T_INTERSECTION_INCOMING_DEGRADED`),
+  3 193 peças em vermelho, 35 paredes reprovadas na auditoria de amarração — **mesmo diagnóstico de antes**
+  (104 juntas corridas): os deslocamentos de 10 cm não mudam a composição, só a posição da junta repetida.
+- As 104 juntas corridas são todas de 7 situações de planta (poço de 30 cm; nós T a 100–105 cm nas divisas e nas
+  paredes internas longas; T a 47 cm da jamba nas paredes de 254; T a 50 cm do canto nos closets de 169; porta das
+  4 paredes de fachada presa entre T e canto; bonecas de 129/134 entre janelas de fachada). Todas exigem decisão de
+  cômodo ou esquadria — registradas como **pendência de projeto**, não do motor.
+- Referência permanente pedida pelo usuário: `butanta testes.rvt` (humano R08_LT, §86) — toda modulação nova deve
+  ficar o mais parecida possível com ele. Arquivo salvo (55,8 MB) e enviado pelo chat.
