@@ -12842,3 +12842,34 @@ parede conferidas contra as faces (0 dentes).
   cômodo ou esquadria — registradas como **pendência de projeto**, não do motor.
 - Referência permanente pedida pelo usuário: `butanta testes.rvt` (humano R08_LT, §86) — toda modulação nova deve
   ficar o mais parecida possível com ele. Arquivo salvo (55,8 MB) e enviado pelo chat.
+
+### 88.7 REGRA OBRIGATÓRIA (correção do usuário, 2026-10-23): compensador em coluna no nó e septo desalinhado são ERRO — DOCUMENTADO, pendência de código aberta
+
+**Como foi descoberto:** prints 3D da cópia do DONA FRANCISCA enviados pelo usuário (fiadas vistas de cima com
+inclinação). Nos nós T/X apareceram colunas de C09 "de lado" (empilhados em todas as 13 fiadas, sem amarrar) e
+blocos com os septos (prismas) fora do alinhamento vertical. Palavras do usuário: "quero que não tenha bloco sem o
+prisma correto e com os septos desalinhados; esses compensadores 'de lado' estão completamente errados, não faça
+mais isso".
+
+**Medido no resultado (solve CHANNEL, 16 928 peças):** 558 C09 com razão `JUNCTION_UNRESOLVED_FILL` em **56 dos
+165 nós** (519 ocorrências em T, 36 em L, 3 `BOND_PIECE_PARTIAL`), exatamente as 558 `missing_required_junction_bond`
+(`NO_BOND_PIECE`); `sem_alinhamento_vertical` reprovado em 220 pares parede×banda. Nenhuma peça está girada em
+relação ao próprio eixo (0 de 16 928 com `x_dir` perpendicular à parede) — o "de lado" é a coluna de compensadores
+do nó vista da parede que chega.
+
+**A regra (prevalece sobre o comportamento da §76.1 "preenche com C09 e marca para revisão"):**
+1. Um nó sem peça de amarração válida (B34/B54 conforme §§39/74/76/77) **não pode ser entregue preenchido com
+   compensador** em nenhuma fiada. `JUNCTION_UNRESOLVED_FILL` deixa de ser uma saída aceitável da modulação: ou o
+   motor resolve o nó (peça de amarração + ajuste de geometria dentro das tolerâncias), ou o nó fica **vazio e
+   bloqueia a criação** daquela parede até decisão humana — nunca uma coluna de C09/C04.
+2. Todo bloco lançado tem de ter o prisma (septos) alinhado verticalmente com a fiada de baixo e a de cima, em toda
+   a altura da parede (`sem_alinhamento_vertical` passa a ser gate de criação, não só validação informativa).
+3. A §76.1 continua valendo para o diagnóstico (classificação do nó); o que muda é a **materialização**: nó não
+   resolvido = parede não criada, com o motivo exato (§18.8).
+
+**Pendência de código:** (a) `materialization_plan`/regra 48: pular (e bloquear) as peças `JUNCTION_UNRESOLVED_FILL`
+e as paredes com `sem_alinhamento_vertical=False`; (b) diagnosticar por que 519 nós T desta planta não recebem
+B34/B54 (suspeita: avaliação de espaço do T, §74, com os T a 100–105 cm e as paredes de 122/154 cm) e, se for
+geometria, devolver ao usuário a lista de nós com a mudança mínima que resolve; (c) teste de caracterização sobre
+`df_geometry.json` desta planta (rascunho local) com os 56 nós. A cópia criada em 2026-10-23 **contém** essas
+558 peças e os septos desalinhados — não é referência aprovada.

@@ -254,3 +254,10 @@ reais por fiada).
   a única exceção é o B54 da cinta de topo (§86.16).
 - Nunca deixar junta na face da parede que chega na fiada em que a principal
   passa o nó (§86.15).
+
+## Compensador em coluna no nó e septo desalinhado são ERRO (REGRAS §88.7 — REGRA OBRIGATÓRIA do usuário, 2026-10-23; pendência de código)
+
+Nó sem B34/B54 válido nunca sai preenchido com C09/C04 (`JUNCTION_UNRESOLVED_FILL`
+não é saída aceitável): ou resolve, ou fica vazio e bloqueia a criação. Prismas
+(septos) alinhados em toda a altura é gate, não aviso. Medido no DONA FRANCISCA:
+558 C09 em 56 nós, 220 pares parede×banda sem alinhamento vertical.
