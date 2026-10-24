@@ -132,3 +132,12 @@ como "já resolvido":
   reintroduza algum risco de `ALTERNATING_JOINT_PATTERN` que a K>1
   tentava evitar. Ver BONDING.md, "Padronização entre fiadas". Pendência:
   reavaliar K=1 medindo `CONTINUOUS_VERTICAL_JOINT`.
+
+## 2026-10-23 — DONA FRANCISCA: portas encostadas no nó → 56 nós com coluna de C09 (REGRAS §88.7/§88.8)
+
+Causa real: o oráculo da grade de 5 cm mediu só `non_modular`; a porta encostada
+no canto (J = 7) passou nesse critério mas deixou 14 cm no braço do nó, abaixo
+dos 34 cm do B34 — o motor caiu em `JUNCTION_UNRESOLVED_FILL` (76.1) e empilhou
+C09 em 13 fiadas. Correção de motor: `materialization_plan` passo 3 pula esse
+compensador e marca o nó em `unresolved_junctions` (gate, chave
+`UNRESOLVED_JUNCTION_FILL_IS_SKIPPED`). Correção de projeto: boneca ≥ 34 cm.

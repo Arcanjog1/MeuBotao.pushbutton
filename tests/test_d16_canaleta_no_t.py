@@ -92,7 +92,10 @@ def _bond_row(res, node, ci):
 
 def _sem_48(res, walls, openings):
     pf = m.controlled_beta_preflight(res, walls, openings, CAT, 0.0)
-    return not pf.get("opening_violations") and not m.materialization_plan(res, pf)["skip"]
+    # secao 88.7: o compensador de no' pulado NAO e' violacao da regra 48 - so' conta o resto
+    skip = [s for s in m.materialization_plan(res, pf)["skip"]
+            if s[2]["rule_id"] != getattr(m, "UNRESOLVED_JUNCTION_FILL_RULE_ID", "JUNCTION_UNRESOLVED_FILL")]
+    return not pf.get("opening_violations") and not skip
 
 
 def _bloqueio(res, walls, node, ci):

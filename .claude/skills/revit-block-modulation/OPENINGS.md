@@ -261,3 +261,13 @@ existente, nunca inventar uma nova.
 - Nunca deixar compensador/pastilha atrás do B19 junto do vão (§86.13).
 - Nunca usar meia canaleta (U19) fora do B54 da última fiada (§86.14,
   §86.16).
+
+## Boneca mínima junto a um nó: 34 cm em cada braço (REGRAS §88.8 — REGRA OBRIGATÓRIA, medida 2026-10-23)
+
+Toda abertura deixa ≥ 34 cm (ideal 40) entre a face interna de um nó L/T/X e
+a jamba, nos dois braços — é o espaço que `L_CORNER_B34`/`T_B54_B34` exigem para
+a peça de amarração. Parede com abertura entre dois nós: eixo a eixo ≥ 14 + 34 +
+largura + 34 + 14 (porta 81 → 177 cm; 91 → 187 cm). Jamba encostada no canto
+("boneca 0") fecha a modulação mas deixa o nó SEM amarração — nunca usar.
+Ao medir no oráculo, olhar `missing_required_junction_bond`, não só
+`non_modular`.

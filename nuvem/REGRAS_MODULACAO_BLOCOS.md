@@ -12770,7 +12770,7 @@ geometrias mínimas (`scratchpad/oracle.py` da sessão). "Fecha" = `non_modular`
 | Sala retangular, 4 cantos L, distância entre eixos D | D mod 5 ∈ {0, 1, 2} (falha em 3 e 4) | idem (280–341 testados) |
 | Parede chegando em T a T cm do canto (D = 640) | T mod 5 = 0 (falha em 1–4) | idem |
 | Janela 121 / porta 81 / porta 91 / porta 101 numa parede de 640 entre dois L, jamba esquerda a J do eixo do canto | J mod 5 = 2 (= boneca da face interna múltipla de 5) | boneca da face múltipla de 20 (J = 107: 100 cm) — J = 97/102/112 fecham com 4–22 compensadores |
-| Porta 91 espremida entre canto L e parede que cruza (eixos a 125 cm = 111 cm livres) | J = 7 (jamba **encostada na face interna do canto**, 20 cm até a parede que cruza) | J = 7 fecha com 4 compensadores e **passa na validação**; J = 27 (encostada na parede que cruza) fecha mas **reprova** |
+| Porta 91 espremida entre canto L e parede que cruza (eixos a 125 cm = 111 cm livres) | J = 7 (jamba **encostada na face interna do canto**, 20 cm até a parede que cruza) fecha e passa na validação de parede — **MAS deixa o canto SEM AMARRAÇÃO** (ver 88.8: o braço do nó fica com 14 cm, B34 precisa de 34). Não é solução; 111 cm livres não cabem porta de 91 + duas bonecas de 34 | — |
 | Duas paredes paralelas cruzando a mesma parede (nós X), eixos a G cm | G ≥ 56 (54 e 55 dão trecho de −1 cm entre as reservas de 28 cm dos nós) | G = 56, 70, 75 limpos; 60, 65, 80 com 6 compensadores |
 | Parede com ponta livre cruzada por outras | o trecho da ponta livre até a reserva do 1º nó tem de fechar (82/62 cm não fecham; ±2 cm resolve) | — |
 
@@ -12873,3 +12873,54 @@ B34/B54 (suspeita: avaliação de espaço do T, §74, com os T a 100–105 cm e 
 geometria, devolver ao usuário a lista de nós com a mudança mínima que resolve; (c) teste de caracterização sobre
 `df_geometry.json` desta planta (rascunho local) com os 56 nós. A cópia criada em 2026-10-23 **contém** essas
 558 peças e os septos desalinhados — não é referência aprovada.
+
+### 88.8 Boneca mínima junto a um nó = 34 cm em cada braço (medido; CONFLITO com a leitura da 88.2) — REGRA OBRIGATÓRIA; gate IMPLEMENTADO na materialização
+
+**Como foi descoberto:** `bond_trace_steps` do solve final (56 nós sem amarração). Todos reprovam pela MESMA
+razão, `*_ROOM_INSUFFICIENT`: o braço do nó (a parede que chega ou um dos lados da principal) tem **14 cm** ou
+**24 cm** disponíveis a partir do contato, e `L_CORNER_B34` / `T_B54_B34` exigem **34 cm** na chegada (B34) e
+**27 cm** de cada lado na principal (B54). Depois disso o motor cai em `T_SINGLE_ELEMENT` → C09 em todas as fiadas
+(76.1). Casos: nós 28–31 (portas de 91 do corredor encostadas no canto, 14 cm); 70/71/74/75 (portas das 4 paredes
+de fachada encostadas no canto — mudança feita nesta sessão pela leitura errada da 88.2); 77/78; 89–116 (portas de
+81 das paredes de 254/169 a 15–24 cm do nó); 117–136 (paredes de 122 cm dos banheiros: 108 cm livres, porta de 81
+→ sobram 27 cm para as DUAS bonecas, nunca 34 de um lado).
+
+**A regra:** toda abertura deixa **≥ 34 cm** (B34; ideal 40 = B34 + junta + 5-grade) entre a face interna de um
+nó L/T/X e a jamba, nos dois braços do nó. Parede com abertura entre dois nós precisa de
+`comprimento entre eixos ≥ 14 + 34 + largura + 34 + 14` (porta 81: **177 cm**; porta 91: **187 cm**). A oracle da 88.2
+só mediu `non_modular`; **amarração tem de ser medida por `missing_required_junction_bond`** — anotado para o
+oráculo.
+
+**Consequência nesta planta (decisão de projeto, não de motor):** paredes de 122 cm com porta de 81 (10 nós),
+portas de 91 em 111 cm livres (4 nós do corredor), portas de 81 em 91 cm livres (4 nós da fachada) e portas de 81 a
+15–24 cm do T nas paredes de 254/169 (≈30 nós) só se resolvem alargando a parede/afastando a porta para 34–40 cm, ou
+trocando a largura da porta (81 → 71 nos banheiros deixa 2 × 18, ainda insuficiente — precisa de parede ≥ 177).
+
+**Gate implementado (2026-10-23, `nuvem/core/wall_modeling.py`, `materialization_plan` passo 3,
+`UNRESOLVED_JUNCTION_FILL_IS_SKIPPED = True`):** o compensador `JUNCTION_UNRESOLVED_FILL` é pulado com
+`severity = BOND_UNRESOLVED`, o nó entra em `plano["unresolved_junctions"]` / `create_result["unresolved_junctions"]`
+e `structurally_resolved` fica False; a parede fica retida como INCOMPLETA (opção A, §48). Teste:
+`tests/test_regra_88_7_junction_fill_gate.py`; `tests/test_d16_canaleta_no_t.py` (`_sem_48`) e
+`tests/test_materializacao_e_estado_da_run.py` ajustados para a chave nova. O alinhamento dos septos como gate
+continua **PENDÊNCIA** (não há validador de prisma por peça hoje; `sem_alinhamento_vertical` mede junta corrida).
+
+### 88.9 Aplicação da 88.8 na planta (2026-10-23, 22h): o que coube sem mover parede e o que não coube
+
+Planejador de bancada (`scratchpad/plan_bonecas.py`, lê a mesma geometria do solve): para cada abertura, mede a
+boneca até a face do nó (ou até a abertura vizinha) dos dois lados; alvo 40 cm, mínimo 34.
+- **37 aberturas deslocadas** (9 a 40 cm) sem mover parede: janelas das fachadas (121, 41, 321), portas de 91 do
+  corredor (20 cm), janelas das paredes y=90/1180 (16 cm), portas de 81 das paredes de 254 (10–16 cm).
+- **5 porta-janelas estreitadas e recentradas**: 321 → 311 (vãos de 384–385 cm livres: bonecas 35/39) e 321 → 301
+  (vãos de 370: 35/35). Alterar largura de esquadria foi autorizado pelo usuário ("liberdade para alterar qualquer
+  abertura").
+- **23 paredes NÃO fecham sem alargar** (precisam de `14 + 34 + largura + 34 + 14`): portas de 91 em 125 cm
+  livres (W23–26, entradas dos apartamentos: faltam 34 cm), portas de 81 em 104–105 cm (W43–46 fachada e W65–68
+  closets: faltam 44 cm), paredes de 122 cm dos banheiros com porta de 81 (W69–78: 119–124 livres, faltam 25–30 cm)
+  e 1 porta-janela de 321 em 385. **Decisão de projeto pendente**: alargar essas paredes (mover a parede
+  perpendicular que as limita) ou trocar a largura das portas (81 → 71 ainda não basta nos banheiros: precisa de
+  parede ≥ 177 cm).
+- **Resultado da rodada (22h40, após mais 15 correções de 1 cm para a jamba voltar a 2 mod 5):** solve 16 584 peças,
+  0 trechos não modulares, 0 colisões, 0 invasões; amarrações de nó faltando **558 → 394**; peças em vermelho
+  3 193 → 2 395; compensadores de nó pulados pelo gate 88.7 (nós ficam vazios). Arquivo salvo e copiado para
+  `OneDrive\Área de Trabalho\BANCO DE DADOS PROJETOS\ENTREGAS CLAUDE\`. Os 394 restantes são as 23 paredes acima
+  (decisão de projeto) mais nós com o mesmo problema vistos do outro braço.

@@ -7092,6 +7092,11 @@ def _record_incomplete_wall_creation(solve_result, create_result, walls_to_creat
 # amarracao). Um B34/B54 de preenchimento (STANDARD_FILL etc.) NAO e' amarracao.
 OPENING_INVASION_RULE_ID = "OPENING_VOID_INVASION"
 PIECE_COLLISION_RULE_ID = "PIECE_COLLISION"
+# SECAO 88.7: a razao do compensador de preenchimento de no' (76.1) e' tambem o
+# rule_id com que ele e' PULADO na materializacao. Chave de produto: True = o
+# compensador nunca e' criado (regra obrigatoria do usuario, 2026-10-23).
+UNRESOLVED_JUNCTION_FILL_RULE_ID = "JUNCTION_UNRESOLVED_FILL"
+UNRESOLVED_JUNCTION_FILL_IS_SKIPPED = True
 BOND_UNRESOLVED_STATUS = "BOND_UNRESOLVED"
 
 
@@ -7188,6 +7193,36 @@ def materialization_plan(result, preflight=None):
             alvo = j
         pular(ci, alvo, PIECE_COLLISION_RULE_ID, "a peca colide com outra peca do mesmo lote", registro,
               {"collides_with_candidate_index": j if alvo == i else i})
+
+    # 3) SECAO 88.7 (regra obrigatoria do usuario, 2026-10-23): no' sem peca de
+    #    amarracao valida NUNCA sai preenchido com compensador. O C09/C04 que a
+    #    76.1 poe no lugar (JUNCTION_UNRESOLVED_FILL) continua existindo no
+    #    diagnostico, mas NAO e' materializado: a peca e' pulada, o no' entra em
+    #    `unresolved_junctions` e a parede fica retida como INCOMPLETA (opcao A,
+    #    secao 48) ate' decisao humana. Medido no DONA FRANCISCA: 558 C09 em 56
+    #    nos, empilhados nas 13 fiadas sem amarrar nada.
+    plano["unresolved_junctions"] = []
+    if UNRESOLVED_JUNCTION_FILL_IS_SKIPPED:
+        vistos = set()
+        for ci in sorted(sources):
+            for idx, cand in enumerate(sources.get(ci) or []):
+                if cand.get("placement_reason") != UNRESOLVED_JUNCTION_FILL_RULE_ID:
+                    continue
+                pular(ci, idx, UNRESOLVED_JUNCTION_FILL_RULE_ID,
+                      "compensador no lugar de amarracao (no' nao resolvido - secao 88.7)",
+                      {"origin_cm": [_ft_to_cm(cand["origin_world"].X), _ft_to_cm(cand["origin_world"].Y)]},
+                      {"severity": "BOND_UNRESOLVED", "requires_human_review": True})
+                chave = (cand.get("node_index"), ci)
+                if chave in vistos:
+                    continue
+                vistos.add(chave)
+                plano["unresolved_junctions"].append({
+                    "status": BOND_UNRESOLVED_STATUS, "requires_human_review": True,
+                    "node_index": cand.get("node_index"), "course_index": ci,
+                    "wall_idx": cand.get("wall_idx"), "logical_code": cand.get("logical_code"),
+                    "rejected_rule": UNRESOLVED_JUNCTION_FILL_RULE_ID,
+                    "message": "no' sem amarracao valida: o compensador de preenchimento NAO foi criado (secao 88.7)",
+                })
     return plano
 
 
@@ -15437,6 +15472,8 @@ class _PostCreationEventHandler(IExternalEventHandler):
         _opening_trace_apply_materialization(self.solve_result, plano_material)
         self._unbuildable = plano_material["skip"]
         self._unresolved_bonds = plano_material["unresolved_bonds"]
+        # SECAO 88.7: nos cujo compensador de preenchimento foi pulado
+        self._unresolved_junctions = list(plano_material.get("unresolved_junctions") or [])
         if self.solve_result is not None and self.solve_result.get("bond_trace") is not None:
             _bond_trace_apply_materialization(self.solve_result["bond_trace"], self._unresolved_bonds)
         # INVARIANTE da regra 48 sobre o que vai REALMENTE para o modelo: refeito
@@ -15530,12 +15567,16 @@ class _PostCreationEventHandler(IExternalEventHandler):
             # SECAO 80: verga/contraverga sem solucao (ou canaleta que nao foi
             # criada) tambem deixa a modulacao NAO resolvida estruturalmente
             _reforco = unresolved_opening_reinforcement(self.solve_result, self.create_result)
+            # SECAO 88.7: no' sem amarracao cujo compensador NAO foi criado
+            _nos_vazios = list(getattr(self, "_unresolved_junctions", None) or [])
             self.create_result["unresolved_bonds"] = _nao_resolvidas
+            self.create_result["unresolved_junctions"] = _nos_vazios
             self.create_result["unresolved_spans"] = _trechos
             self.create_result["unresolved_opening_reinforcement"] = _reforco
             # aviso sem minimo novo: criada, mas sem assentamento num lado (51.4)
             self.create_result["opening_reinforcement_review"] = opening_reinforcement_review(self.solve_result)
-            self.create_result["structurally_resolved"] = not (_nao_resolvidas or _faltando or _trechos or _reforco)
+            self.create_result["structurally_resolved"] = not (
+                _nao_resolvidas or _faltando or _trechos or _reforco or _nos_vazios)
         with _perf.span("create.save_modulation_state_cache"):
             self._save_modulation_state_cache()
         _resultado = self.create_result or {}
