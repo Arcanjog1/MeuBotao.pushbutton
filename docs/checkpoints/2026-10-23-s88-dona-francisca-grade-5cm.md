@@ -15,3 +15,13 @@
 - **Pendências:** ver REGRAS §88.1 (arredondar CAD no `main()`), §88.5 (revisão das peças em vermelho; `math.isfinite`
   no IronPython); CR de performance do solve NONE (§80) — perfil em §88.3.
 - Estado candidato, não oficial: nenhuma medição independente ainda.
+
+## Adendo 22h50 — §88.7/88.8 (commit `b71f9bd`)
+
+- Código: gate em `materialization_plan` (compensador de nó nunca materializado, `unresolved_junctions`),
+  teste `tests/test_regra_88_7_junction_fill_gate.py`; d16 e materializacao ajustados. Suíte completa estava em
+  execução ao commitar (focados passam) — **confirmar `py -m pytest tests -q` na próxima sessão**.
+- Revit (cópia salva 22h43, 55,8 MB, também em `OneDrive\...\ENTREGAS CLAUDE\`): 16 584 peças, 0 não modulares,
+  0 colisões/invasões, 394 nós sem amarração (eram 558), 2 395 em vermelho (eram 3 193); 37 aberturas deslocadas,
+  5 porta-janelas estreitadas (311/301), 15 correções de 1 cm.
+- Pendente (decisão de projeto): 23 paredes curtas demais para porta + 34 cm de boneca nos dois lados (§88.9).
