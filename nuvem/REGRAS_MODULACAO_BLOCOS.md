@@ -13014,3 +13014,17 @@ itens, e o planejador de abertura (item 1) no fluxo do botão.
   compensadores entre nós T a 60 cm (poço/armário a 505/765 do corredor; limpo seria 75) e os B19 no meio vêm daí.
   Zerar compensador e B19 no meio do pano exige **mudança de arquitetura** (cômodos movidos em 10–20 cm e as
   paredes de 122 dos banheiros alargadas ≥ 177 ou sem porta) — decisão do usuário.
+
+### 88.14 As corridas de B34 (3 × 34 numa fiada, 39 na outra) — causa medida e o que falta decidir (2026-10-26)
+
+**Print do usuário:** fiadas alternadas com `34|34|34` ao lado de uma jamba e, na fiada vizinha, `39|39|19|C04`
+— septo quebrado. É o arranjo da §60/§61 (corrida de B34 para fechar um vão não modular sem compensador).
+**Causa:** o vão entre a jamba e a face do nó vizinho não é múltiplo de 20 (ex.: 85, 55, 50, 75, 45, 25, 20 cm).
+Auditoria de vãos (`scratchpad/bay_audit.py`, 330 vãos): **~70 vãos jamba→face fora da grade** em 30 paredes,
+embora a boneca do lado do canto já esteja em 40 — porque o nó **intermediário** (T de outra parede) não entrou na
+regra ≡ 15 (mod 20) da 88.11, e quando entra (todos os nós consecutivos) o sistema tem **24 pares de eixos em
+conflito** mesmo só nas paredes com abertura: (28075↔28130), (28620↔29005), (29165↔29240), (29840↔29995),
+(30550↔30720), (31050↔31205), (31595↔31980), (32085↔32135/32395) e os pares horizontais do corredor/poço.
+**Conclusão:** não há correção de motor nem de posição de abertura que elimine as corridas de B34 sem mover esses
+eixos (cômodos) em 10–20 cm, escolhendo em cada ciclo qual parede absorve a diferença. **Decisão de projeto
+pendente.** Enquanto isso, a regra 88.12-3 (B34 só em par vertical) fica como gate pendente de código.
