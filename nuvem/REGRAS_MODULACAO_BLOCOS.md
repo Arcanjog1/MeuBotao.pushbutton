@@ -12968,3 +12968,25 @@ de 20 antes de resolver. **Pendência de projeto:** portas de 91 (11 un.) → 81
   13 eixos movem 5 cm (9 verticais, 4 horizontais). Falta espaço em 14 paredes: closets de 169 cm (+6 → próxima
   grade) e as 10 paredes de 122 cm dos banheiros com porta 81 (**faltam 51–56 cm**). Larguras fora da grade: 11
   portas de 91 e 2 porta-janelas de 311 (estreitadas na 88.9) → 301 ou 321. **Decisões de projeto pendentes.**
+
+### 88.12 REGRA OBRIGATÓRIA (correção do usuário, 2026-10-26, prints da fachada e das paredes internas): janela desloca para o septo, nenhum B19 no meio do pano, B34 só em par vertical — DOCUMENTADO, pendência de código
+
+**Palavras do usuário:** "a ideia é que as janelas sejam levemente deslocadas para que os septos se mantenham
+alinhados nos blocos nas laterais delas; não posso ter o uso do meio bloco no meio da modulação da parede, pois quebra
+o prisma; e não posso ter uma fiada apenas de 34 sem que a de cima ou a de baixo seja de 34, pois quando uso os blocos
+de 34 os seus septos menores têm que ter outro septo menor para manter o alinhamento".
+
+**Regras (amarração — registro obrigatório):**
+1. **Abertura segue a modulação, não o contrário.** A posição da janela/porta é ajustada (poucos cm) para que as
+   peças das laterais sejam blocos inteiros com septos alinhados fiada a fiada — é a coordenação de 20 cm da 88.10/88.11
+   aplicada à abertura (jambas na grade do pano).
+2. **B19 (meio bloco) nunca no meio do pano.** Só em fechamento de ponta de parede/jamba quando a própria grade pede
+   (§85 já restringia; aqui vira proibição no meio). Um B19 interno quebra o prisma: seu septo não encontra par acima.
+3. **B34 só em par vertical.** Uma fiada com B34 numa posição exige B34 (ou peça com o mesmo septo reduzido) na
+   fiada imediatamente acima **ou** abaixo, na mesma posição — o septo menor do B34 precisa de outro septo menor
+   alinhado. Fiada isolada de B34 (34 em cima de 39, 39 em cima de 34) é erro, mesmo que a modulação "feche".
+4. Compensador no meio do pano continua proibido (88.10).
+
+**Medição a fazer no resultado (gate pendente):** contagem de B19 fora das pontas, de B34 sem B34 vizinho vertical
+na mesma posição, de C09/C04 fora de nó. **Pendência de código:** validador + gate de materialização para os três
+itens, e o planejador de abertura (item 1) no fluxo do botão.

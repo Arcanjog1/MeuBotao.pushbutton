@@ -261,3 +261,11 @@ Nó sem B34/B54 válido nunca sai preenchido com C09/C04 (`JUNCTION_UNRESOLVED_F
 não é saída aceitável): ou resolve, ou fica vazio e bloqueia a criação. Prismas
 (septos) alinhados em toda a altura é gate, não aviso. Medido no DONA FRANCISCA:
 558 C09 em 56 nós, 220 pares parede×banda sem alinhamento vertical.
+
+## Prisma contínuo: janela desloca, B19 nunca no meio, B34 em par vertical (REGRAS §88.10–§88.12 — REGRA OBRIGATÓRIA do usuário, 2026-10-26; pendência de código)
+
+Abertura ajusta a posição para a grade de 20 do pano (jamba = face interna + 20k,
+≥ 40; entre aberturas 20k − 1; largura ≡ 1 mod 20; parede com abertura entre nós
+tem eixo-a-eixo ≡ 15 mod 20). B19 só em fechamento; B34 só com B34 acima ou
+abaixo na mesma posição; nenhum C09/C04 fora de nó. Septo (furo) alinhado em
+toda a altura é a condição — se a modulação "fecha" mas quebra o prisma, está errada.
