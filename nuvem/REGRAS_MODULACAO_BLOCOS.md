@@ -13028,3 +13028,17 @@ conflito** mesmo só nas paredes com abertura: (28075↔28130), (28620↔29005),
 **Conclusão:** não há correção de motor nem de posição de abertura que elimine as corridas de B34 sem mover esses
 eixos (cômodos) em 10–20 cm, escolhendo em cada ciclo qual parede absorve a diferença. **Decisão de projeto
 pendente.** Enquanto isso, a regra 88.12-3 (B34 só em par vertical) fica como gate pendente de código.
+
+### 88.15 Rodada com limite de 10 cm (2026-10-26, pedido: "pode alterar até 10 cm, mas só em último caso")
+
+- O usuário removeu 10 portas de 81 (ficaram 89 aberturas). Otimizador `scratchpad/optimize_grid.py`: resíduos dos
+  eixos com restrição ≡ 15 (mod 20) entre nós consecutivos das paredes **com abertura**, fachadas fixas, |move| ≤ 10,
+  custo = violações × 1000 + soma dos deslocamentos (busca local + recozimento, 400 reinícios).
+- Resultado: 15 eixos verticais e 2 horizontais movidos (5–10 cm, 120 cm no total); **18 arestas continuam
+  violadas** (7 pares de eixos: 28230↔29005, 31205↔31980, 29165↔29240, 29760↔29840, 31050↔31205, 28075↔28130,
+  32085↔32135 e 965↔1310) — precisam de mais de 10 cm. Com a restrição em **todas** as paredes (também as sem
+  abertura, onde o motor hoje põe C04/C09/B19 entre T's a 60–80 cm): 24 + 33 violações — fora do alcance de 10 cm.
+- Relançado: 15 854 peças, 0 colisões, amarrações de nó faltando **69** (189 → 69), 16 trechos não modulares e 64
+  invasões de vão (todos nas paredes curtas de porta: 254/169/434 e entradas de 91 em 125 cm), compensadores fora
+  de nó 1 065, B19 no meio 788, B34 sem par vertical 2 529 — as três últimas vêm das paredes **sem** abertura com
+  T's a 60–80 cm (poço/armário a 60 do corredor, closets) e só mudam com cômodos movidos > 10 cm.
