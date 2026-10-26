@@ -12924,3 +12924,47 @@ boneca até a face do nó (ou até a abertura vizinha) dos dois lados; alvo 40 c
   3 193 → 2 395; compensadores de nó pulados pelo gate 88.7 (nós ficam vazios). Arquivo salvo e copiado para
   `OneDrive\Área de Trabalho\BANCO DE DADOS PROJETOS\ENTREGAS CLAUDE\`. Os 394 restantes são as 23 paredes acima
   (decisão de projeto) mais nós com o mesmo problema vistos do outro braço.
+
+### 88.10 REGRA OBRIGATÓRIA (correção do usuário, 2026-10-26): prisma contínuo do piso ao topo e nenhum compensador no meio da parede — DOCUMENTADO, pendência de código/projeto
+
+**Palavras do usuário (prints da cópia DONA FRANCISCA):** "tem esses compensadores nessas paredes, estão completamente
+errados, e muitos blocos estão tendo o prisma quebrado; preciso que siga o alinhamento dos septos dos blocos — se eu
+tenho um bloco de 34 na primeira e segunda fiada, a ideia é que isso se mantenha até a última".
+
+**O que os prints mostram:** (a) faixas verticais de C09/C04 (rosa/marrom) encostadas nas jambas das janelas,
+alternando entre as fiadas — a "faixa de compensação na jamba" da **§84**; (b) a banda da janela (peitoril→verga)
+com composição diferente da banda de baixo e da de cima → septos (furos) desalinhados entre bandas; (c) coluna de
+C09/C04 ainda em alguns nós T (razão ≠ `JUNCTION_UNRESOLVED_FILL`, p.ex. `T_INTERSECTION_INCOMING_DEGRADED`),
+que o gate da 88.7 não pega.
+
+**A regra (prevalece sobre a §84 e sobre a exceção de banda da §18.4):**
+1. O par de fiadas (A/B) definido nas duas primeiras fiadas **se repete até a última** em toda a parede: a banda de
+   abertura só **remove** as peças dentro do vão (e põe a canaleta de verga/contraverga); fora do vão as peças são
+   as mesmas das fiadas de baixo. Septo (furo) alinhado em toda a altura é condição de prisma.
+2. **Nenhum compensador (C09/C04) no meio da parede** — nem na jamba, nem ao lado de nó. A §84 (faixa alinhada de
+   compensador na jamba) deixa de ser aceitável como resultado; vira só diagnóstico de que a abertura está fora da
+   grade.
+3. Consequência geométrica: a abertura tem de nascer na **grade de 20 cm do pano**: boneca da face interna do nó até
+   a jamba múltipla de 20 (≥ 40), largura ≡ 1 (mod 20) (41/61/81/101/121/321 — **91 não**), e entre duas aberturas
+   vão de parede ≡ 19 (mod 20). Medição no motor: 88.11.
+
+**CONFLITO registrado:** a §84 foi uma correção do usuário em 2026-09-28 para o BUTANTÃ (humano usa compensador
+alinhado na jamba quando o vão não é modular). Vale agora a orientação mais recente: a solução é **mover a abertura
+para a grade**, não compensar; a §84 fica como comportamento de último recurso **sinalizado**, nunca silencioso.
+**Pendência de código:** (i) gate de "compensador no meio da parede" e de "septo desalinhado entre bandas" na
+materialização, com o mesmo tratamento da 88.7 (parede retida); (ii) o planejador de aberturas deve propor a grade
+de 20 antes de resolver. **Pendência de projeto:** portas de 91 (11 un.) → 81 ou 101; as 23 paredes curtas da 88.9.
+
+### 88.11 Medição da coordenação de 20 cm (2026-10-26)
+
+- Oráculo (sala 640 × 320, 13 fiadas, CHANNEL): porta 81 / janela 121 com boneca da face interna em 40/60/80/100
+  → `non_modular` 0 e amarração completa; em 34/54/74/94 → 2 trechos não modulares. Os 48 compensadores que sobram
+  em todos os casos vêm do **outro** lado da abertura (640 − 14 − boneca − largura ≢ 0 mod 20): os DOIS lados têm de
+  cair na grade.
+- Dedução confirmada pela conta das juntas: jambas esquerdas ≡ face interna (mod 20), direitas ≡ face + 1; entre
+  aberturas 20k − 1; então uma parede **com abertura entre dois nós** precisa de **eixo-a-eixo ≡ 15 (mod 20)**
+  (interno ≡ 1). Parede sem abertura é livre na grade de 5 (B34/B54 absorvem).
+- Planta DONA FRANCISCA (`scratchpad/grid20_plan.py`): o sistema de resíduos dos eixos **fecha sem conflito** —
+  13 eixos movem 5 cm (9 verticais, 4 horizontais). Falta espaço em 14 paredes: closets de 169 cm (+6 → próxima
+  grade) e as 10 paredes de 122 cm dos banheiros com porta 81 (**faltam 51–56 cm**). Larguras fora da grade: 11
+  portas de 91 e 2 porta-janelas de 311 (estreitadas na 88.9) → 301 ou 321. **Decisões de projeto pendentes.**
