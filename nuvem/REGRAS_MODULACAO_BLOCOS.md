@@ -12990,3 +12990,27 @@ de 34 os seus septos menores têm que ter outro septo menor para manter o alinha
 **Medição a fazer no resultado (gate pendente):** contagem de B19 fora das pontas, de B34 sem B34 vizinho vertical
 na mesma posição, de C09/C04 fora de nó. **Pendência de código:** validador + gate de materialização para os três
 itens, e o planejador de abertura (item 1) no fluxo do botão.
+
+### 88.13 Rodada da grade de 20 na cópia (2026-10-26) — resultado, dois incidentes e o limite da planta
+
+- **Aplicado:** resíduos dos eixos das paredes com abertura (13 eixos, 5 cm), 85 aberturas na grade do pano, 2
+  porta-janelas 311 → 321. Resultado antes dos incidentes: amarrações de nó faltando **558 → 4**, 0 colisões, 1
+  trecho não modular — a coordenação de 20 cm resolve os nós.
+- **Incidente 1 — exclusão silenciosa ao alargar porta para 101:** a família `Abertura de janela para paredes de
+  blocos` não aceita `Largura_abertura = 101`; ao gravar o valor o Revit **apagou as 10 portas** de entrada dos
+  apartamentos sem erro (mesmo mecanismo da §… `MoveElement`/IsValidObject). Regra de bancada: depois de qualquer
+  `Set`/`MoveElement` em abertura, conferir `IsValidObject` e `Regenerate()` dentro da transação; largura nova só
+  após testar numa cópia descartável. As 10 portas foram recriadas (91) por cópia da porta do W40.
+- **Incidente 2 — abertura fora da parede (PROIBIDO, correção do usuário):** o planejador da grade pôs a jamba a
+  40 cm da face sem conferir o lado direito; em 15 paredes curtas a porta saiu do pano. Correção `c13`: toda
+  abertura tem as duas jambas dentro de `[início + 14, fim − 14]`; se não cabe boneca 40 + largura + 40, centra no
+  vão. **Regra de bancada obrigatória: nenhum script move abertura sem essa conferência.** 99 aberturas, 0 fora.
+- **Rodada final (portas de volta):** 16 146 peças criadas, 0 não modulares, 0 colisões, 64 invasões de vão
+  (peças puladas pelo gate 48 nas paredes curtas), amarrações faltando **189** (as paredes de 122/169/434 com porta
+  sem boneca de 34), compensadores fora de nó **1 524**, B19 no meio do pano **761**, B34 sem par vertical **2 232**
+  (métricas `scratchpad/metrics_88_12.py`; a de B34 ainda conta os B34 de canto como "isolados" — superestima).
+- **Limite medido da planta:** a regra geral "nós consecutivos a ≡ 15 (mod 20)" (88.11, estendida a toda parede)
+  **não tem solução** nesta planta: 14 pares de eixos verticais e 18 horizontais em conflito (ciclos de cômodos). Os
+  compensadores entre nós T a 60 cm (poço/armário a 505/765 do corredor; limpo seria 75) e os B19 no meio vêm daí.
+  Zerar compensador e B19 no meio do pano exige **mudança de arquitetura** (cômodos movidos em 10–20 cm e as
+  paredes de 122 dos banheiros alargadas ≥ 177 ou sem porta) — decisão do usuário.
